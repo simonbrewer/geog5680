@@ -1,0 +1,37 @@
+---
+title: "Analyzing the Iris Dataset"
+author: "Simon Brewer"
+date: "5/3/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+We're going to analyze Fisher's data (again)
+
+```{r}
+iris = read.csv("iris.csv")
+iris$Species = factor(iris$Species)
+head(iris)
+```
+
+```{r}
+cor(iris$Petal.Length, iris$Petal.Width)
+```
+
+Let's add a simple plot
+
+```{r}
+plot(iris$Petal.Length, iris$Petal.Width, 
+     pch = 16, col = iris$Species)
+```
+
+```{r echo=FALSE}
+hist(iris$Petal.Length, col = "green")
+```
+
+

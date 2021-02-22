@@ -1,0 +1,261 @@
+---
+title: "GEOG 5680 6680 05 Control statements"
+author: | 
+  | Simon Brewer
+  | Geography Department
+  | University of Utah
+date: "April 28, 2020"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    fig_caption: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(png)
+library(grid)
+```
+
+## Introduction
+
+In this lab, we'll explore some control statements that can be used to define the way that your script and analysis work. If you have previously used any programming language you will be familar with these. You may find that you only rarely use these in R, as it is often possible to work with an entire vector or matrix, rather than iterating over every value. It is still worth having some idea about how these work as they can come in useful.
+
+Remember to use RStudio's script editor (top left panel) to enter your commands and then copy-paste these to the console when you are ready. This will keep a copy of the commands that you can save and return to. 
+
+Before starting, remember to create a working directory (e.g. `module05`). Next download the files for today's lab from the Canvas page and move them to this directory. You'll need the following file:
+
+- *giss_temp.csv*
+
+Then start RStudio, and change your working directory from the [Session] menu > [Set working directory] > [Choose directory...]. Remember to check that R can see the files by running the `list.files()` command. 
+
+## Looping in R
+As a programming language, R has functions for loops and control flows. Looping, in particular, is a powerful extension that allows you to repeat or automate certain tasks. Further, looping, when combined with R's indexing functions provides an excellent way to perform the same set of analyses on different subsets of a dataset. 
+
+There are two main commands for looping: `for()` which repeats a set of commands a number of times, and `while()` which repeats a set of commands until a condition is reached. 
+
+## `for` loops
+
+The format of the `for()` function is: `for (counter in start:stop)`. The counter (or iterator) is an integer which is increased by one each time the loop runs. 'start' gives the intial value of the counter, and 'stop' gives the final value. The commands which are to be run within the loop are then enclosed within curly brackets `{...}`. 
+
+Open a new script in the editor and star by adding a very simple loop:
+```{r}
+for (i in 1:12) {
+  print(i)
+}
+```
+The loop starts at 1 and runs to 12, and the iterator *i* is printed then increased by one at each step. 
+
+### Plotting monthly global temperatures
+Now let's do something a little more useful. The file *giss_temp.csv* contains a dataset of global temperature *anomalies* from 1881 to 2012 (anomalies are differences in temperature from a reference average temperature). We will use this file to plot out the trends in temperature for each month for the 130 years of record (i.e. plot all the Januaries, then all the Febuaries, etc). We will start by plotting these progressively to a figure, then extend this produce individual figures for each month, simlpy by looping through the months. 
+
+Open a new script in the editor, and add the following text to read the file. 
+```{r results='hide'}
+giss = read.csv("giss_temp.csv")
+```
+Save and run the script, then use `ls()` to make sure that the new data frame 'giss' has been created, and `names()` and `str()` to examine the data frame. 
+
+We'll start by plotting the entire time series (you can do this in the script file or directly in the console). On the x-axis we use the variable 'DecDate' which is decimal dates (e.g. January 1881 is 1881.042):
+```{r}
+plot(giss$DecDate, giss$TempAnom,
+     xlab="Year", ylab="T Anomaly")
+```
+
+And we can see the well known temperature changes of the past century. So now, we want to plot this on a month-by-month basis. The steps we will need to take are:
+
+1. Loop through the twelve months
+2. In each loop - select all values in a given month
+3. Plot these values with their corresponding years
+4. Add appropriate labels
+5. (Added a smoothed line)
+6. Save the figure to a file (otherwise it will be overwritten by the next plot)
+
+We will start with steps 1 to 3. In your script, add the following code after the files has been read in:
+
+```{r fig.keep='none'}
+for (i in 1:12) {
+  monthID = which(giss$Month == i)
+  plot(giss$Year[monthID], giss$TempAnom[monthID],
+     xlab="Year", ylab="T Anomaly")
+}
+```
+The only new thing here, is that we create an index 'monthID', which in each loop contains the row numbers of every observation corresponding to a particular month. This can then be used to plot only the values of the columns 'Year' and 'TempAnom' corresponding to a given month. Save and run the plot. 
+
+### Saving images to files
+When we run the script, it goes too fast to see the individual plots, so we will instead save the figures as graphic files. R can write to several different figure formats, and here we will write to a PNG file. To understand how this works, it is important to understand the idea of a graphics *device*. In R, this simply refers to the current figure that is being created, and includes the graphical window which is used by default, and different file types. If we want to write a figure to a different device that the default one, we have to first open that device (here using the `png()` function), plot our figure, then close the device (using the `dev.off()` function). 
+
+Change the loop in your script so it reads as follows:
+```{r eval=FALSE}
+for (i in 1:12) {
+  monthID = which(giss$Month == i)
+  png("giss_temp.png")
+  plot(giss$Year[monthID], giss$TempAnom[monthID],
+     xlab="Year", ylab="Temperature Anomaly")
+  dev.off()
+}
+```
+Save and run. 
+
+If you check your working directory, you will see that a figure has been created called 'giss_temp.png'. Unfortunately, this only contains the last figure, as it is overwritten in each iteration of the loop. To avoid this, we need to change the name of file to include the loop number. We can do this using the `paste()` function introduced earlier. In the loop, change the `png()` function to:
+```{r eval=FALSE}
+png(paste("giss_temp_",i,".png",sep=''))
+```
+Here we paste the first part of the file name as a character string to the current loop number (taken from the iterator *i*). This is then pasted to the extension ".png" for a png file. The option `sep=''` tells `paste()` to not insert spaces between the various parts (it will by default). Save and run, and you should now see 12 png files in your directory, one per month.
+
+### Tweaking the plots
+At this point, we need to clean up the plots. We will start by adding a meaningful title. Here, we can take advantage of a built-in dataset called 'month.abb', a vector of abbreviated month names. To see this, type in the console:
+```{r}
+month.abb
+```
+We can again use the `paste()` function with this to add a title "`Month` temperature anomaly". Change the `plot()` function as follows:
+
+```{r eval=FALSE}
+plot(giss$Year[monthID], giss$TempAnom[monthID],
+     xlab="Year", ylab="Temperature Anomaly",
+     main=paste(month.abb[i],"temp. anom."))
+```
+With reference to the previous lab also do the following:
+
+- Change the x and y labels
+- Change the symbol and symbol color
+
+Finally, we will set the extent of the y-limit, so that it is the same for all plots, to help in comparing different months. For this, we need to set the `ylim` option in the `plot()` function to the minimum and maximum of the temperature dataset. This option requires two values, so we could get these using the `min()` and `max()` functions, but a simpler way is to use `range()`, which gives us the two values we need. 
+````{r eval=FALSE}
+plot(giss$Year[monthID], giss$TempAnom[monthID],
+     xlab="Year", ylab="Temperature Anomaly",
+     main=paste(month.abb[i],"temp. anom."), ylim=range(giss$TempAnom))
+```
+Save and run, and check that the figures are made with a fixed y-extent. 
+
+## `while` loops
+
+`while` loops allow a program to continue to run until some value has been reached. These are quite widely used in optimization, where we want to keep reducing the error of a model until it no longer changes by more than some small amount. We'll use a simpler example here with the GISS temperature data to see which is the first year where the temperature anomalies are above zero. Open a new script and enter the following code. I've given this as the entire block here, and the description of what it is doing is given below:
+
+```{r eval=FALSE}
+giss = read.csv("giss_temp.csv")
+
+mythreshold = 0
+myyear = min(giss$Year)
+ann_temp = -99999
+while (ann_temp < mythreshold) {
+  mon_temp = giss$TempAnom[giss$Year == myyear]
+  ann_temp = mean(mon_temp)
+  myyear = myyear + 1
+}
+print(myyear - 1)
+```
+
+- The first thing we do is to read in the data. While you have already read in this file, it is always good practice to read in data at the start of your script in case you restart R and the memory is cleared
+- We then set the threshold that we want to use to stop the loop (here if the annual temperature exceeds this value we stop)
+= We set the starting year (`myyear`) to the first (minimum) year
+- We create variable `ann_temp` to hold the current annual average temperature anomaly. We set this to an arbitrary high negative value
+- We then start the loop. This does the following
+    - First it checks to see if the existing annual temperature is above the threshold. If it is not, then the loop continues. If the value is above the threshold then the loop stops.
+    - Next, we extract the 12 monthly values for the current year
+    - These are then averaged to give the annual value (`ann_temp`)
+    - We then increase the year by one, so that in the next iteration, we will use temperatures for the next year
+- Finally we print out the year when annual values were above zero. Why do you think we subtract 1 from this?
+
+## `if` statements
+
+The final control function we will look at is the `if` statement. This allows your script to operate differently, depending on the value of some variable. There are a couple of ways to use this in R, so we will illustrate both of them here. We'll continue to use the GISS temperature data. The goal will be to calculate the average annual temperature values for the entire dataset, then create a vector of colors (`red` if above zero and `blue` if below). 
+
+In the first example, we will use a `for` loop to iterate across all years, then use an `if` statement to set the color. As in the previous example, the full code block is given here and an explanation follows:
+
+```{r}
+giss = read.csv("giss_temp.csv")
+
+allyears = unique(giss$Year)
+nyears = length(allyears)
+
+ann_temp = mycols = rep(NA, nyears)
+
+for (i in 1:nyears) {
+  ann_temp[i] = mean(giss$TempAnom[giss$Year == allyears[i]])
+  if (ann_temp[i] > 0) {
+    mycols[i] = "red"
+  } else {
+    mycols[i] = "blue"
+  }
+}
+plot(allyears, ann_temp, type = 'h', 
+     col = mycols, lwd = 3,
+     xlab= "Year", ylab = "T anomaly")
+```
+
+In this code we do the following:
+
+- Load the data
+- Make a vector of the years in the dataset. We use the `unique()` function as there are twelve repeats of each year (one per month)
+- Create a variable to store the number of years
+- Create two blank vectors, one to store the annual temperature anomaly (`ann_temp`) and one to store the color (`mycols`). These are filled with `NA`s to start, and will be the same length as the number of years
+- Next we use a `for` loop to iterate across every year
+- We extract all the monthly values for that year and average them. This is stored in the `ann_temp` vector
+- We then use the `if` statement to see if this value is above or below zero. 
+    - If it is above zero, this triggers the first statement, setting the color to `red` in the vector of colors
+    - It is is below (or equal) to zero the `else` statement is triggered amd the color is set to `blue`
+- Once the `for` loop is finished, we plot the values as a histogram line plot, where the color of each vertical line is taken from the vector of colors
+
+While this demonstrates how to use an `if` statement in a scrip, this is a very simple example. In general you would use `if` statements with more complex conditions and loops. A much easier way to achieve the same results would be to use the `ifelse()` function. This uses a conditional statement with a single vector, and then creates a new vector with two possible values, depending on whether or not the condition was met. The example below uses the statement:
+
+```{r eval=FALSE}
+mycols = ifelse(ann_temp > 0, "orange", "purple")
+```
+
+This examines each value in `ann_temp` and creates a new vector (`mycols`), where the values are `orange` is the `ann_temp` is above zero, and `purple` if below.  
+
+We can then use a combination of the `tapply()` function and the `ifelse()` statement to repeat the above loop in just 5 lines:
+
+- Load the data
+- Make vector of unique year values
+- Use `tapply()` to estimate annual values
+- Use `ifelse()` to create the vector of colors (we've used different colors here to distingush from the previous example)
+- Plot the outcome
+
+```{r}
+giss = read.csv("giss_temp.csv")
+allyears = unique(giss$Year)
+ann_temp = tapply(giss$TempAnom, giss$Year, mean)
+mycols = ifelse(ann_temp > 0, "orange", "purple")
+plot(allyears, ann_temp, type = 'h', 
+     col = mycols, lwd = 3,
+     xlab= "Year", ylab = "T anomaly")
+```
+
+## Exercises
+
+The exercise for this lab is in two parts. For each you will need to submit a) your R script and b) a Word document containing the figures you have made. Figures can be directly exported from RStudio by clicking the [Export] button or by writing directly to a PDF file (see above for an example). 
+
+### Part 1: `for` loops
+
+In the first section, you made a `for` loop to plot select time series by month (i.e. all the Januaries, Februaries, etc):
+```{r eval=FALSE}
+for (i in 1:12) {
+  monthID = which(giss$Month == i)
+  png(paste("giss_temp_",i,".png",sep=''))
+  plot(giss$Year[monthID], giss$TempAnom[monthID],
+     xlab="Year", ylab="Temperature Anomaly")
+  dev.off()
+}
+```
+
+Modify this loop so that it loops acrss all years instead of months, and plots the 12 monthly time values for each year. Your answer should consist of your R script (you do not need to submit all the figures that this will make). 
+
+### Part 2: `if` statements
+
+In the last section, we used an `ifelse` statement to generate a vector of colors dependent on whether the temperature anomaly was above or below zero. How would you change this to generate a vector of colors dependent on whether the year is before 1980, or after 1980? Make a new figure that uses these colors. Your answer should consist of the R script and the figure you made. 
+
+## Files used in lab
+
+### *giss_temp.csv*
+
+GISS northern hemisphere temperature dataset: 
+
+| Column header | Variable |
+| --- | --- |
+| Year | Year |
+| Month | Month |
+| DecDate | Decimal data |
+| TempAnom | Temperature anomaly |
+|  | Deviation from long-term mean ('61-'90) |

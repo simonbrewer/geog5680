@@ -1,0 +1,18 @@
+\frametitle{Predictions}
+\begin{itemize}
+  \item Predicting for new values of $x$
+  \item Requires new data frame containing variable(s) with the same name(s) as the independent $x$'s used in model
+  \item \texttt{interval} parameter estimates 95\% prediction CIs
+\end{itemize}
+\begin{knitrout}\scriptsize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{newtemp} \hlkwb{=} \hlkwd{data.frame}\hlstd{(}\hlkwc{temp.c} \hlstd{=} \hlnum{70} \hlopt{-} \hlkwd{mean}\hlstd{(Icecream}\hlopt{$}\hlstd{temp))}
+\hlkwd{predict}\hlstd{(fit,} \hlkwc{newdata} \hlstd{= newtemp,} \hlkwc{interval} \hlstd{=} \hlstr{"pred"}\hlstd{)}
+\end{alltt}
+\begin{verbatim}
+##         fit     lwr       upr
+## 1 0.4243771 0.33403 0.5147241
+\end{verbatim}
+\end{kframe}
+\end{knitrout}

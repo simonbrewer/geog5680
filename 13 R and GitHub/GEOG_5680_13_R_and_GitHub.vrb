@@ -1,0 +1,9 @@
+\frametitle{How do you set it up?}
+To get R/Rstudio talking to GitHub you will need to do the following:
+\begin{itemize}
+  \item	Create a GitHub account (it's free...)
+  \item	Install/upgrade R and RStudio
+  \item	Install git
+  \item	Setup github
+  \item	Connect R to GitHub
+\end{itemize}

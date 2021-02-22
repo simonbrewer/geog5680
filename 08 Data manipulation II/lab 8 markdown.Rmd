@@ -1,0 +1,71 @@
+---
+title: "Lab 8 dplyr"
+author: "Zachary Higgins"
+date: "6/7/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Introduction
+
+I will be analyzing the theoph dataset for this lab
+```{R}
+library(dplyr)
+theoph = read.csv("theoph.csv")
+theoph$Subject = factor(theoph$Subject)
+
+head(theoph)
+```
+Using select() make a new data frame containing only the subject ID, the Time and conc variables
+```{R}
+theo = select(theoph,Subject,Time,conc)
+
+head(theo)
+```
+Using a combination of select() and distinct() make a new data frame containing a single row for each subject with the subject ID, their weight and the dose
+```{R}
+theo2= theoph%>%
+  select(Subject,Wt,Dose)%>%
+  distinct(Subject, .keep_all = TRUE)
+
+head(theo2)
+```
+Using filter() make a new data frame containing only the first subject
+```{R}
+sub1 = filter(theoph, Subject == 1)
+
+head(sub1)
+```
+Using filter() make a new data frame containing only the four subjects
+```{R}
+sub1_4= filter(theoph, Subject %in% c(1,2,3,4))
+
+head(sub1_4)
+```
+Using group_by(), calculate the average concentration per subject (across all times)
+```{R}
+theoph%>%
+  group_by(Subject)%>%
+  summarise(avgConc = mean(conc))
+```
+Using filter() make a new data frame containing only the first subjectand pipe this to ggplot() to make a line plot with Time on the x-axis and conc on the y-axis
+```{R}
+library(ggplot2)
+sub1%>%
+  ggplot(aes(Time,conc))+ geom_line()+ ggtitle("Subject 1")
+```
+Using select() to extract just the Subject, Time and conc variables and pipe this to ggplot() to make a line plot with Time on the x-axis, conc on the y-axis and the lines colored by subject
+```{R}
+subjPlot= select(theoph,Subject,Time,conc)
+
+subjPlot%>%
+  ggplot(aes(x=Time,y=conc,col=Subject),)+ geom_line()
+```
+Using select() to extract just the Subject, Time and conc variables and pipe this to ggplot to make a line plot with Time on the x-axis, conc on the y-axis and faceted by the subject ID
+```{R}
+subjPlot%>%
+  ggplot(aes(x=Time,y=conc))+ geom_line()+facet_wrap(Subject)
+```

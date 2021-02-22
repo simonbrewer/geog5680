@@ -1,0 +1,20 @@
+\frametitle{ANOVA}
+\begin{itemize}
+    \item We can use the R function \texttt{aov()} to calculate ANOVA for the three groups. Note this uses the model syntax ($\sim$)
+  \end{itemize}
+\begin{knitrout}\scriptsize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{roles} \hlkwb{=} \hlkwd{c}\hlstd{(}\hlkwd{rep}\hlstd{(}\hlstr{"Aragorn"}\hlstd{,}\hlnum{50}\hlstd{),} \hlkwd{rep}\hlstd{(}\hlstr{"Gimli"}\hlstd{,}\hlnum{50}\hlstd{),} \hlkwd{rep}\hlstd{(}\hlstr{"Legolas"}\hlstd{,}\hlnum{50}\hlstd{))}
+\hlstd{heights} \hlkwb{=} \hlkwd{c}\hlstd{(aragorn, gimli, legolas)}
+\hlkwd{summary}\hlstd{(}\hlkwd{aov}\hlstd{(heights} \hlopt{~} \hlstd{roles))}
+\end{alltt}
+\begin{verbatim}
+##              Df Sum Sq Mean Sq F value Pr(>F)
+## roles         2  42767   21383   181.5 <2e-16 ***
+## Residuals   147  17319     118
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+\end{kframe}
+\end{knitrout}

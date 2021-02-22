@@ -1,0 +1,6 @@
+\beamer@sectionintoc {1}{Statistical modeling}{2}{0}{1}
+\beamer@sectionintoc {2}{Diagnostics}{8}{0}{2}
+\beamer@subsectionintoc {2}{1}{ANOVA}{10}{0}{2}
+\beamer@subsectionintoc {2}{2}{Residuals and Diagnostic Plots}{13}{0}{2}
+\beamer@sectionintoc {3}{Predictions}{16}{0}{3}
+\beamer@sectionintoc {4}{Extensions to basic model}{17}{0}{4}

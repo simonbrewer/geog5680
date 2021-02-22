@@ -1,0 +1,391 @@
+\documentclass[aspectratio=169]{beamer}
+\usepackage{multirow}
+%\usecolortheme{beaver}
+%\usecolortheme[RGB={129,3,3}]{structure}
+\usetheme{CambridgeUS}
+\usecolortheme{seahorse}
+
+% Standard header (will need to change date!)
+\title[GEOG 5680 Summer '20]{GEOG 5680\\Introduction to R}
+\subtitle[Intro]{12: Spatial data in R}
+\author[S. Brewer]{Simon Brewer}
+\institute[Univ. Utah]{
+  Geography Department\\
+  University of Utah\\
+  Salt Lake City, Utah 84112\\[1ex]
+  \texttt{simon.brewer@geog.utah.edu}
+}
+\date[May 06, 2020]{May 06, 2020}
+
+\begin{document}
+<<setup, include=FALSE>>=
+#opts_chunk$set(size = 'footnotesize')
+opts_chunk$set(size = 'scriptsize')
+@
+
+%--- the titlepage frame -------------------------%
+\begin{frame}
+  \titlepage
+\end{frame}
+
+% \section{Objectives}
+% %--- Slide 3 ----------------%
+% \begin{frame}{Objectives}
+% \begin{itemize}
+%   \item Spatial data in R
+%   \item Vector data (points, lines, polygons)
+%   \item Raster data
+% \end{itemize}
+% \end{frame}
+% 
+\section{Spatial data in R}
+%--- Slide ----------------%
+\begin{frame}[fragile]{Spatial data in R}
+From Cressie (1991):
+\begin{itemize}
+  \item	Point processes (occurrences of events in space)
+	\item	Areal or lattice --- discrete variation of values aggregated across regular or irregular regions
+	\item	Geostatistical --- continuous variation of values
+\end{itemize}
+Expressed as geometric features: 
+\begin{itemize}
+	\item Points/Lines/Areal units (polygons)/Regular grids
+	\item In a plane, or, less frequently, on a surface
+\end{itemize}
+<<echo=FALSE, include=FALSE>>=
+require(maptools)
+require(rgdal)
+require(classInt)
+require(RColorBrewer)
+@
+\end{frame}
+
+%--- Slide ----------------%
+\begin{frame}{Spatial data in R}
+Packages in R dealing with spatial data (from Bivand et al)
+\begin{center}
+	\includegraphics[width=0.9\textwidth]{./images/spatialdataclasses.png}
+\end{center}
+\end{frame}
+
+%--- Slide ----------------%
+\begin{frame}{Spatial data in R}
+Key spatial packages:
+\begin{itemize}
+	\item \textbf{sp} provides the class information to deal with spatial data
+	\item \textbf{raster} --- raster data and analysis
+	\item \textbf{rgdal}: GDAL API interface for import/export
+	\item \textbf{rgeos}: spatial geometry operations
+	\item \textbf{maptools} provides many functions for read and transforming data
+\end{itemize}
+Most other spatial analysis packages depend on these!
+\begin{itemize}
+	\item \textbf{spatstat} --- analysis of spatial point processes
+	\item \textbf{spatdep} --- spatial dependency
+	\item \textbf{spatialreg} --- spatial regression models
+	\item \textbf{gstat} --- geostatistical analysis
+\end{itemize}
+\end{frame}
+
+\subsection{Spatial* data classes}
+%--- Slide ----------------%
+\begin{frame}{Spatial data classes in \textbf{sp}}
+\begin{tabular}{|l|l|}
+	\hline
+	Class & Data type \\
+	\hline
+	SpatialPoints & Point locations \\
+	SpatialPointsDataFrame & Point locations with values\\
+	SpatialPolygons & Polygon vertices \\
+	SpatialPolygonsDataFrame & Polygons with values\\
+	SpatialGrid & Grid or raster \\
+	SpatialGridDataFrame & Grid/raster with values\\
+	SpatialPixel & Grid stored as point data  \\
+	SpatialPixelDataFrame & Point grid with values\\
+	\hline
+\end{tabular}
+\\Note also \texttt{ppp} (point process objects) in \textbf{spatstat} package
+\end{frame}
+
+%--- Slide ----------------%
+\begin{frame}{Spatial data classes in \textbf{sp}}
+Each Spatial* object has a series of \emph{slots} which contain both data and metadata about the object:
+\begin{itemize}
+	\item Coordinates
+	\item Bounding box
+	\item Coordinate Reference System
+	\item Grid topology
+	\item Data
+	  \begin{itemize}
+	    \item This is a data frame and can be acessed with indices, conditional selection, \texttt{subset()}
+	  \end{itemize}
+	\item Etc$\ldots$
+\end{itemize}
+\end{frame}
+
+%--- Slide ----------------%
+\begin{frame}[fragile]{Spatial data classes in \textbf{sp}}
+<<echo=TRUE>>=
+oregon = readOGR("oregon/orotl.shp")
+slotNames(oregon)
+slot(oregon,"data")
+@
+\end{frame}
+
+%--- Slide ----------------%
+\begin{frame}[fragile]{Spatial data classes in \textbf{sp}}
+<<echo=TRUE>>=
+names(oregon)
+oregon$NAME
+subset(oregon, NAME=="Columbia")
+@
+\end{frame}
+
+% %--- Slide ----------------%
+% \begin{frame}[fragile]{Map projections}
+% <<echo=FALSE>>=
+% orotl <- readShapeSpatial("oregon/orotl.shp")
+% ortann <- readShapeSpatial("oregon/oregontann.shp")
+% @
+% \begin{itemize}
+% 	\item The library \textbf{sp} has a function to provide projection information for Spatial* objects
+% 	\item Requires a `proj4string': a list of parameters relevant to the projection
+% 	\item Set projection to Lon/Lat
+% \end{itemize}
+% <<echo=TRUE>>=
+% slot(oregon,"proj4string")
+% proj4string(oregon) = CRS("+proj=longlat +ellps=WGS84")
+% slot(oregon,"proj4string")
+% @
+% \end{frame}
+% 
+% %--- Slide ----------------%
+% \begin{frame}[fragile]{Map projections}
+% \begin{itemize}
+% 	\item More complex example (Albers Equal Area), uses the \texttt{spTransform()} function to reproject (from the \textbf{rgdal} library)
+% 	\item Based on PROJ.4 library
+% \end{itemize}
+% <<echo=TRUE, tidy=FALSE>>=
+% slot(oregon,"proj4string")
+% aea.proj <- "+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=37.5 +lon_0=-110 
+% 	+x_0=0 +y_0=0 +ellps=GRS80 +datum=NAD83 +units=m"
+% oregon.proj <- spTransform(oregon, CRS(aea.proj))
+% slot(oregon.proj,"proj4string")
+% @
+% <<echo=FALSE, tidy=FALSE>>=
+% proj4string(ortann) = CRS("+proj=longlat +ellps=WGS84")
+% ortann.proj <- spTransform(ortann, CRS(aea.proj))
+% @
+% \end{frame}
+% 
+% %--- Slide ----------------%
+% \begin{frame}[fragile]{Map projections}
+% \begin{columns}
+% 	\begin{column}{0.5\textwidth}
+% <<echo=FALSE>>=
+% plot(oregon, main="Long/Lat projection", axes=T)
+% plot(ortann, add=TRUE, pch=16)
+% @
+% 	\end{column}
+% 	\begin{column}{0.5\textwidth}
+% <<echo=FALSE>>=
+% plot(oregon.proj, main="Albers equal area projection", axes=T)
+% plot(ortann.proj, add=TRUE, pch=16)
+% @
+% 	\end{column}
+% \end{columns}
+% \end{frame}
+% 
+% %--- Slide ----------------%
+% \begin{frame}[fragile]{Visualizing spatial data}
+% \begin{columns}
+% 	\begin{column}{0.5\textwidth}
+% 		\begin{itemize}
+% 			\item \textbf{sp} package provides function \texttt{spplot()}, which will provide basic plots of most Spatial* objects
+% 			\item More flexibility can be obtained by using plot() functions
+% 		\end{itemize}
+% 	\end{column}
+% 	\begin{column}{0.5\textwidth}
+% <<echo=FALSE>>=
+% NY8 = readShapePoly("./NY_data/NY8_utm18.shp")
+% @
+% <<echo=FALSE, cache=FALSE>>=
+% spplot(NY8,"POP8")
+% @
+% 	\end{column}
+% \end{columns}
+% \end{frame}
+% 
+% %--- Slide ----------------%
+% \begin{frame}[fragile]{Visualizing spatial data}
+% \begin{columns}
+% 	\begin{column}{0.5\textwidth}
+% 		\begin{itemize}
+% 			\item Uses two packages \textbf{classInt} and \textbf{RColorBrewer}
+% 			\item \textbf{classInt} uses a data set to define intervals for color classes (quantiles, fixed, etc)
+% 			\item \textbf{RColorBrewer} provides color scales for maps	
+% 		\end{itemize}
+% 	\end{column}
+% 	\begin{column}{0.5\textwidth}
+% <<echo=FALSE>>=
+% display.brewer.all()
+% @
+% 	\end{column}
+% \end{columns}
+% \end{frame}
+% 
+% %--- Slide ----------------%
+% \begin{frame}[fragile]{Visualizing spatial data}
+% \begin{columns}
+% 	\begin{column}{0.5\textwidth}
+% <<echo=FALSE>>=
+% ppt <- read.csv("swiss_ppt.csv")
+% swiss.sp <- SpatialPointsDataFrame(cbind(ppt$x, ppt$y),data.frame(ppt=ppt$ppt,elev=ppt$elev))
+% swiss.bord <- readShapeSpatial("borders/borders.shp")
+% 
+% nclr = 8
+% plotvar <- swiss.sp$ppt
+% class <- classIntervals(plotvar, nclr, style = "quantile",
+% dataPrecision = 2)
+% plotclr <- brewer.pal(nclr, "GnBu")
+% colcode <- findColours(class, plotclr, digits = 3)
+% 
+% plot(swiss.sp, col = colcode, pch=16, axes = T)
+% plot(swiss.sp, pch=1, add=T)
+% plot(swiss.bord, add=T)
+% title(main = "Swiss Precipitation Data")
+% legend("topleft", legend = names(attr(colcode, "table")), fill = attr(colcode, "palette"), cex = 0.8)
+% @
+% 	\end{column}
+% 	\begin{column}{0.5\textwidth}
+% <<echo=FALSE>>=
+% swiss.dem <- read.asciigrid("swiss_dem.grd",colname='elev')
+% swiss.dem <- as(swiss.dem,'SpatialPixelsDataFrame')
+% nclr <- 9
+% plotvar <- swiss.dem$elev
+% class <- classIntervals(plotvar, nclr, style = "quantile", dataPrecision = 2)
+% plotclr <- rev(brewer.pal(nclr, "YlGn"))
+% colcode <- findColours(class, plotclr, digits = 3)
+% image(swiss.dem, col=plotclr, axes=T, breaks=class$brks)
+% title(main = "Swiss 1km DEM")
+% legend("topleft", legend = names(attr(colcode,"table")), 
+%   fill = attr(colcode, "palette"), cex=0.8)
+% @
+% 	\end{column}
+% \end{columns}
+% \end{frame}
+% 
+% %--- Slide ----------------%
+% \begin{frame}{Data import/export}
+% \begin{itemize}
+% 	\item \textbf{maptools} package
+% 	\item Allows import and export of shapefiles
+% 	\item \texttt{readShapeSpatial()} and \texttt{writeSpatialShape()}
+% 	\item Also \texttt{readShapePoly()}, \texttt{readShapeLines()}, etc
+% 	\item NB --- work best with Spatial*DataFrame objects
+% 	\item Also has tools for converting to/from classes
+% \end{itemize}
+% \end{frame}
+% 
+% % %--- Slide ----------------%
+% % \begin{frame}{Data import/export}
+% % \begin{itemize}
+% % 	\item \textbf{rgdal} package (uses GDAL/OGR library)
+% % 	\item Allows import and export of most raster formats (ArcInfo/GeoTIFF/ESRI/Most RS images)
+% % 	\item See also \texttt{readAsciiGrid()} in \textbf{maptools} (reads ESRI grids)
+% % 	\item \textbf{raster} package (large files), \textbf{ncdf} package, \textbf{shapefile} package
+% % 
+% % \end{itemize}
+% % \end{frame}
+% % 
+% %--- Slide ----------------%
+% \begin{frame}{Writing to kml files}
+% \texttt{kmlPoints()} function in \textbf{maptools} package:
+% \begin{center}
+% 	\includegraphics[width=0.8\textwidth]{./images/kmlexample.png}
+% \end{center}
+% \end{frame}
+% 
+\subsection{Raster data}
+%--- Slide ----------------%
+\begin{frame}{Raster data}
+\begin{itemize}
+  \item Area divided into regular cells or pixels with associated values
+  \item Used extensively with environmental data (climate, soils, RS images, etc)
+  \item Often large data files
+	\item \textbf{raster} package
+	\item Allows import and export of most widely used raster data formats
+	\item Includes functions for raster algebra and analysis
+	\item Can work of disk, avoiding memory limits
+\end{itemize}
+\end{frame}
+
+%--- Slide ----------------%
+\begin{frame}[fragile]{Raster data}
+<<message=FALSE>>=
+library(raster)
+r = raster("air.mon.ltm.nc", varname="air")
+r
+@
+\end{frame}
+
+%--- Slide ----------------%
+\begin{frame}[fragile]{Raster data}
+<<echo=FALSE, message=FALSE>>=
+library(maps)
+@
+<<echo=FALSE, message=FALSE, fig.width=6, fig.height=3.75>>=
+r = rotate(r)
+my.pal <- rev(brewer.pal(n = 9, name = "RdYlBu"))
+plot(r, main="NCEP NCAR January LTM Tair", col=my.pal)
+map(add=TRUE)
+@
+\end{frame}
+
+% %--- Slide ----------------%
+% \begin{frame}[fragile]{Visualizing spatial data}
+% \begin{columns}
+% 	\begin{column}{0.5\textwidth}
+% 		\begin{itemize}
+% 			\item Extraction by regions or shapefiles
+% 			\item Summary statistics, correlations
+% 			\item Raster algebra, spatial statistics
+% 			\item Multi-dimensional `stacks'
+% 			\item Improved visualization with \textbf{rasterVis}
+% 		\end{itemize}
+% 	\end{column}
+% 	\begin{column}{0.5\textwidth}
+% <<echo=FALSE, message=FALSE, cache=TRUE>>=
+% library(raster)
+% library(RColorBrewer)
+% myext = extent(c(-130,-60,25,50))
+% for (i in 1:12) {
+%   r = rotate(raster("air.mon.ltm.nc", varname="air", band=i))
+%   r = crop(r, myext)
+%   if (i == 1) {
+%     r.stk = stack(r)
+%   } else {
+%     r.stk = stack(r.stk, r)
+%   }
+% }
+% 
+% #plot(r.stk, main=paste("NCAR NCEP", month.abb), zlim=c(-20,30))
+% library(rasterVis)
+% us48 = readShapeSpatial("states_21basic/states.shp")
+% levelplot(r.stk, names.attr=month.abb, contour=TRUE,
+%           par.settings=rasterTheme(region=rev(brewer.pal(9, 'PuOr')))) +
+%   layer(sp.polygons(us48))
+% @
+% 	\end{column}
+% \end{columns}
+% \end{frame}
+% 
+% %--- Slide ----------------%
+% \begin{frame}{Next Class}
+% \begin{itemize}
+%   \item Lab: Spatial data in R
+%   \item 0502: Web applications with R and Shiny
+% \end{itemize}
+% \end{frame}
+% 
+\end{document}

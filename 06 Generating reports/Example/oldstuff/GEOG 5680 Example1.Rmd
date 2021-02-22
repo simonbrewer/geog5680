@@ -1,0 +1,39 @@
+GEOG 5680 Example 
+========================================================
+
+## Introduction 
+We are doing some exploratory statistics on the Fisher Iris dataset. Start by reading the file:
+```{r}
+iris = read.csv("iris.csv")
+```
+
+### Summary statistics
+Calculate summary stats on all columns:
+```{r}
+summary(iris)
+```
+
+### Make a plot
+Just a scatterplot:
+```{r}
+plot(iris$Sepal.Length, iris$Sepal.Width, 
+     col=iris$Species, pch=16)
+```
+And a histogram:
+```{r}
+hist(iris$Sepal.Length, col="darkorange")
+```
+### Correlations
+Start this with a list
+- Correlation only the variables
+- These are columns 1 to 4
+```{r}
+cor(iris[,1:4])
+```
+
+Be aware of [correlations][Correlation]!
+
+### Discussion
+Well, we have found out lots of things about the Iris. Flowers with wide petals tend to have long petals. Who knew?
+
+[Correlation]: http://xkcd.com/552/

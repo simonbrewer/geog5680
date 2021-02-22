@@ -1,0 +1,36 @@
+\frametitle{Data frames for ggplot2}
+\begin{columns}
+  \begin{column}{0.50\textwidth}
+Short/fat table: good for presenting results
+\begin{tabular}{ l | c r }
+  \hline
+   & TreatA & TreatB \\
+  \hline
+  Jane Smith & - & 2 \\
+  John Doe & 16 & 11 \\
+  Mary Jones & 3 & 1 \\
+  \hline
+\end{tabular}
+\end{column}
+  \begin{column}{0.5\textwidth}
+Tall/thin dataframe: preferred for plotting
+\begin{tabular}{ l | c | r }
+  \hline
+  Name & Treat & Result \\
+  \hline
+  Jane Smith & a & - \\
+  John Doe & a & 16 \\
+  Mary Jones & a & 3 \\
+  Jane Smith & b & 2 \\
+  John Doe & b & 11 \\
+  Mary Jones & b & 1 \\
+  \hline
+\end{tabular}
+
+\end{column}
+\end{columns}
+\begin{itemize}
+  \item Support package \textbf{reshape2} includes functions to transform between these layouts
+  \item \texttt{cast}: thin data frame to table
+  \item \texttt{melt}: table to thin data frame
+\end{itemize}

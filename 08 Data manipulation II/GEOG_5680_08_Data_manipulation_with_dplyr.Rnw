@@ -1,0 +1,204 @@
+\documentclass[aspectratio=169]{beamer}
+\usepackage{multirow}
+%\usecolortheme{beaver}
+%\usecolortheme[RGB={129,3,3}]{structure}
+\usetheme{CambridgeUS}
+\usecolortheme{seahorse}
+
+% Standard header (will need to change date!)
+\title[GEOG 5680 Summer '20]{GEOG 5680\\Introduction to R}
+\subtitle[dpylr]{08: Data manipulation with dplyr}
+\author[S. Brewer]{Simon Brewer}
+\institute[Univ. Utah]{
+  Geography Department\\
+  University of Utah\\
+  Salt Lake City, Utah 84112\\[1ex]
+  \texttt{simon.brewer@geog.utah.edu}
+}
+\date[May 04, 2020]{May 04, 2020}
+
+\begin{document}
+<<setup, include=FALSE>>=
+#opts_chunk$set(size = 'footnotesize')
+opts_chunk$set(size = 'scriptsize')
+@
+
+%--- the titlepage frame -------------------------%
+\begin{frame}
+  \titlepage
+\end{frame}
+
+% \section{Objectives}
+% %--- Slide 3 ----------------%
+% \begin{frame}{Objectives}
+% \begin{itemize}
+%   \item Introduce the tidyverse
+%   \item Split-apply-combine
+%   \item The \textbf{dplyr} package
+% \end{itemize}
+% \end{frame}
+
+\section{Tidyverse}
+%--- Slide ----------------%
+\begin{frame}{Tidyverse}
+\begin{itemize}
+	\item Set of packages developed by Hadley Wickham and RStudio for data science
+	\item Designed to cover the main steps of data analysis: data import, manipulation, transformation, visualization and modeling
+\end{itemize}
+\begin{center}
+	\includegraphics[width=0.75\textwidth]{./images/data-science}
+\end{center}
+\end{frame}
+
+%--- Slide ----------------%
+\begin{frame}{Tidyverse}
+\begin{columns}
+  \begin{column}{0.6\textwidth}
+    \begin{itemize}
+    	\item \textbf{ggplot2}: visualization
+    	\item \textbf{dplyr}: manipulation
+    	\item \textbf{tidyr}: tidying
+    	\item \textbf{purrr}: functional programming
+    	\item \textbf{tibble}: improved data frames
+    	\item \textbf{stringr}: string manipulation
+    	\item \textbf{forcat}: factor manipulation
+    \end{itemize}
+	\end{column}
+	\begin{column}{0.4\textwidth}
+  \begin{center}
+  	\includegraphics[width=0.75\textwidth]{./images/r4ds}
+  \end{center}
+\end{column}
+\end{columns}
+\end{frame}
+
+%--- Slide ----------------%
+\begin{frame}{Data structure semantics}
+\begin{itemize}
+	\item Data manipulation of data frames (or tibbles)
+	\item Data frame consists of \emph{observations} (rows) and \emph{variables} (columns)
+	\item Each combination of observations and variables has a \emph{value}
+	\item Each variable is one of R's modes (numeric, factor, etc.)
+\end{itemize}
+\begin{center}
+	\includegraphics[width=0.85\textwidth]{./images/data-semantics}
+\end{center}
+\end{frame}
+
+\section{Split-apply-combine}
+%--- Slide ----------------%
+\begin{frame}{Split-apply-combine}
+\begin{itemize}
+	\item Common approach to data analysis
+	\item ``break up a big problem into manageable pieces, operate on each piece independently and then put all the pieces back together''
+  \begin{itemize}
+  	\item Group-wise ranking or standardization
+  	\item Creating data summaries or marginal means
+  	\item Fitting models to individual panels of data
+  \end{itemize}
+  \item Analogous to the map-reduce strategy in parallel processing
+\end{itemize}
+\end{frame}
+
+\section{\textbf{dplyr}}
+%--- Slide ----------------%
+\begin{frame}{\textbf{dplyr}}
+\begin{itemize}
+	\item The \textbf{dplyr} package contains tools for this approach
+	\item Set of functions that can be combined to provide full workflow
+  \begin{itemize}
+  	\item \texttt{filter}: subset or remove observations (rows)
+  	\item \texttt{select}: subset or remove variables (columns)
+  	\item \texttt{mutate}: modify or creaate new variable
+  	\item \texttt{summarize}: aggregate multiple values (e.g. mean or sum)
+  	\item \texttt{group\_by}: divide dataset according to one or more factor(s)
+  	\item \texttt{arrange}: order the observations
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+%--- Slide ----------------%
+\begin{frame}[fragile]{\textbf{dplyr}}
+<<echo=FALSE, message=FALSE>>=
+library(dplyr)
+library(ggplot2)
+gap = read.csv("gapminderData5.csv")
+@
+<<echo=TRUE>>=
+filter(gap, lifeExp < 29)
+filter(gap, country == "Rwanda", year > 1979)
+@
+\end{frame}
+
+%--- Slide ----------------%
+\begin{frame}[fragile]{\textbf{dplyr}}
+<<echo=TRUE>>=
+select(gap, year, lifeExp)
+@
+\end{frame}
+
+%--- Slide ----------------%
+\begin{frame}{The pipe}
+    \begin{itemize}
+      \item Based on the concept of Unix pipes that allow commands to be chained together
+    	\item The \textbf{magrittr} package introduced a similar concept to R
+    	\item Allows the output of one function to be passed to the next
+    	\item Syntax is `\%\textgreater\%'
+    	\item Works with many base R functions, but integrates well with \textbf{dplyr}
+    \end{itemize}
+  \begin{center}
+  	\includegraphics[width=0.4\textwidth]{./images/MagrittePipe}
+  \end{center}
+\end{frame}
+
+%--- Slide ----------------%
+\begin{frame}[fragile]{\textbf{dplyr}}
+<<echo=TRUE>>=
+gap %>% filter(country == "Rwanda", year > 1979)
+gap %>% 
+  filter(country == "Rwanda", year > 1979) %>%
+  select(country, pop)
+@
+\end{frame}
+
+%--- Slide ----------------%
+\begin{frame}[fragile]{Split-apply-combine with \textbf{dplyr}}
+Step 1: split using \texttt{group\_by}
+<<echo=TRUE>>=
+gap %>% 
+  group_by(continent) 
+@
+\end{frame}
+
+%--- Slide ----------------%
+\begin{frame}[fragile]{Split-apply-combine with \textbf{dplyr}}
+Steps 2 and 3: apply a function (here summarize the mean life expectancy) and combine into new data frame:
+<<echo=TRUE>>=
+gap %>% 
+  group_by(continent) %>%
+  summarize(meanLifeExp = mean(lifeExp))
+@
+\end{frame}
+
+%--- Slide ----------------%
+\begin{frame}[fragile]{Split-apply-combine with \textbf{dplyr}}
+Note that you can use multiple factors for grouping:
+<<echo=TRUE>>=
+gap %>% 
+  group_by(continent, year) %>%
+  summarize(meanLifeExp = mean(lifeExp))
+@
+\end{frame}
+
+%--- Slide ----------------%
+\begin{frame}[fragile]{Split-apply-combine with \textbf{dplyr}}
+Results can be piped to other functions (e.g. \texttt{ggplot}):
+<<echo=TRUE, fig.height=2.25, fig.width=5>>=
+gap %>% 
+  group_by(continent, year) %>%
+  summarize(meanLifeExp = mean(lifeExp)) %>%
+  ggplot(aes(x = year, y = meanLifeExp, col = continent)) + geom_line()
+@
+\end{frame}
+
+\end{document}

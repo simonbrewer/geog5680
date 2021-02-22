@@ -1,0 +1,205 @@
+---
+title: "GEOG 5680 6680 15c Making better maps with tmap"
+author: | 
+| Simon Brewer
+  | Geography Department
+  | University of Utah
+  date: "May 02, 2020"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    fig_caption: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(png)
+library(grid)
+```
+
+## Introduction
+
+In this lab we'll introduce the add-on package **tmap**, which can be used to produce much nicer maps than the default mapping functions in R. Before starting the lab, make sure this is installed. 
+
+Remember to use RStudio's script editor (top left panel) to enter your commands and then copy-paste these to the console when you are ready. This will keep a copy of the commands that you can save and return to. 
+
+Before starting, remember to create a working directory (e.g. `module15`). Next download the files for today's lab from the Canvas page and move them to this directory (unzip the compressed files). You'll need the following files:
+
+- *ipccScenario_1900_2100.csv*
+- *sids2.zip*
+- *Shiny_Example1.zip*
+
+Then start RStudio, and change your working directory from the [Session] menu > [Set working directory] > [Choose directory...]. Remember to check that R can see the files by running the `list.files()` command. 
+
+## The **tmap** package
+
+**tmap** works in a very similar way to **ggplot2**, by building a series of layers and map geometries and elements. In general, we start by using `tm_shape()` to identify the spatial object to be used, and add geometries are added, including filled polygons, borders and symbols. Finally, we can add legends, scale bars, etc. 
+
+```{r message=FALSE}
+library(tmap)
+```
+
+### Example 1: Syracuse data
+
+For the first example, we'll make some maps using the subset of the `NY8` shapefile for Syracuse (we used this in a previous module). Start by loading the packages we need (**rgdal** to read the data, and **tmap** to plot it):
+```{r}
+library(tmap)
+library(rgdal)
+```
+
+Next load the `NY8` data, and subset Syracuse. We'll also make a quick map with the default mappign function as a reference:
+
+```{r}
+NY8 <- readOGR("NY_data/NY8_utm18.shp")
+Syracuse <- NY8[NY8$AREANAME == "Syracuse city", ]
+spplot(Syracuse, "POP8")
+```
+
+Now let's do the same things with **tmap**. First, let's make a simple map showing the polygon outlines using `tm_borders()`:
+
+```{r fig.keep='none', message=FALSE}
+tm_shape(Syracuse) + tm_borders()
+```
+
+The function `tm_fill()` will then fill these using one of the variables in the Syracuse data set (POP8). Note that this automatically adds a legend within the frame of the figure:
+
+```{r fig.keep='high', message=FALSE}
+tm_shape(Syracuse) + tm_borders() + tm_fill("POP8")
+```
+
+The color scale can be changed by setting the `palette` argument in `tm_fill()`. This includes the ColorBrewer scales described in the previous module, and the algorithm used to define the intervals. For example, to use the 'Greens' palette with percentile breaks:
+
+```{r fig.keep='none', message=FALSE}
+tm_shape(Syracuse) + tm_borders() + 
+  tm_fill("POP8", palette = "Greens", style = "quantile")
+```
+
+If you want to see the full set of palettes that you can use, install the **tmaptools** package and run the following code (you may also need to install **shinyjs**):
+
+```{r eval=FALSE}
+tmaptools::palette_explorer()
+```
+
+Other map elements can be added. Here we add a longitude/latitude graticule with `tm_graticules()`, a north arrow and a line of text with the date the map was made. 
+
+```{r fig.keep='none', message=FALSE}
+tm_shape(Syracuse) + tm_graticules(col = "lightgray") + tm_borders() + 
+  tm_fill("POP8", palette = "Greens", style = "quantile") + 
+  tm_compass(position = c("left", "bottom")) + 
+  tm_credits("2019-10-19", position = c("right", "top"))
+```
+
+### Interactive
+
+**tmap** also has a function to produce a simple, interative map. This is done by changing the mode of operation from `plot` to `view`. The following code set the mode to interactive, makes a simple plot of the Syracuse data, and resets the mode to static plots. Note that these plots will be interactive in RStudio, and can also be embedded in the html files produced in R Markdown. At the end we reset the view back to static plots
+
+```{r fig.keep='none', eval=FALSE}
+tmap_mode("view")
+names(Syracuse)
+tm_shape(Syracuse) + tm_borders() + tm_fill("Cases", palette = "Greens")
+tmap_mode("plot")
+```
+
+### Example 2
+
+We'll next make some maps with the Western North American site data. We'll first need to read the data in and make a spatial object:
+
+```{r}
+wnaclim <- read.csv("WNAclimate.csv")
+llCRS <- CRS("+proj=longlat +ellps=WGS84")
+wnaclim.spdf <- SpatialPointsDataFrame(cbind(wnaclim$LONDD, 
+                                             wnaclim$LATDD), 
+                                       wnaclim, proj4string=llCRS)
+```
+
+Individual symbols can be plotted on a color scale using `tm_symbols`.
+```{r fig.keep='none', message=FALSE}
+tm_shape(wnaclim.spdf) + tm_symbols(col="Jan_Tmp")
+```
+
+This takes the same arguments as `tm_fill()` for the color palette. We'll use a red to blue color scale from RColorBrewer. The minus sign before the palette name reverses the order of the colors. As there is a large amount of overlap between the sites, we also add an alpha level to make the symbols transparent. 
+
+```{r fig.keep='none', message=FALSE}
+tm_shape(wnaclim.spdf) + 
+  tm_symbols(col="Jan_Tmp", alpha = 0.5, palette = "-RdBu") 
+```
+
+Next, load the Natural Earth shapefile of country boundaries. 
+
+```{r}
+countries <- readOGR("ne_50m_admin_0_countries/ne_50m_admin_0_countries.shp")
+```
+
+We can now add this to our existing plot. Note that as this is a different spatial object, we have to use `tm_shape()` a second time to reference this, then use `tm_borders()` to add the lines.
+
+```{r fig.keep='none', message=FALSE}
+tm_shape(wnaclim.spdf) + 
+  tm_symbols(col="Jan_Tmp", alpha = 0.75, palette = "-RdBu") + 
+  tm_shape(countries) + tm_borders(col="gray")
+```
+
+We can use `tm_style()` to alter the appearance of the map:
+```{r fig.keep='none', message=FALSE}
+tm_shape(wnaclim.spdf) + 
+  tm_symbols(col="Jan_Tmp", alpha = 0.75, palette = "-RdBu", size = 0.5) + 
+  tm_shape(countries) + tm_borders(col="gray") + tm_style("cobalt") 
+```
+
+Like **gplot2**, the figures that are made can be saved as R objects. Here we make two maps (January and July temperature) and save them as `tm1` and `tm2`
+```{r fig.keep='none', message=FALSE}
+tm1 <- tm_shape(wnaclim.spdf) + 
+  tm_symbols(col="Jan_Tmp", alpha = 0.75, palette = "-RdBu", size = 0.5) + 
+  tm_shape(countries) + tm_borders(col="gray") + tm_style("classic") 
+tm2 <- tm_shape(wnaclim.spdf) + 
+  tm_symbols(col="Jul_Tmp", alpha = 0.75, palette = "-RdBu", size = 0.5) + 
+  tm_shape(countries) + tm_borders(col="gray") + tm_style("classic") 
+```
+
+We can now use `tm_arrange()` to make a single figure with the two maps:
+
+```{r}
+tmap_arrange(tm1, tm2)
+```
+
+### Example 3
+
+In the final example, we'll make figures using the global air temperature dataset. Start by reading the data using the **raster** package (we also change the name of the layer, to reduce the amount of typing later on...).
+
+```{r fig.keep='none', message=FALSE}
+library(raster)
+r = raster("air.mon.ltm.nc", varname="air")
+r = rotate(r)
+names(r) <- "jan_tmp"
+```
+
+Now let's make a plot using `tm_raster()`, which again takes similar options for color palettes. We'll also add the country borders. 
+
+```{r eval=FALSE}
+tm_shape(r) + 
+  tm_raster("jan_tmp", style="fisher", palette="-RdBu") +
+  tm_shape(countries) + tm_borders() 
+```
+
+This throws an error about the projections. We'll simply set the projection of the raster `r` using the projection from the `countries` object
+
+```{r}
+proj4string(r) <- proj4string(countries)
+```
+
+And now remake the figure
+
+```{r fig.keep='high', message=FALSE, warning=FALSE}
+tm_shape(r) + 
+  tm_raster("jan_tmp", style="fisher", palette="-RdBu") +
+  tm_shape(countries) + tm_borders() 
+```
+
+We can improve this a little by moving the color legend outside of the plotting area. We'll increase the number of color classes to 9, and add a histogram showing the frequency of different values. 
+
+```{r fig.keep='high', message=FALSE, warning=FALSE}
+tm_shape(r) + 
+  tm_raster("jan_tmp", style="fisher", palette="-RdBu", legend.hist = TRUE, n = 9) +
+  tm_shape(countries) + tm_borders() + tm_layout(legend.outside = TRUE, 
+                                                 legend.outside.position = "left")
+```

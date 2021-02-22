@@ -1,0 +1,90 @@
+---
+title: "exercise11md"
+author: "Daniel Kirkegaard"
+date: "6/15/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# setwd("~/Documents/intro to R/exercise 11")
+getwd()
+list.files()
+require(data.table)
+```
+
+## Read in the data using fread
+```{r}
+fread("Temperature.csv")
+temp1 = fread("Temperature.csv")
+```
+
+## Extract all winter observations
+```{r}
+class(temp1)
+winter = temp1[Season == "winter"]
+```
+
+## Extract all winter observations for zone NC
+```{r}
+winter = temp1[Season == "winter", Area == "NC"]
+```
+
+## Select only the columns Area, Season and Temperature
+```{r}
+AST = c("Area", "Temperature", "Season")
+temp1[ , ..AST]
+```
+
+## Select only the columns Area and Temperature but only for winter observations
+```{r}
+WinterAT = c("Area", "Temperature")
+winter[ , ..WinterAT]
+```
+
+## Find the total number of observations in winter
+```{r}
+dim(winter)
+```
+
+## Calculate the mean temperature and mean salinity in winter (Note that there are missing values so will have to use na.rm = TRUE)
+```{r}
+wintmean = temp1[Season == 'winter',
+                .(meantemp = mean(Temperature, na.rm = TRUE),
+                  meansal = mean(Salinity, na.rm = TRUE))]
+wintmean
+```
+
+## Find the number of observations per station in winter
+```{r}
+table(winter$Station)
+```
+
+## Find the number of observations per station per season
+```{r}
+table(temp1$Station, temp1$Season)
+```
+
+## Estimate average temperatures by month
+```{r}
+meanmonthtemp = temp1[, .(meanmonthtemp = mean(Temperature, na.rm=TRUE)), by = Month]
+meanmonthtemp
+```
+
+## Estimate average temperatures by month by area
+```{r}
+meanmonthareatemp = temp1[, .(meanmonthareatemp = mean(Temperature, na.rm=TRUE)), by = .(Area, Month)]
+meanmonthareatemp
+```
+
+## Plot the output of the previous question using ggplot2 using the geom_line() geometry
+```{r}
+require(ggplot2)
+library(ggplot2)
+DKplot = ggplot(meanmonthareatemp, aes(x=Month, y=meanmonthareatemp, col= Area)) + ggtitle("Mean Monthly Temperature by Area") + scale_x_discrete(name = "Month", limits = c("1","2","3","4","5","6","7","8","9","10","11","12")) + scale_y_continuous(name = "Temperature")
+DKplot + geom_line(aes (y=meanmonthareatemp))
+```
+

@@ -1,0 +1,94 @@
+\documentclass[aspectratio=169]{beamer}
+\usepackage{multirow}
+%\usecolortheme{beaver}
+%\usecolortheme[RGB={129,3,3}]{structure}
+\usetheme{CambridgeUS}
+\usecolortheme{seahorse}
+
+% Standard header (will need to change date!)
+\title[GEOG 5680 Summer '20]{GEOG 5680\\Introduction to R}
+\subtitle[Intro]{13: R and GitHub}
+\author[S. Brewer]{Simon Brewer}
+\institute[Univ. Utah]{
+  Geography Department\\
+  University of Utah\\
+  Salt Lake City, Utah 84112\\[1ex]
+  \texttt{simon.brewer@geog.utah.edu}
+}
+\date[May 06, 2020]{May 06, 2020}
+
+\begin{document}
+<<setup, include=FALSE>>=
+#opts_chunk$set(size = 'footnotesize')
+opts_chunk$set(size = 'scriptsize')
+@
+
+%--- the titlepage frame -------------------------%
+\begin{frame}
+  \titlepage
+\end{frame}
+
+% \section{Objectives}
+% %--- Slide 3 ----------------%
+% \begin{frame}{Objectives}
+% \begin{itemize}
+%   \item Spatial data in R
+%   \item Vector data (points, lines, polygons)
+%   \item Raster data
+% \end{itemize}
+% \end{frame}
+% 
+\section{R and GitHub}
+%--- Slide ----------------%
+\begin{frame}[fragile]{What is git?}
+\begin{itemize}
+  \item	Version control system
+  \item	Manages a set of files in a *repository*
+  \item	Provides simple method for incremental backups
+  \item	System for collaboration and communication
+  \item	Tools for updating, tracking changes, bug notification and tracking, ...
+\end{itemize}
+\end{frame}
+
+%--- Slide ----------------%
+\begin{frame}[fragile]{Why use GitHub?}
+\begin{itemize}
+  \item	GitHub provides a hosting service for your repository (others include Bitbucket and Gitlab)
+  \item	Provides a frontend to your project as well as a cloud-based backup
+  \item	Makes it easy to share code (and retrieve your own code if your local copy is not working
+  \item	Used for the development of lots of R packages - you can use it to develop your own package
+\end{itemize}
+\end{frame}
+
+%--- Slide ----------------%
+\begin{frame}[fragile]{How do you set it up?}
+To get R/Rstudio talking to GitHub you will need to do the following:
+\begin{itemize}
+  \item	Create a GitHub account (it's free...)
+  \item	Install/upgrade R and RStudio
+  \item	Install git
+  \item	Setup github
+  \item	Connect R to GitHub
+\end{itemize}
+\end{frame}
+
+%--- Slide ----------------%
+\begin{frame}[fragile]{How do you set it up?}
+To get R/Rstudio talking to GitHub you will need to do the following:
+\begin{itemize}
+  \item	Create a GitHub account (it's free...)
+  \item	Install/upgrade R and RStudio
+  \item	Install git
+  \item	Setup github
+  \item	Connect R to GitHub
+\end{itemize}
+\end{frame}
+
+%--- Slide 15 ----------------%
+\begin{frame}{GitHub}
+	\begin{center}
+		\includegraphics[width=.85\textwidth]{./images/github2.png}
+	\end{center}
+\end{frame}
+
+\end{document}

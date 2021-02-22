@@ -1,0 +1,499 @@
+---
+title: "GEOG 5680 6680 14 R and Shiny"
+author: | 
+  | Simon Brewer
+  | Geography Department
+  | University of Utah
+date: "May 02, 2020"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    fig_caption: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(png)
+library(grid)
+```
+
+## Introduction
+
+In this lab we'll introduce the add-on package **shiny**, which allows you to build web and dashboard applications from R. Before starting the lab, make sure this is installed.
+
+Remember to use RStudio's script editor (top left panel) to enter your commands and then copy-paste these to the console when you are ready. This will keep a copy of the commands that you can save and return to. 
+
+Before starting, remember to create a working directory (e.g. `module14`). Next download the files for today's lab from the Canvas page and move them to this directory (unzip the compressed files). You'll need the following files:
+
+- *ipccScenario_1900_2100.csv*
+- *sids2.zip*
+- *Shiny_Example1.zip*
+
+Then start RStudio, and change your working directory from the [Session] menu > [Set working directory] > [Choose directory...]. Remember to check that R can see the files by running the `list.files()` command. 
+
+## A simple example
+
+We'll start with the simple example shown in the [R Shiny tutorial][tutID]. Download the zipfile *Shiny_Example1.zip* from Canvas and unzip this in your working directory. This will create a new directory called 'Example1, containing two R scripts, *ui.R* and *server.R*. While newer versions of R allow you to combine these into a single script, we will work with two has it helps enforce the difference between the script defining the web interface (*ui.R*), and the script which holds the server code and does the analysis (*server.R*). 
+
+The file *ui.R* has the following code:
+```{r eval=FALSE}
+library(shiny)
+
+# Define UI for application that draws a histogram
+shinyUI(fluidPage(
+
+  # Application title
+  titlePanel("Hello Shiny!"),
+
+  # Sidebar with a slider input for the number of bins
+  sidebarLayout(
+    sidebarPanel(
+      sliderInput("bins",
+                  "Number of bins:",
+                  min = 1,
+                  max = 50,
+                  value = 30)
+    ),
+
+    # Show a plot of the generated distribution
+    mainPanel(
+      plotOutput("distPlot")
+    )
+  )
+))
+```
+
+This script creates the user interface. Some things to note:
+
+- We need to load the **shiny** package
+- The interface is generated using the `shinyUI()` function, which can take a large number of parameters to alter the way the interface is set up. We add three main components:
+- We add a `titlePanel()` function to specify a header for the web page
+- We add a`sidebarPanel()`. This adds a sidebar, usually with various controls and widgets to alter the behavior of the application. Here it has a single slider, which control the number of bins used to make the histogram
+- We add a `mainPanel()`. This is the main panel of the application and is used to show the output, created using a function `plotOutput()`, which is specified in the server script
+
+Note that these are included in the function `fluidPage()`, which allows the interface to adapt to the size of any browser window. 
+
+
+The file *server.R* has the following code:
+```{r eval=FALSE}
+library(shiny)
+
+# Define server logic required to draw a histogram
+shinyServer(function(input, output) {
+
+  output$distPlot <- renderPlot({
+    x    <- faithful[, 2]  # Old Faithful Geyser data
+    bins <- seq(min(x), max(x), length.out = input$bins + 1)
+
+    # draw the histogram with the specified number of bins
+    hist(x, breaks = bins, col = 'darkgray', border = 'white')
+  })
+})
+```
+
+This script creates the local server. Some things to note:
+
+- We (again) need to load the **shiny** package
+- The server is generated using the `shinyServer()` function, which takes two parameters `input` and `output` (we'll look at these in more detail below). 
+- We use a function called `renderPlot` to create a figure (a histogram), which gets stored in `output$distPlot` and passed back to the user interface. 
+    - Note that in this function, we use a variable `input$bins` to set the number of bins. This is the variable that is set by the slider in the interface script
+
+### Running applications
+
+Make sure that the two scrips are saved and run the application. You can do this either by using the function `runApp()`, with the directory containing the scripts (you will need to make sure that the **shiny** library) loaded:
+
+```{r eval=FALSE}
+runApp('Example/')
+```
+
+Or by clicking on the 'Run App' button:
+
+```{r fig.width=1.5, fig.height=.5, echo=FALSE}
+img <- readPNG("images/runapp.png")
+grid.raster(img)
+```
+
+This will open a browser window showing the application. This is a very simple example, in which the the histogram should change in response to changes in the slider values. Note that there is a button 'Open in browser`, which will open this as an html page in your default browser. Note that all you see here is a local copy and instance of the application. At the end of this lab we will look at how to deploy this as a public website. 
+
+## Building your own app 1: The IPCC data
+
+We'll now go through the steps of building a different app to explore how this is put together. We will build an app to explore and plot the IPCC global temperature data used in a previous lab. Start by making a new directory called `ipcc_app`, and make the two scripts we need for the app (*ui.R* and *server.R*) in this directory. 
+
+Add the following framework code to *ui.R*:
+```{r eval=FALSE}
+library(shiny)
+shinyUI(fluidPage(
+
+))
+```
+
+Add the following framework code to *server.R*:
+```{r eval=FALSE}
+library(shiny)
+shinyServer(function(input, output) {
+
+})
+```
+
+In order to make sure that the framework is correct, start the app by clicking the 'Run app' button or using:
+```{r eval=FALSE}
+runApp("ipcc_app")
+```
+
+This will open the browser with a blank window, close this and continue. Now add the following components to the interface (in the `fluidPage()` function):
+```{r eval=FALSE}
+  titlePanel("IPCC Global Temperature"),
+  sidebarLayout(
+    sidebarPanel("Choose scenario:"
+    ),
+    mainPanel("Global temperature time series"
+    ), position="right"
+  )
+```
+
+We'll now add a widget to the sidebar to control our application. Start by moving the IPCC data file in a directory called `data` in the `ipcc_app` directory. Now load this and examine the file to remind yourself of the format and column names:
+
+```{r eval=FALSE}
+ipcc = read.csv("ipcc_app/data/ipccScenario_1900_2100.csv")
+names(ipcc)
+str(ipcc)
+```
+
+The IPCC data have 4 scenarios of future temperatures, and we will want to select one of these for the app. As we want to select only one, we will use a radio button, so add the following code to the `sidebarPanel()` function, after the text. Other widgets can be found [here][widID].
+
+```{r eval=FALSE}
+radioButtons("radio1", label = h3("IPCC AR4 Scenarios"),
+             choices = list("Commit" = "commit", 
+                            "B1" = "b1", 
+                            "A1B" = "a1b", 
+                            "A2" = "a2"), 
+             selected = "commit")
+```
+
+This provides a radio button called 'radio1' - this name is important as it allows us to refer to this choice from the server script. We add a set of four choices corresponding to the scenarios (with a corresponding code that can be used to select columns from the data file), and select the first by default. Run the app to check your code.
+
+We'll now start setting up the server script with a simple plot of the temperature data. Add the following code to the start of the script (we only need to load the data once):
+```{r eval=FALSE}
+ipcc = read.csv("./data/ipccScenario_1900_2100.csv")
+```
+
+Then add the following within the `shinyServer()` function to make the plot:
+```{r eval=FALSE}
+  output$timeplot <- renderPlot({
+    scenario = input$radio1
+    scenario_med = paste(scenario,"Med",sep='')
+    plot.df = data.frame(year = ipcc$yrs,
+                         temp = ipcc[,scenario_med])
+    plot(plot.df$year, plot.df$temp, type='l', xlab="Year", ylab="T (K)",
+         main=paste("Scenario",scenario), ylim=c(-1.5,3.5))
+  })
+```
+
+Some things to note here. We:
+
+- Create a new object in the `output` object called `timeplot`. This is the plot that we will pass back to the interface
+- Store the value of the radio button (the scenario code) as a new variable `scenario`
+- Use `paste()` to make the column name with the median value for that scenario
+- Make a new data frame for plotting with the year and that column
+- Make a standard R line plot
+
+Also note that the whole of this set of functions to make the plot is wrapped in the `renderPlot()` function. This is one of a set of 'reactive' functions in Shiny that are run *every* time one of the widgets on the interface page is changed. You can avoid using this, but then need a dedicated function on the interface to update the plot.
+
+The last thing to do is to add a place in the original script for the plot. This will go in the `mainPanel()` function, and we specify the object name (`timeplot`) that we want added to the page:
+```{r eval=FALSE}
+plotOutput("timeplot")
+```
+
+You should now have all the elements for the app to work. Save both scripts and launch the app and you should get the following:
+
+```{r fig.width=6.5, fig.height=4., echo=FALSE}
+img <- readPNG("images/ipcc_app.png")
+grid.raster(img)
+```
+
+### Extending the application
+
+We add a couple of small modifications to our app. First, we'll switch the standard R plot for a **ggplot2** plot, which will allow us to easily add the confidence limits from the file. As we are only changing the way in which the plots are made, we only need to change the *server.R* script. First add `library(ggplot2)` to the script to make sure the functions are loaded. Now modify the `shinyServer()` function to a) extract the lower and upper confidence limits and store these in the data frame:
+```{r eval=FALSE}
+    scenario_lo = paste(scenario,"Lo",sep='')
+    scenario_hi = paste(scenario,"Hi",sep='')
+    plot.df = data.frame(year = ipcc$yrs,
+                         temp = ipcc[,scenario_med],
+                         temp_lo = ipcc[,scenario_lo],
+                         temp_hi = ipcc[,scenario_hi])
+```
+And now replace the plot function with `ggplot`:
+```{r eval=FALSE}
+x = ggplot(plot.df, aes(x=year, y=temp)) + geom_line(col="red") 
+    x = x + geom_ribbon(aes(ymin=temp_lo, ymax=temp_hi), alpha=0.3, fill="red")
+    x = x + ggtitle(paste("Scenario",scenario))
+    print(x)
+```
+
+The second modification will be used to find which in which year the increase in global temperatures exceed a certain amount. This will require a new input (the threshold temperature), and new text output to be added to the interface, in addition to server code to find the year. 
+
+We'll start by modifying the server. Add the following to the `shinyServer()` function, following the `renderPlot()` function, as this is a separate output to be calculated and returned:
+```{r eval=FALSE}
+  output$thresholdyear <- renderPrint({
+    scenario = input$radio1
+    threshold_temp = input$num1
+    scenario_med = paste(scenario,"Med",sep='')
+    exyears = ipcc$yrs[which(ipcc[,scenario_med] > threshold_temp)]
+    if (length(exyears) >0) {
+      min_year=min(exyears)
+    } else {
+      min_year=NA
+    }
+    return(min_year)
+  })
+```
+
+You should be getting familiar with most of this code. Some notes:
+
+- We use `renderPrint()` instead of `renderPlot()` as the output is text
+- The year is found as the lowest year where temperatures are above the threshold
+- We check that at least one year over the threshold is found by checking the length of the `exyears` vector
+- We use `return()` to return the year to the interface
+
+In order for this to do something, we need to add both an input and output to the interface. Add the following three lines to the sidebarPanel function (after the radio buttons).
+
+```{r eval=FALSE}
+numericInput("num1", label = h3("Threshold temperature"), value = 1,
+             min=0, max=3, step=0.1),
+hr(),
+fluidRow(column(10, textOutput("thresholdyear")))
+```
+
+The first of these creates an variable in the `input` object called `num1`. This will contain the threshold temperature and will be passed to the server. We use a function `numericInput()` which allows us to restrict the range of possible inputs (here to between 0 and 3 with a step of 0.1). 
+
+The second is a function that creates a horizontal line in the sidebar, below the input.
+
+The third displays the variable `thresholdYear` which is returned from the server in the `output` object. There are three nested functions for formatting here which a) display the variable as text; b) places this in a column of width 10 and c) adds this to a `fluidRow` which allows the display to be modified according to the browser.
+
+Save and run, and try investigating the first year that global temperatures will be 0.5, 1 or 2 degrees above the long term mean.
+
+## Building your own app 2: North Carolina SIDS data
+
+In our second example, we will build an application to display some spatial data. We will use a shapefile of birth and SIDS information from North Carolina, and design an app that allows us to pick a variable and show its spatial distribution. One of the big differences with this new app is that the list of variables that can be plotted will be generated on the fly, rather than hard coded. 
+
+Start by creating a new directory (`sids_map`) in your current working directory. As before create the two scripts (*ui.R* and *server.R*) in this directory, and copy the basic framework into each of these (see the previous example). We'll also need to move the data into this directory. Earlier in the lab, you downloaded and unzipped the *sids2.zip* file, which should have created a directory called `sids2` with a shapefile (*sids2.shp*, etc.). Move this entire directory with all the files to the `sids_map` directory. 
+
+In the *ui.R* script add the following code:
+
+```{r eval=FALSE}
+titlePanel("North Carolina SIDS dataset"),
+sidebarLayout(
+  sidebarPanel(uiOutput("choose_variable")
+  ),
+  mainPanel(
+  ),
+  position="right"
+)
+```
+
+The main difference from the previous example is the function `uiOutput()`. This allows the server script to generate a widget, rather than it being coded directly in the interface script. In this case, it will take an object called `choose_variable` and render this on the interface. Also, we add a parameter to position the sidebar to the right of the main panel.
+
+In the *server.R* script add the following code before the `shinyServer()` function to load the packages we need and the shapefile:
+
+```{r eval=FALSE}
+library(shiny)
+library(rgdal)
+library(classInt)
+library(RColorBrewer)
+
+mapdata = readOGR("./sids2/sids2.shp")
+```
+
+
+Then add the following code in the `shinyServer()` function:
+
+```{r eval=FALSE}
+output$choose_variable <- renderUI({
+  # Get the data set with the appropriate name
+  colnames <- names(mapdata)
+  # Find columns with numeric data
+  numID = sapply(mapdata@data, is.numeric)
+  colnames = colnames[numID]
+  # Create the buttons and check the first by default
+  selectInput("select", "Choose variable", 
+              choices  = colnames,
+              selected = colnames[1])
+})
+```
+
+This code uses the function `renderUI()` to create the object `choose_variable` (the selection widget). This is stored in `output` and then gets passed back to the interface. In the function, we do the following:
+
+- Get a list of the variables names in `mapdata`
+- Find the subset of those variables that are numeric (we can't use this to plot categorical variables)
+- Use `selectInput()` to generate a drop-down selection list of those variables, with the first one selected
+
+Save and run the app. If it is working, we will now add some code to make the map. Rather than adding this to the server script, we will create a new script called *helpers.R*. This is frequently used as a way of keeping more complex analyses separate from the server script to improve readability. In this script, add the following code:
+
+```{r}
+make_map <- function(shp, variable, nclr, pal = "Greens") {
+  breaks.qt <- classIntervals(shp@data[,variable], nclr, style = "jenks")
+  plotclr <- brewer.pal(nclr, pal) 
+  spplot(shp, variable, col.regions = plotclr, col = "lightgray", 
+         at = breaks.qt$brks)
+}
+```
+
+This script, when run, will create a function called `make_map()`. This needs four inputs:
+
+- A Spatial*DataFrame object (here, taken from a shapefile)
+- The variable in the object to plot
+- The number of breaks to use in the color palette
+- The palette to use. This is one of the RColorBrewer palettes
+
+The rest of the code should be familiar from the lab on spatial data. Save this script in the `sids_map` directory.
+
+We need to load this function into the server script, which we can do with the `source()` command after the packages are loaded
+```{r eval=FALSE}
+source("helpers.R")
+```
+
+And finally we add a `renderPlot()` function following the `renderUI()` function in *server.R*, to create `map` as part of the server output:
+
+```{r eval=FALSE}
+output$map <- renderPlot({
+  if(is.null(input$select))
+    return()
+  make_map(mapdata, as.character(input$select), 
+           nclr=5, pal="Greens")
+})
+```
+
+This runs our `make_map()` function with the `mapdata` object (the shapefile), the selected variable name (held in `input$select`), and the Greens color palette with 5 colors. Finally we need to add a line to the `mainPanel()` function in the interface script to display our map:
+```{r eval=FALSE}
+plotOutput("map")
+```
+
+Save everything and run to get the following app. Try changing the selected variable:
+
+```{r fig.width=6.5, fig.height=4., echo=FALSE}
+img <- readPNG("images/sids_map.png")
+grid.raster(img)
+```
+
+### Extending the application
+
+As in the previous example, we'll add a couple of extensions to our basic mapping app. These will allow us to change the color palette used and to change the number of breaks used in the palette.
+
+To do this, we will need to add two new widgets to *ui.R* (after the `uiOutput()` function):
+```{r eval=FALSE}
+ selectInput("palette", label = h3("Select palette"), 
+             choices = list("Yellow/Orange/Red" = "YlOrRd", 
+                            "Blues" = "Blues", 
+                            "Greens" = "Greens", 
+                            "Purples" = "Purples", 
+                            "Greys" = "Greys"), 
+             selected = "Greens"),
+ numericInput("num1", label = h3("Number of breaks"), value = 5,
+              min=3, max=9, step=1)
+```
+
+The first of these gives a selection of possible RColorBrewer palettes to use (see the `display.brewer.all()` function for all possible choices). The selected value is stored in "palette" and passed to the server. The second provides a numeric list of breaks from 3 to 9 (default = 5). The selected value is stored in `num1` and passed to the server. 
+
+Now change the `make_map()` function in the server script to use these inputs:
+```{r eval=FALSE}
+make_map(mapdata, as.character(input$buttons), 
+         nclr=input$num1, pal=input$palette)
+```
+
+Save and re-run.
+
+Our second extension will involve the addition of a checkbox to choose whether or not to log-transform the data (particularly useful with right-skewed data). Add the following:
+
+In *ui.R* add a check box:
+```{r eval=FALSE}
+checkboxInput("checkbox", label = "Log-transform?", value = FALSE)
+```
+
+In *helpers.R* modify the function to include a parameter for log-transformation:
+```{r eval=FALSE}
+make_map <- function(shp, variable, nclr, pal="Greens", logtrans=FALSE) {
+```
+
+and add a test to the `make_map` function: if `logtrans=TRUE`, then log10 transform the selected variable (before making the map):
+```{r eval=FALSE}
+  if (logtrans) {
+    shp@data[,variable] <- log10(shp@data[,variable])
+  }
+```
+
+In *server.R* change the `make_map()` function
+```{r eval=FALSE}
+checkboxInput("checkbox", label = "Log-transform?", value = FALSE)
+```
+
+Save and run.
+
+## Deploying applications
+
+Once built, Shiny web applications can be deployed in one of two ways (at present), either using RStudio's public server or by setting up your own server. 
+
+[**Note that there is currently a problem with the latest version of R (4.0.0) in connecting to this service. This should be fixed fairly quickly**]
+
+### Shinyapps.io
+
+As part of the Shiny package, RStudio have set up a public web server to host R web applications at [shinyapps.io][sappID]. To use this, you will need to set up an account on the site, and follow the instructions to install the **rsconnect** package which provides functions to upload your application code, and to authorize the connection. You should only need to run the authorization once. 
+
+Once your account is set up, you can publish your application by either 
+
+- Clicking on the 'publish' button in the top right hand corner of the R browser window: 
+
+```{r fig.width=1., fig.height=.5, echo=FALSE}
+img <- readPNG("images/publish.png")
+grid.raster(img)
+```
+
+- Clicking the 'Publish' button next to the 'Run App' button in either the *ui.R* or *server.R* script
+- Use the `deployApp()` function with the name of directory containing the application
+
+The first time you do this, it will ask you to copy a *token* from the web site to your computer. This is simply to allow your computer to connect to the service (again you should only need to do this once). R will then go through the process of uploading the code and setting up the application on the site. You should see some output similar to the following, which will let you know that the application has been successfully deployed.
+
+```{r fig.width=5., fig.height=2.5, eecho=FALSE}
+img <- readPNG("images/deploy.png")
+grid.raster(img)
+```
+
+### Your own server
+
+Follow the instructions [here][sservID] to set up your own Shiny server.
+
+## Exercise
+
+The zipfile *covid19.zip* contains a Shiny app to visualize the number of COVID-19 cases per country over time. Download this file and unzip it into your current working directory. This should create a new folder `covid19` which contains the following files
+
+- *ui.R*
+- *server.R*
+- A `data` folder, containing two files
+    - *getData.R*
+    - *covid_dat.csv*
+    
+Change your working directory to this new folder, load the *ui.R* and *server.R* files, and run the app to get the following screen:
+
+```{r fig.width=5.5, fig.height=4.5, echo=FALSE}
+img <- readPNG("images/covidEx.png")
+grid.raster(img)
+```
+
+The app is designed to let you select a country and a variable to plot (e.g. number of deaths or cases), and it will then render this in the main window. While it should work out of the box, there are some problems with. For the exercise, you will need to fix this, then submit your code as well as a Word document with a screenshot of the working corrected app, and the answer to the first two questions below:
+
+- What are the parameters passed in the `input` list from the UI to the server? 
+- What are the parameters passed in the `output` list from the server to the UI?
+- Improve the interface by adding a better title
+- Add a more informative title to the figure, including the currently chosen country and variable
+- Make the plot a line plot, not points
+- Currently, the figure is always produced for the United States, irrespective of what is chosen from the country drop-down list. Fix the code to correct this
+- The COVID19 data also includes information on the number of tests performed by country (`tests`), as well as the number of hospitalizations (`hosp`). Modify the scripts to include these variables in app (i.e. make them available in the drop-down variable menu, and allow them to be plotted). Pay attention to how the data is manipulated in the *server.R* script before the plot is made
+
+Note: the *covid_dat.csv* data set in the `data` directory was downloaded on 5/7/2020. To update this, run the `getData.R` script in the `data` directory, which will update this csv file, by downloading current data from a set of different sources, including the Johns Hopkins CRC
+
+
+[sappID]: https://www.shinyapps.io
+[sservID]: https://www.rstudio.com/products/shiny/shiny-server/
+[tutID]: http://shiny.rstudio.com/tutorial/
+[widID]: http://shiny.rstudio.com/gallery/widget-gallery.html
+[zevID]: http://zevross.com/blog/2016/04/19/r-powered-web-applications-with-shiny-a-tutorial-and-cheat-sheet-with-40-example-apps/
