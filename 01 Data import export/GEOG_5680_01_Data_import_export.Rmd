@@ -4,7 +4,7 @@ author: |
   | Simon Brewer
   | Geography Department
   | University of Utah
-date: "December 30, 2020"
+date: "April 30, 2021"
 output:
   html_document:
     toc: true
@@ -76,7 +76,7 @@ grid.raster(img)
 - Bottom left: console window (also called command window). Here you can type simple commands after the '>' prompt and R will then execute your command. This is the most important window, because this is where R actually does stuff.
 - Top left: editor window (also called script window). Collections of commands (scripts) can be edited and saved. The first time you open RStudio, you won't see this as there are no currently open scripts. When you don't see this window, you can open it with [File > New > R script]. We'll look at these scripts in more detail below. 
 - Top right: workspace / history window. In the workspace window you can see which data and values R has in its memory. You can view and edit the values by clicking on them. The history window shows what has been typed before.
-- Bottom right: Files / plots / packages / help window. Here you can open files, view plots (also previous plots), install and load packages or use the help function. You can change the size of the windows by dragging the grey bars between the windows.
+- Bottom right: Files / plots / packages / help window. Here you can open files, view plots (also previous plots), install and load packages or use the help function. You can change the size of the windows by dragging the gray bars between the windows.
 
 ## Working with R
 
@@ -335,7 +335,7 @@ When you are finished with R, exit by typing `q()` in the console (or going to [
 
 ## Exercise 01
 
-For this module, the only thing to submit is your finished script for the final section. Please change the name of this to include either your surname or your uID and upload this to Canvas by June 17th [3pts] 
+For this module, the only thing to submit is your finished script for the final section. Please change the name of this to include either your surname or your uID and upload this to Canvas by June 25th [5pts] 
 
 ## Files used in lab
 
