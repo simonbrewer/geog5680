@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019) (preloaded format=pdflatex 2019.5.8)  1 MAY 2020 12:02
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019) (preloaded format=pdflatex 2019.5.8)  11 MAY 2021 19:28
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -978,7 +978,7 @@ d.
 Here is how much of TeX's memory you used:
  17532 strings out of 492616
  337174 string characters out of 6129482
- 412197 words of memory out of 5000000
+ 412193 words of memory out of 5000000
  20995 multiletter control sequences out of 15000+600000
  11463 words of font info for 42 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
@@ -989,7 +989,7 @@ Here is how much of TeX's memory you used:
 usr/local/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmss9.pfb></us
 r/local/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmssbx10.pfb></u
 sr/local/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb>
-Output written on GEOG_5680_00_Class_Intro.pdf (18 pages, 1623504 bytes).
+Output written on GEOG_5680_00_Class_Intro.pdf (18 pages, 1623484 bytes).
 PDF statistics:
  809 PDF objects out of 1000 (max. 8388607)
  640 compressed objects within 7 object streams
