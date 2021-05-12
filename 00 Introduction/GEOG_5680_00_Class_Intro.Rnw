@@ -128,16 +128,16 @@
 %--- Slide 9 ----------------%
 \begin{frame}{Course assessment}
 \begin{itemize}
-  \item In-class exercises (45 pts)
+  \item In-class exercises (75 pts)
   \begin{itemize}
     \item 2-3 short exercises per class
     \item Designed to make you repeat the methods covered
     \item Provide R code as a script
     \item Copy-paste results and/or figures to Word document
     \item Submission through Canvas
-    \item All exercises to be submitted by Wednesday, June 17
+    \item All exercises to be submitted by Wednesday, June 25
   \end{itemize}
-  \item<2-> Course project (55 pts)
+  \item<2-> Course project (25 pts)
   \begin{itemize}
     \item Analysis of a dataset using one or more of the techniques covered in class (or use R to explore other techniques)
     \item Project can be either:
@@ -145,6 +145,7 @@
   		\item One of three predefined datasets
   		\item Your own dataset
   	\end{itemize}
+    %\item Project report to be submitted by Wednesday, June 25
   \end{itemize}
 \end{itemize}
 \end{frame}
@@ -167,7 +168,7 @@
       \item Results including figures
       \item Brief discussion of project and results
   	\end{itemize}
-  	\item Due Wednesday, June 17 through Canvas
+  	\item Due Friday, June 25 through Canvas
   \end{itemize}
 \end{itemize}
 \end{frame}
