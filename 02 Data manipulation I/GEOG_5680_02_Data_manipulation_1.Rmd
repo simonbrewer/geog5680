@@ -4,7 +4,7 @@ author: |
   | Simon Brewer
   | Geography Department
   | University of Utah
-date: "April 28, 2020"
+date: "May 02, 2021"
 output:
   html_document:
     toc: true
@@ -20,7 +20,7 @@ As a general rule, these labs are designed to give you examples of how R works. 
 
 Before starting, remember to create a working directory (e.g. `module01`). Then start RStudio, and change your working directory from the [Session] menu > [Set working directory] > [Choose directory...]. You will need to make sure this is correctly set to load a file later on.
 
-**This is one of the longest labs in this class, and contains some boring, but very useful information about working with data in R. I would suggest working through it in 2 or even 3 sessions. If you do this, remember to save you code in a script so you can continue working on it, and remember to re-set your working directory if you close and re-open RStudio. **
+**This is one of the longest labs in this class, and contains some boring, but very useful information about working with data in R. I would suggest working through it in 2 or even 3 sessions. If you do this, remember to save you code in a script so you can continue working on it, and remember to re-set your working directory if you close and re-open RStudio.**
 
 ### A simple dataset
 
