@@ -4,7 +4,7 @@ author: |
   | Simon Brewer
   | Geography Department
   | University of Utah
-date: "April 28, 2020"
+date: "May 16, 2021"
 output:
   html_document:
     toc: true
@@ -49,7 +49,7 @@ For these last options, clicking in the box next to a package name will load the
 
 ### An example session using a package
 
-As an example, we are interested in using a classification (or recursive partitioning) tree with the iris dataset. This is a widely used technique in data mining and aims to find the variables that best differentiate between a set of groups. Here, we are interested in undertsanding which of the morphological variables (petals, sepals) best distinguishes the different species. If we can do this successfully, then we should be able to use the results with a new flower to guess which species that flower came from. 
+As an example, we are interested in using a classification (or recursive partitioning) tree with the iris dataset. This is a widely used technique in data mining and aims to find the variables that best differentiate between a set of groups. Here, we are interested in understanding which of the morphological variables (petals, sepals) best distinguishes the different species. If we can do this successfully, then we should be able to use the results with a new flower to guess which species that flower came from. 
 
 At this point, we may not know the function that we need to run this analysis, so we can use the search function, here we search for 'tree':
 
@@ -85,7 +85,7 @@ Now add the data in to the function. This function uses the relationship operato
 ```{r}
 rpart(Species ~ Sepal.Length + Sepal.Width + Petal.Length + Petal.Width, data=iris)
 ```
-The output from this function gives information about the classification tree, including the variables that were used to split the groups and some information about how successful these splits were. As with any function, if we want to store the output, we need to assign it to a variable. We can use anything for a variable name, but a simple method is to construct variables as a combination of the data (iris) and the function (rpart):
+The output from this function gives information about the classification tree, including the variables that were used to split the groups and some information about how successful these splits were. As with any function, if we want to store the output, we need to assign it to a variable. We can use anything for a variable name, but a simple method is to construct variables as a combination of the data (`iris`) and the function (`rpart`):
 
 ```{r}
 iris.rpart = rpart(Species ~ Sepal.Length + Sepal.Width + Petal.Length + Petal.Width, 
@@ -137,7 +137,7 @@ img <- readPNG("images/Capture2.PNG")
 grid.raster(img)
 ```
 
-The top line allows you to select the mirror site to download the packages (leave this at its default setting). The text box on the second line is where you add the name of the package. The third line will give the directory on your computer where the packages are to be installed. This should correspond to the 'personal library' created above. Make sure the box labelled "Install dependencies" is ticked. This ensures that any necessary support packages are downloaded and installed with your package. 
+The top line allows you to select the mirror site to download the packages (leave this at its default setting). The text box on the second line is where you add the name of the package. The third line will give the directory on your computer where the packages are to be installed. This should correspond to the 'personal library' created above. Make sure the box labeled "Install dependencies" is ticked. This ensures that any necessary support packages are downloaded and installed with your package. 
 
 We will install a package called **rpart.plot** which can be used to make much nicer plots with the output of the `rpart()` function. Enter the name of this package in the text box, and click 'Install'. You will see some text appear in the console, including a progress bar indicating the download and installation progress. (You may see that all the window is doing is running the `install.packages()` function for you.)
 
@@ -154,12 +154,12 @@ The main function in this package is `prp()`, which produces better plots of cla
 prp(iris.rpart)
 ```
 
-The fonts are better, and it has added labels so that we can understand what the decision is at each split of the tree (left = 'yes', right = 'no'). This function has a huge number of options (see the help page), but two simple ones are `type` and `extra`. An alternative, which puts the variable splits on the branches of the tree, and adds information about how well the splits seperate the species is this:
+The fonts are better, and it has added labels so that we can understand what the decision is at each split of the tree (left = 'yes', right = 'no'). This function has a huge number of options (see the help page), but two simple ones are `type` and `extra`. An alternative, which puts the variable splits on the branches of the tree, and adds information about how well the splits separate the species is this:
 ```{r}
 prp(iris.rpart, type=3, extra=1)
 ```
 
-The numbers in each box represent the number of observations of each species that get classified into that group, using the variable splits. This tells us that the first split perfectly differentiates 'setosa', but the second split has some missclassification. For example, the smaller widths correctly classify 49 'versicolor', but also 5 'virginica'. 
+The numbers in each box represent the number of observations of each species that get classified into that group, using the variable splits. This tells us that the first split perfectly differentiates 'setosa', but the second split has some misclassification. For example, the smaller widths correctly classify 49 'versicolor', but also 5 'virginica'. 
 
 ```{r echo = FALSE, message=FALSE}
 require(knitr)
@@ -178,7 +178,7 @@ knit_hooks$set(source = function(x, options){
 
 ## Report generation
 
-R has several add-on packages that allow you to write reports directly from R, incorporating the code, analyses and plots that you would make. These include Sweave, knitr and pander. These can be used to generate a wide variety of output documents, including LaTeX, RTF, the open document format (ODF) and html. One of the most advanced of these is **knitr**, which integrates extremely well with RStudio. Using **knitr**, reports can be generated in html using *markdown*, a simplified version of the full html markup language. 
+R has several add-on packages that allow you to write reports directly from R, incorporating the code, analyses and plots that you would make. These include **Sweave**, **knitr** and **pander**. These can be used to generate a wide variety of output documents, including LaTeX, RTF, the open document format (ODF) and html. One of the most advanced of these is **knitr**, which integrates extremely well with RStudio. Using **knitr**, reports can be generated in html using *markdown*, a simplified version of the full html markup language. 
 
 The report that you write as part of this course should be generated using **knitr** and markdown, and this lab should provide a sufficient introduction for you to be able to write your own documents. 
 
@@ -186,7 +186,7 @@ The report that you write as part of this course should be generated using **kni
 
 We'll start with a quick introduction to markdown, before starting to introduce R code into our document. 
 
-You are probably familar with html, the markup language that is used to create web pages. Like most markup languages, it works of a series of tags that are used to format different parts of the text. For example, `<h1>` and `</h1>` indicate that the enclosed text is a "level one header", or `<em>` and `</em>` indicate emphasis (generally italics). A web browser will parse the html tags and render the web page, often using a Cascading style sheet (CSS) to define the precise style of the different elements.
+You are probably familiar with html, the markup language that is used to create web pages. Like most markup languages, it works of a series of tags that are used to format different parts of the text. For example, `<h1>` and `</h1>` indicate that the enclosed text is a "level one header", or `<em>` and `</em>` indicate emphasis (generally italics). A web browser will parse the html tags and render the web page, often using a Cascading style sheet (CSS) to define the precise style of the different elements.
 
 Writing directly in html is difficult, as it is necessary to remember all these tags and how they all fit together. Markdown is designed to simplify this, by using very simple formatting. For example, text starting with `#` is a header, text enclosed by `*` is emphasized, and so on. The result is a file that is easy to read even before it is processed into html, and has an easy method for including code: the backtick (on the key to the left of the '1' on your keyboard. See appendix 2 for an example. 
 
@@ -238,12 +238,12 @@ Links to web pages can be included. Usually this is done in two ways. The word t
 will convert the words "Google", "Yahoo" and "MSN" in the first line into hyperlinks. 
 
 #### Horizontal lines
-A horizontal line can be specified by a line of hypens:
+A horizontal line can be specified by a line of hyphens:
 
     -----
 
 #### Code
-The ease in which prgramming code can be formatted in a document has made markdown a favorite tool for writing documents and tutorials on programming. For example, all of the lab documents for this course are written using markdown. Text that should be formatted as code is usually shown enclosed in backticks or by identing the code by four spaces (one tab stop).
+The ease in which programming code can be formatted in a document has made markdown a favorite tool for writing documents and tutorials on programming. For example, all of the lab documents for this course are written using markdown. Text that should be formatted as code is usually shown enclosed in backticks or by indenting the code by four spaces (one tab stop).
 ```
     ```
     Some code
@@ -362,6 +362,7 @@ And a line plot showing the annual temperatures
 Add some text to explain what the code is doing, and click 'Knit HTML' to get the final report. When it is finished, go to your working directory, and double click the *.html file to open this in a browser. 
 
 ### Chunk options
+
 **knitr** has a set of [options][opID] for modifying the way in which the chunks are run. This is done by adding options in between brackets at the start of the chunk (`{r}`). For example, `{r echo=FALSE}` will run the code, but not display it in the document. Some other options are:
 
 - `fig.keep=FALSE`: doesn't display any figures
