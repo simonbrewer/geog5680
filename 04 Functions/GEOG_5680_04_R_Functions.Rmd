@@ -4,7 +4,7 @@ author: |
   | Simon Brewer
   | Geography Department
   | University of Utah
-date: "April 28, 2020"
+date: "May 15, 2021"
 output:
   html_document:
     toc: true
@@ -160,7 +160,7 @@ apply(temp[,3:14], 2, mean, na.rm=TRUE)
 
 The distinction with the previous example is that `tapply()` calculates the mean (or any other function) for subsets of observations of a variable, whereas `apply()` and `sapply()` calculate the mean (or any other function) of one or more variables, using all observations.
 
-Now we calculate the mean annual temperature for each location using `apply()` in a rowwise direction by setting the `MARGIN` to 1:
+Now we calculate the mean annual temperature for each location using `apply()` in a row-wise direction by setting the `MARGIN` to 1:
 ```{r results='hide'}
 apply(temp[,3:14], 1, mean, na.rm=TRUE)
 ```
@@ -193,7 +193,7 @@ summary(temp)
 
 ### The `table()` function
 
-The functions we have looked at so far work well to summarize numerical data, but do not play well with categorical data or factors - the `table()` function can be used instead. To demonstrate this, we'll use a set of data looking at the occurence of tuberculosis in deer in several farms in Spain (Vincente et al, 2006). The columns 'Ecervi' and 'Tb' indicate the presence (1) or absence (0) of, respectively, a parasite and tuberculosis. This data can be found in *the *Deer.csv*, so load this and do the usual check of the column names and structure of the data frame. 
+The functions we have looked at so far work well to summarize numerical data, but do not play well with categorical data or factors - the `table()` function can be used instead. To demonstrate this, we'll use a set of data looking at the occurrence of tuberculosis in deer in several farms in Spain (Vincente et al, 2006). The columns `Ecervi` and `Tb` indicate the presence (1) or absence (0) of, respectively, a parasite and tuberculosis. This data can be found in the *Deer.csv* file, so load this and do the usual check of the column names and structure of the data frame. 
 
 ```{r echo=TRUE}
 deer = read.csv("Deer.csv")
@@ -323,7 +323,7 @@ These are called *generic* functions, and in general are calling a lower-level f
 seq.default
 ```
 
-What this shows is that this function is itself made up of R code. In fact many R functions are simply a set of low-level R functions combined together to produce a certain operation. This is not true for all functions; some call backend code compiled in Fortran or C++. However, what this does mean is that it is easy to write your own functions, particularly for any operation that you might need to do repeatedly. Here, we'll borrow an example from Hadley Wikham's R for Data Science book and make a function to do a min-max rescaling of a vector of variables. This rescales a vector of values so that the minimum becomes zero and the maximum becomes 1:
+What this shows is that this function is itself made up of R code. In fact many R functions are simply a set of low-level R functions combined together to produce a certain operation. This is not true for all functions; some call backend code compiled in Fortran or C++. However, what this does mean is that it is easy to write your own functions, particularly for any operation that you might need to do repeatedly. Here, we'll borrow an example from Hadley Wickham's R for Data Science book and make a function to do a min-max rescaling of a vector of variables. This rescales a vector of values so that the minimum becomes zero and the maximum becomes 1:
 
 $$
 \mbox{MinMax}(x_i) = \frac{x_i - \mbox{min}(x)}{(\mbox{max}(x) - \mbox{min}(x))}
@@ -338,7 +338,7 @@ function.name <- function(arg1, arg2, arg3=2, ...) {
 }
 ```
 
-To make our minmax function, open a new script (`my_function.R`), and set up the basic template:
+To make our `minmax` function, open a new script (`my_function.R`), and set up the basic template:
 
 ```{r eval=FALSE}
 minmax = function(x) {
