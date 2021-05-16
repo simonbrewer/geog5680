@@ -4,7 +4,7 @@ author: |
   | Simon Brewer
   | Geography Department
   | University of Utah
-date: "April 28, 2020"
+date: "May 15, 2021"
 output:
   html_document:
     toc: true
@@ -20,7 +20,7 @@ library(grid)
 
 ## Introduction
 
-In this lab, we'll explore some control statements that can be used to define the way that your script and analysis work. If you have previously used any programming language you will be familar with these. You may find that you only rarely use these in R, as it is often possible to work with an entire vector or matrix, rather than iterating over every value. It is still worth having some idea about how these work as they can come in useful.
+In this lab, we'll explore some control statements that can be used to define the way that your script and analysis work. If you have previously used any programming language you will be familiar with these. You may find that you only rarely use these in R, as it is often possible to work with an entire vector or matrix, rather than iterating over every value. It is still worth having some idea about how these work as they can come in useful.
 
 Remember to use RStudio's script editor (top left panel) to enter your commands and then copy-paste these to the console when you are ready. This will keep a copy of the commands that you can save and return to. 
 
@@ -37,7 +37,7 @@ There are two main commands for looping: `for()` which repeats a set of commands
 
 ## `for` loops
 
-The format of the `for()` function is: `for (counter in start:stop)`. The counter (or iterator) is an integer which is increased by one each time the loop runs. 'start' gives the intial value of the counter, and 'stop' gives the final value. The commands which are to be run within the loop are then enclosed within curly brackets `{...}`. 
+The format of the `for()` function is: `for (counter in start:stop)`. The counter (or iterator) is an integer which is increased by one each time the loop runs. 'start' gives the initial value of the counter, and 'stop' gives the final value. The commands which are to be run within the loop are then enclosed within curly brackets `{...}`. 
 
 Open a new script in the editor and star by adding a very simple loop:
 ```{r}
@@ -48,15 +48,15 @@ for (i in 1:12) {
 The loop starts at 1 and runs to 12, and the iterator *i* is printed then increased by one at each step. 
 
 ### Plotting monthly global temperatures
-Now let's do something a little more useful. The file *giss_temp.csv* contains a dataset of global temperature *anomalies* from 1881 to 2012 (anomalies are differences in temperature from a reference average temperature). We will use this file to plot out the trends in temperature for each month for the 130 years of record (i.e. plot all the Januaries, then all the Febuaries, etc). We will start by plotting these progressively to a figure, then extend this produce individual figures for each month, simlpy by looping through the months. 
+Now let's do something a little more useful. The file *giss_temp.csv* contains a dataset of global temperature *anomalies* from 1881 to 2012 (anomalies are differences in temperature from a reference average temperature). We will use this file to plot out the trends in temperature for each month for the 130 years of record (i.e. plot all the Januaries, then all the Februaries, etc). We will start by plotting these progressively to a figure, then extend this produce individual figures for each month, simply by looping through the months. 
 
 Open a new script in the editor, and add the following text to read the file. 
 ```{r results='hide'}
 giss = read.csv("giss_temp.csv")
 ```
-Save and run the script, then use `ls()` to make sure that the new data frame 'giss' has been created, and `names()` and `str()` to examine the data frame. 
+Save and run the script, then use `ls()` to make sure that the new data frame `giss` has been created, and `names()` and `str()` to examine the data frame. 
 
-We'll start by plotting the entire time series (you can do this in the script file or directly in the console). On the x-axis we use the variable 'DecDate' which is decimal dates (e.g. January 1881 is 1881.042):
+We'll start by plotting the entire time series (you can do this in the script file or directly in the console). On the x-axis we use the variable `DecDate` which is decimal dates (e.g. January 1881 is 1881.042):
 ```{r}
 plot(giss$DecDate, giss$TempAnom,
      xlab="Year", ylab="T Anomaly")
@@ -80,7 +80,7 @@ for (i in 1:12) {
      xlab="Year", ylab="T Anomaly")
 }
 ```
-The only new thing here, is that we create an index 'monthID', which in each loop contains the row numbers of every observation corresponding to a particular month. This can then be used to plot only the values of the columns 'Year' and 'TempAnom' corresponding to a given month. Save and run the plot. 
+The only new thing here, is that we create an index `monthID`, which in each loop contains the row numbers of every observation corresponding to a particular month. This can then be used to plot only the values of the columns `Year` and `TempAnom` corresponding to a given month. Save and run the plot. 
 
 ### Saving images to files
 When we run the script, it goes too fast to see the individual plots, so we will instead save the figures as graphic files. R can write to several different figure formats, and here we will write to a PNG file. To understand how this works, it is important to understand the idea of a graphics *device*. In R, this simply refers to the current figure that is being created, and includes the graphical window which is used by default, and different file types. If we want to write a figure to a different device that the default one, we have to first open that device (here using the `png()` function), plot our figure, then close the device (using the `dev.off()` function). 
@@ -104,7 +104,7 @@ png(paste("giss_temp_",i,".png",sep=''))
 Here we paste the first part of the file name as a character string to the current loop number (taken from the iterator *i*). This is then pasted to the extension ".png" for a png file. The option `sep=''` tells `paste()` to not insert spaces between the various parts (it will by default). Save and run, and you should now see 12 png files in your directory, one per month.
 
 ### Tweaking the plots
-At this point, we need to clean up the plots. We will start by adding a meaningful title. Here, we can take advantage of a built-in dataset called 'month.abb', a vector of abbreviated month names. To see this, type in the console:
+At this point, we need to clean up the plots. We will start by adding a meaningful title. Here, we can take advantage of a built-in dataset called `month.abb`, a vector of abbreviated month names. To see this, type in the console:
 ```{r}
 month.abb
 ```
@@ -194,7 +194,7 @@ In this code we do the following:
 - We extract all the monthly values for that year and average them. This is stored in the `ann_temp` vector
 - We then use the `if` statement to see if this value is above or below zero. 
     - If it is above zero, this triggers the first statement, setting the color to `red` in the vector of colors
-    - It is is below (or equal) to zero the `else` statement is triggered amd the color is set to `blue`
+    - It is is below (or equal) to zero the `else` statement is triggered and the color is set to `blue`
 - Once the `for` loop is finished, we plot the values as a histogram line plot, where the color of each vertical line is taken from the vector of colors
 
 While this demonstrates how to use an `if` statement in a scrip, this is a very simple example. In general you would use `if` statements with more complex conditions and loops. A much easier way to achieve the same results would be to use the `ifelse()` function. This uses a conditional statement with a single vector, and then creates a new vector with two possible values, depending on whether or not the condition was met. The example below uses the statement:
@@ -210,7 +210,7 @@ We can then use a combination of the `tapply()` function and the `ifelse()` stat
 - Load the data
 - Make vector of unique year values
 - Use `tapply()` to estimate annual values
-- Use `ifelse()` to create the vector of colors (we've used different colors here to distingush from the previous example)
+- Use `ifelse()` to create the vector of colors (we've used different colors here to distinguish from the previous example)
 - Plot the outcome
 
 ```{r}
@@ -240,7 +240,7 @@ for (i in 1:12) {
 }
 ```
 
-Modify this loop so that it loops acrss all years instead of months, and plots the 12 monthly time values for each year. Your answer should consist of your R script (you do not need to submit all the figures that this will make). 
+Modify this loop so that it loops across all years instead of months, and plots the 12 monthly time values for each year. Your answer should consist of your R script (you do not need to submit all the figures that this will make). 
 
 ### Part 2: `if` statements
 
