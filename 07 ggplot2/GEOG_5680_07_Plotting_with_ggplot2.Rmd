@@ -4,7 +4,7 @@ author: |
   | Simon Brewer
   | Geography Department
   | University of Utah
-date: "April 28, 2020"
+date: "May 17, 2021"
 output:
   html_document:
     toc: true
@@ -225,7 +225,7 @@ myplot = ggplot(gapdata, aes(x=continent))
 myplot + geom_bar()
 ```
 
-Often, however, we want to use some precalculated value for the height of the bar. In the Virginia death rate dataset, for example, the death rates have already been calculated by age and demographic class. To plot death rates per age groups, we can do the following:
+Often, however, we want to use some pre-calculated value for the height of the bar. In the Virginia death rate dataset, for example, the death rates have already been calculated by age and demographic class. To plot death rates per age groups, we can do the following:
 
 ```{r fig.keep='none'}
 myplot = ggplot(VADeaths2, aes(x = Age, y = DeathRate))
@@ -247,7 +247,7 @@ myplot + geom_bar(stat="identity") + facet_wrap(~ DemClass) + coord_flip()
 
 ### Scatterplots
 
-Scatterplots are the simplest way to display bivariate data. **ggplot2** has several different geometries, including points and lines. To make a simple figure of life expectency against per capita GDP from the gapminder dataset:
+Scatterplots are the simplest way to display bivariate data. **ggplot2** has several different geometries, including points and lines. To make a simple figure of life expectancy against per capita GDP from the gapminder dataset:
 ```{r}
 myplot = ggplot(gapdata, aes(x = gdpPercap, y = lifeExp)) 
 myplot + geom_point()
