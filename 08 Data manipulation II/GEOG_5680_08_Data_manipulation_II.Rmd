@@ -4,7 +4,7 @@ author: |
   | Simon Brewer
   | Geography Department
   | University of Utah
-date: "April 28, 2020"
+date: "May 18, 2021"
 output:
   html_document:
     toc: true
@@ -55,7 +55,7 @@ head(gap)
 | `filter()`	| filter rows | 
 | `arrange()`	| re-order or arrange rows |
 | `mutate()` | create new columns |
-| `summarise()` | summarise values |
+| `summarise()` | summarize values |
 | `group_by()` | allows for group operations | 
 
 ## Selecting by column and row
@@ -318,7 +318,7 @@ theoph$Subject = factor(theoph$Subject)
 
 You should submit the results as an R script with the commands you used, and a Word (or equivalent) with the plots. Remember that you can export plots directly from the plot window, or by using `pdf()` to export to a file. 
 
-Remeber that you can also use R Markdown and **knitr** to produce an html page that contains both the code *and* the plots. If you have the time to do this, I would highly recommend it, as it is a great way to keep all your results in one place.
+Remember that you can also use R Markdown and **knitr** to produce an html page that contains both the code *and* the plots. If you have the time to do this, I would highly recommend it, as it is a great way to keep all your results in one place.
 
 Now use the commands introduced above to do the following:
 
