@@ -4,7 +4,7 @@ author: |
   | Simon Brewer
   | Geography Department
   | University of Utah
-date: "May 01, 2020"
+date: "May 01, 2021"
 output:
   html_document:
     toc: true
@@ -89,7 +89,7 @@ $$
 y = \beta_0 + \beta_1 x + \epsilon
 $$
 
-where $\beta_0$ and $\beta_1$ are coefficients to be estimated. $\beta_0$ is also called the intercept, and indicates the value of $y$ when $x = 0$. $\beta_1$ is the slope, which gives the *rate* at whcih $y$ changes per unit change in $x$. $\epsilon$ represents the model error, the variation in the data that is **not** explained by the model. 
+where $\beta_0$ and $\beta_1$ are coefficients to be estimated. $\beta_0$ is also called the intercept, and indicates the value of $y$ when $x = 0$. $\beta_1$ is the slope, which gives the *rate* at which $y$ changes per unit change in $x$. $\epsilon$ represents the model error, the variation in the data that is **not** explained by the model. 
 
 The `lm()` function is used to build linear models in R. This uses R's standard model formula syntax, which is written as `y ~ x`. The tilde (`~`) implies the direction of the relationship; here this would model `y` as a function of `x`. This notation is important to understand as it forms the basis for the majority of modeling functions in R. The variable that we want to model goes on the left, and the variables we use to explain go on the right. 
 
@@ -122,7 +122,7 @@ str(fit1)
 
 ### Model diagnostics
 
-The variable created from the model is a new class of object *lm* (a linear model), and the output of `str()` shows that this is quite complex, with much more information than just the coefficients. Rather than trying to use this, we will instead use the `summary()` function, which provides most of the necessary information to diagnose a linear model:
+The variable created from the model is a new class of object `lm` (a linear model), and the output of `str()` shows that this is quite complex, with much more information than just the coefficients. Rather than trying to use this, we will instead use the `summary()` function, which provides most of the necessary information to diagnose a linear model:
 ```{r}
 summary(fit1)
 ```
@@ -134,7 +134,7 @@ The output gives a summary of the residuals. These are the models errors, and we
 #### Coefficients
 The `summary()` function prints a table of coefficients. Each line is a coefficient (intercept, slope), and the first column gives the estimate of these. The second gives the standard error of these - a measure of the uncertainty of the coefficients. 
 
-The third and fourth give the results of a *t*-test comparing the coefficents to zero. If the *t*-values are low and the *p*-values high then the coefficients are not significantly different from zero. Here, both coefficients are significant. The output also gives a 'code' to represent significance, where 3 stars is the highest. 
+The third and fourth give the results of a *t*-test comparing the coefficients to zero. If the *t*-values are low and the *p*-values high then the coefficients are not significantly different from zero. Here, both coefficients are significant. The output also gives a 'code' to represent significance, where 3 stars is the highest. 
 
 #### Goodness-of-fit
 In the last section, various statistics are given that represent how well the model fits the data:
@@ -195,12 +195,12 @@ hist(residuals(fit1))
 ```
 While not perfect, these are pretty well distributed (roughly symmetrical around zero). 
 
-R also has a set of diagnostic plots that can be made directly from the model object, using the `plot()` function. This can make six possible diagnostic plots, which can be selected by seeting the parameter `which` to a value between 1 and 6. The following will make a plot of the residuals against the fitted values (the model estimates of $y$ for each observation): 
+R also has a set of diagnostic plots that can be made directly from the model object, using the `plot()` function. This can make six possible diagnostic plots, which can be selected by setting the parameter `which` to a value between 1 and 6. The following will make a plot of the residuals against the fitted values (the model estimates of $y$ for each observation): 
 ```{r fig.keep='none'}
 plot(fit1, which = 1)
 ```
 
-There should be no discernable pattern in this plot (i.e. trends or cycles) which would indicate that there is information that is missed in the model.
+There should be no discernible pattern in this plot (i.e. trends or cycles) which would indicate that there is information that is missed in the model.
 
 A second plot shows Cook's distance for each observation. This is a measure of the independence of each observation in $x$ (i.e. the distance between that value of $x$ and other values). High distances indicate high *leverage* or influence in the model building, and if sufficiently high, may bias the final model. See `help(plot.lm)` for information on the other choices. 
 
@@ -209,7 +209,7 @@ plot(fit1, which = 4)
 ```
 
 ### Predicting from a model
-Having built a reasonable model, we may want to use this for forecasting purposes (e.g. what is the weight of an actor who is 180cm tall?).As we know the intercept (`r round(coef(fit1)[1],4)`) and slope (`r round(coef(fit1)[2],4)`) coefficients for our regression equation, we can simply subsitute these values with the new height to get a prediction. Note that we also need to center this new height to get the correct prediction:
+Having built a reasonable model, we may want to use this for forecasting purposes (e.g. what is the weight of an actor who is 180cm tall?).As we know the intercept (`r round(coef(fit1)[1],4)`) and slope (`r round(coef(fit1)[2],4)`) coefficients for our regression equation, we can simply substitute these values with the new height to get a prediction. Note that we also need to center this new height to get the correct prediction:
 ```{r}
 newx = 180 - mean(aragorn$height)
 73.3 + (0.4194 * newx)
@@ -279,7 +279,7 @@ And we can now see the new coefficient calculated for the relationship between h
 
 ### Dummy variables
 
-We used continuous variables as independent variables in the previous models. If you have a binary or categorical variable, this can be included in the model as a *dummy* variable, and used to estimated the offset between different groups. The `lotr` data frame contains a categorial variable: the role for to which each actor auditioned, and we will use this to help model weight as a function of height for the full dataset:
+We used continuous variables as independent variables in the previous models. If you have a binary or categorical variable, this can be included in the model as a *dummy* variable, and used to estimated the offset between different groups. The `lotr` data frame contains a categorical variable: the role for to which each actor auditioned, and we will use this to help model weight as a function of height for the full dataset:
 
 Start by making a simple model of weight vs. height for the full dataset (we first recenter the height variable for the whole dataset)
 ```{r fig.keep='none', results='hide'}
@@ -288,7 +288,7 @@ fit3 = lm(weight ~ height.cen, lotr)
 summary(fit3)
 ```
 
-Looking at the diagnostics from the `summary()` function, we have an apparently good model with an R2 of `r round(summary(fit2)$r.squared,4)`, and a significant $F$-test. However, if you look at the coefficients, somethign seems odd. The relationship between `weight` and `height.cen` has changed from being positive to negative. Further, if we plot the residuals, however, we can see that there are problems, with one or two fairly strong trends in the residuals.
+Looking at the diagnostics from the `summary()` function, we have an apparently good model with an R2 of `r round(summary(fit2)$r.squared,4)`, and a significant $F$-test. However, if you look at the coefficients, something seems odd. The relationship between `weight` and `height.cen` has changed from being positive to negative. Further, if we plot the residuals, however, we can see that there are problems, with one or two fairly strong trends in the residuals.
 
 ```{r}
 plot(fit3, which = 1)
@@ -309,7 +309,7 @@ fit4 = lm(weight ~ role, data = lotr)
 summary(fit4)
 ```
 
-Now we have a more understandable model, where the heights and weights have a positive relationship. The `summary()` function gives two coefficients 'roleGimli' and 'roleLegolas', which give the mean offsets in weight compared to Aragorn, the reference, and indicates that Gimli actors are on average `r round(coef(fit4)[2],2)` kg heavier than Aragorn actors, and Legolas actors are on average `r round(coef(fit4)[3],2)` kg lighter. 
+Now we have a more understandable model, where the heights and weights have a positive relationship. The `summary()` function gives two coefficients `roleGimli` and `roleLegolas`, which give the mean offsets in weight compared to Aragorn, the reference, and indicates that Gimli actors are on average `r round(coef(fit4)[2],2)` kg heavier than Aragorn actors, and Legolas actors are on average `r round(coef(fit4)[3],2)` kg lighter. 
 
 This model, while accounting for differences between the different actors, does not include a coefficient to show how weight changes with height. So, let's add height back in as an independent variable:
 
@@ -348,7 +348,7 @@ print(x)
 
 This exercise will get you to build a simple linear model of student enrollment. The dataset in the file *enrollmentForecast.csv* contains information used to estimate undergraduate enrollment at the University of New Mexico (Office of Institutional Research, 1990). Each row represents a single year (1 = 1961), and the variables include: the enrollment (`ROLL`), the unemployment rate (`UNEM`), the number of high school graduates (`HGRAD`) and monthly per capita income in 1961 US$ (`INC`).  
 
-As ever, your answer shoudl consist of your R code and the answers to the questions below. These can be submitted as a Word document or as an html page generated from R Markdown. You will need to do the following:
+As ever, your answer should consist of your R code and the answers to the questions below. These can be submitted as a Word document or as an html page generated from R Markdown. You will need to do the following:
 
 - Read in the data
 - Look at the data structure
