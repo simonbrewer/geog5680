@@ -4,7 +4,7 @@ author: |
   | Simon Brewer
   | Geography Department
   | University of Utah
-date: "May 02, 2020"
+date: "May 05, 2021"
 output:
   html_document:
     toc: true
@@ -20,7 +20,7 @@ library(grid)
 
 ## Introduction
 
-We have previously look at processing and manipulating data in R using basic functions and **dplyr**. In this lab, we'll introduce a third method using **data.table**. This package is provides a different implmentation of the data frames that we have been using so far, designed to work with large datasets (>100GB in RAM). It does this by a number of methods: making certain low-level function parallel (i.e. run on multiple cores of your computer) and more efficient referencing of the file in memory. It also provides a way to manipulate and subset data that is based on the functions available in Structured Query Language (SQL) commonly used with databases.
+We have previously look at processing and manipulating data in R using basic functions and **dplyr**. In this lab, we'll introduce a third method using **data.table**. This package is provides a different implementation of the data frames that we have been using so far, designed to work with large datasets (>100GB in RAM). It does this by a number of methods: making certain low-level function parallel (i.e. run on multiple cores of your computer) and more efficient referencing of the file in memory. It also provides a way to manipulate and subset data that is based on the functions available in Structured Query Language (SQL) commonly used with databases.
 
 Remember to use RStudio's script editor (top left panel) to enter your commands and then copy-paste these to the console when you are ready. This will keep a copy of the commands that you can save and return to. 
 
@@ -262,7 +262,7 @@ ans
 Some things to note: 
 
 - This preserves the order of the groups in the original data, rather than reordering them alphabetically
-- Since we did not provide a name for the column returned in `j`, it was named `N`  automatically by recognising the special symbol `.N`.
+- Since we did not provide a name for the column returned in `j`, it was named `N`  automatically by recognizing the special symbol `.N`.
 - if there is only one column or expression to refer to in `j` and `by`, we can drop the `.()` notation. This is purely for convenience. We could instead do:
 
 ```{r}
@@ -317,7 +317,7 @@ library(ggplot2)
 ggplot(ans, aes(x = month, y = m_arr, col = dest)) + geom_line() + facet_wrap(~origin)
 ```
 
-Note that we can also use the pipe operator (`%>%`) that we used with **dplyr** to pass the selected data to **ggplot2** or any other function. Here, we select calculate the depature delay for all flights to Dallas Fort Worth. Note that we need to load the **magrittr** package to make this work. 
+Note that we can also use the pipe operator (`%>%`) that we used with **dplyr** to pass the selected data to **ggplot2** or any other function. Here, we select calculate the departure delay for all flights to Dallas Fort Worth. Note that we need to load the **magrittr** package to make this work. 
 ```{r}
 library(magrittr)
 flights[dest == "DFW",
