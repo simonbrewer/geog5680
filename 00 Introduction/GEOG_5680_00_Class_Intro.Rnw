@@ -6,7 +6,7 @@
 \usecolortheme{seahorse}
 
 % Standard header (will need to change date!)
-\title[GEOG 5680 Summer '21]{GEOG 5680\\Introduction to R}
+\title[GEOG 5680/6680 Summer '21]{GEOG 5680 / 6680\\Introduction to R}
 \subtitle[Intro]{00: Class Introduction}
 \author[S. Brewer]{Simon Brewer}
 \institute[Univ. Utah]{
@@ -97,6 +97,16 @@
 \end{itemize}
 \end{frame}
 
+%--- Slide ----------------%
+\begin{frame}{Getting help with labs}
+\begin{itemize}
+  \item Slack channel (geog568066802021.slack.com)
+  \item Canvas
+  \item Email (simon.brewer@geog.utah.edu)
+  \item Office hours: Tuesday/Thursday mornings
+\end{itemize}
+\end{frame}
+
 %--- Slide 15 ----------------%
 \begin{frame}{Reading material}
 \begin{columns}
@@ -151,7 +161,7 @@
 \end{frame}
 
 %--- Slide 12 ----------------%
-\begin{frame}{Course Project}
+\begin{frame}{Course project}
 \begin{itemize}
   \item Examples of projects
   \begin{itemize}
@@ -324,12 +334,12 @@ From www.datacamp.com
 \end{columns}
 \end{frame}
 
-% %--- Slide 19 ----------------%
-% \begin{frame}{RStudio}
-%   	\begin{center}
-% 			\includegraphics[width=0.8\textwidth]{./images/rstudio.png}
-% 		\end{center}
-% \end{frame}
+%--- Slide 19 ----------------%
+\begin{frame}{RStudio}
+  	\begin{center}
+			\includegraphics[width=0.8\textwidth]{./images/rstudio_script.png}
+		\end{center}
+\end{frame}
 % 
 % %--- Slide ----------------%
 % \begin{frame}{The R Environment}
