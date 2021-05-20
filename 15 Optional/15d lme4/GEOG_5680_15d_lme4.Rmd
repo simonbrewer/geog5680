@@ -4,7 +4,7 @@ author: |
   | Simon Brewer
   | Geography Department
   | University of Utah
-date: "May 12, 2020"
+date: "May 20, 2021"
 output:
   html_document:
     toc: true
@@ -126,7 +126,7 @@ ggplot(orthodont.select, aes(x=age2,y=distance)) + geom_point() +
 
 And again, we can see a problem. While the model might fit well to some of the individuals, for some others it is quite biased (e.g. `M06`).
 
-Indeed, we didn’t take into account the fact that the data are repeated measurements made on the same subjects. A more convenient plot for this type of data consists in joining the data of a same individual:
+Indeed, we didn't take into account the fact that the data are repeated measurements made on the same subjects. A more convenient plot for this type of data consists in joining the data of a same individual:
 
 ```{r}
 ggplot(data=orthodont, aes(x=age2,y=distance)) + geom_point(size=3)  + 
