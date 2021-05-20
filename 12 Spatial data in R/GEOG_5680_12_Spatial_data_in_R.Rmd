@@ -7,7 +7,6 @@ output:
     toc: true
     toc_float: true
     fig_caption: true
-    css: "../style.css"
 ---
 
 ```{r include = FALSE}
@@ -19,15 +18,17 @@ knitr::opts_chunk$set(echo = TRUE,
 
 In this lab, we will explore some of R's functionality with spatial data, with special attention given to the **sf** package. For more information about `sf`, you can visit their [website](https://r-spatial.github.io/sf/). Robin Lovelace's book _Geocomputation with R_ (available [online](https://geocompr.robinlovelace.net/)) is also a really helpful and educational source for learning **sf**. In fact, much of this lab is just an abbreviated version of that book. For some of the longer examples, it is highly recommended to use R's scripting functions to run the examples to save on re-typing.  
 
-Before starting the lab, you will need to set up a new folder for your working directory. Go to your `geog6000` folder now and create a new folder for today's class called `lab08`. The following files will be used in this lab, all available on Canvas:
+Before starting, remember to create a working directory (e.g. `module12`). Next download the files for today's lab from the Canvas page and move them to this directory. You'll need the following files:
 
 - Climate dataset for Western North America: *WNAclimate.csv*
 - Temperature dataset for Oregon in shapefile format: *oregon.zip*
 - New York state polygon data in a shapefile: *NY_Data.zip*
 - Digital elevation map from Switzerland: *swiss_dem.grd*
 - A NetCDF file of global monthly air temperature: *air.mon.ltm.nc*
+- A NetCDF file of global monthly mean air temperature: *air.mon.mean.nc*
+- A dataset of country socioeconomic variables: *countries.zip*
 
-You will need to download these files from Canvas, and move them from your `Downloads` folder to the `datafiles` folder that you made previously. Make sure to unzip the zip files so that R can access the content. Note that on Windows, you will need to right-click on the file and select 'Extract files'.  
+Make sure to unzip the zip files so that R can access the content. Note that on Windows, you will need to right-click on the file and select 'Extract files'.  
 
 
 Base R has no structure for spatial data, so you will need to install the following packages (you should have some of these from previous modules):
@@ -81,7 +82,7 @@ Note that all `sf` functions are prefixed with `st_` (a legacy of this R package
 
 A simple feature is, in the words of the `sf` authors, "a formal standard (ISO 19125-1:2004) that describes how objects in the real world can be represented in computers, with emphasis on the spatial geometry of these objects" ([ref](https://r-spatial.github.io/sf/articles/sf1.html)). In other words, its structured data that provides information about a location in space, including its shape.
 
-The way that `sf` chooses to represent simple features in R should be familiar to you because they are just fancy data.frames. To demonstarte this, we'll load a file of county outlines for North Carolina (this file is included when you install the `sf` package):
+The way that `sf` chooses to represent simple features in R should be familiar to you because they are just fancy data.frames. To demonstrate this, we'll load a file of county outlines for North Carolina (this file is included when you install the `sf` package):
 
 ```{r}
 
@@ -104,7 +105,7 @@ You can summarize this somewhat verbose printout by noting that simple features 
 $$ sf = attributes + geometry + crs $$ 
 <br>
 
-This formula also sugests the kinds of ways that you might interact with an `sf` object by, for example, changing its crs, or filtering based on its attributes (or geometry), or manipulating its geometry.
+This formula also suggests the kinds of ways that you might interact with an `sf` object by, for example, changing its crs, or filtering based on its attributes (or geometry), or manipulating its geometry.
 
 <br>
 
@@ -229,7 +230,7 @@ In `sf`, the function for reading in spatial data is `st_read`. Here is the nitt
 
 ```{r}
 
-NY8 <- st_read(dsn = "../datafiles/NY_data/NY8_utm18.shp",
+NY8 <- st_read(dsn = "./NY_data/NY8_utm18.shp",
                layer = "NY8_utm18",
                drivers = "ESRI Shapefile")
 
@@ -241,7 +242,7 @@ In this case, we are using a simple ESRI shapefile, so the data source and layer
 
 ```{r}
 
-NY8 <- st_read("../datafiles/NY_data/NY8_utm18.shp")
+NY8 <- st_read("./NY_data/NY8_utm18.shp")
 
 ```
 
@@ -262,7 +263,7 @@ Sometimes you have spatial data, but it is not in a spatial data format. Usually
 
 ```{r}
 
-wna_climate <- read.csv("../datafiles/WNAclimate.csv")
+wna_climate <- read.csv("./WNAclimate.csv")
 
 head(wna_climate)
 
@@ -300,7 +301,7 @@ The `sf` function for writing simple features to disk is `st_write`. It is almos
 ```{r, eval = FALSE}
 
 st_write(obj = wna_climate,
-         dsn = "../datafiles/wnaclim.shp",
+         dsn = "./wnaclim.shp",
          layer = "wnaclim",
          drivers = "ESRI Shapefile")
 
@@ -312,7 +313,7 @@ or, more simply:
 
 ```{r, eval = FALSE}
 
-st_write(wna_climate, dsn = "../datafiles/wnaclim.shp")
+st_write(wna_climate, dsn = "./wnaclim.shp")
 
 ```
 
@@ -327,7 +328,7 @@ __The cardinal rule for working with any spatial data is to make sure all of it 
 
 ### Check CRS
 
-The `st_crs()` function allows you to quickly chekck the CRS for any object. 
+The `st_crs()` function allows you to quickly check the CRS for any object. 
 
 ```{r}
 
@@ -400,7 +401,7 @@ The attribute part of a `sf` object is a data.frame, so you can use all the meth
 
 ```{r}
 
-oregon_tann <- read_sf("../datafiles/oregon/oregontann.shp")
+oregon_tann <- read_sf("./oregon/oregontann.shp")
 
 class(oregon_tann)
 
@@ -736,7 +737,7 @@ plot(st_geometry(north_carolina_points), col = "darkorange", pch = 19)
 
 ```
 
-If we convert to a `LINESTRING` objcet, this acts to separate out the individual polygons:
+If we convert to a `LINESTRING` object, this acts to separate out the individual polygons:
 
 ```{r}
 
@@ -798,7 +799,7 @@ binghamton <- subset(NY8, AREANAME == "Binghamton city")
 
 ```
 
-We can now plot this by callin gthe `ggplot()` function and adding the `sf` object with `geom_sf`: 
+We can now plot this by calling the `ggplot()` function and adding the `sf` object with `geom_sf`: 
 
 ```{r}
 
@@ -942,7 +943,7 @@ To read in gridded data, use the `raster()` function.
 
 ```{r, eval = FALSE}
 
-air_temp <- raster("../datafiles/air.mon.ltm.nc")
+air_temp <- raster("./air.mon.ltm.nc")
 
 ```
 
@@ -950,7 +951,7 @@ Note that we have only read the first layer (January). R will tell you that it l
 
 ```{r}
 
-air_temp <- raster("../datafiles/air.mon.ltm.nc", varname = "air")
+air_temp <- raster("./air.mon.ltm.nc", varname = "air")
 
 air_temp
 
@@ -962,7 +963,7 @@ We can write `raster` objects back to file using `writeRaster()` (I'll bet you n
 
 ```{r, eval = FALSE}
 
-writeRaster(air_temp, filename = "../datafiles/air_temp.tif")
+writeRaster(air_temp, filename = "./air_temp.tif")
 
 ```
 
@@ -1036,7 +1037,7 @@ plot(air_temp,
      main = "NCEP NCAR January LTM Tair", 
      col = my.pal)
 
-countries <- st_read("../datafiles/ne_50m_admin_0_countries/ne_50m_admin_0_countries.shp", 
+countries <- st_read("./ne_50m_admin_0_countries/ne_50m_admin_0_countries.shp", 
                      quiet = TRUE)
 
 plot(st_geometry(countries), add = TRUE)
@@ -1180,7 +1181,7 @@ A useful extension to the basic raster functions is the use of stacks. These are
 
 ```{r}
 
-air_temp_stk <- stack("../datafiles/air.mon.ltm.nc", varname = "air")
+air_temp_stk <- stack("./air.mon.ltm.nc", varname = "air")
 
 air_temp_stk <- rotate(air_temp_stk)
 
@@ -1270,38 +1271,6 @@ plot(1:12,
      xlab = "Month", 
      ylab = "Avg T (C)")
 
-```
-
-## Other spatial functionality
-
-### R and KML files
-
-R can write out KML files for use with Google Earth. A few things to note here:
-
-- The function is `kmlPoints()` from the **maptools** package (there are also functions for KML polygons and lines)
-- The function requires a Spatial* object (here a SpatialPointsDataFrame), and the name of an output file
-- Optionally we can provide a layer name (`kmlname`) and a vector of names for each point (`name`)
-- The optional parameter `description` associates some descriptive text with each point, including HTML tags. 
-    + Here we create a series of descriptions that include the January and July temperatures, together with text labels. 
-    + Note the use of the `paste()` function to glue together different text strings (which can include numeric vectors)
-
-The second function writes out the points and descriptions into a KML file in the current working directory. Once run, find this file and open it in Google Earth. You can replace the icon using any of the icons found [here][iconID].
-
-```{r eval=FALSE}
-description = paste("<b>TJan:</b>", wnaclim.spdf$Jan_Tmp, 
-                    "<br><b>TJul:</b>", wnaclim.spdf$Jul_Tmp)
-kmlPoints(wnaclim.spdf,"test.kml", kmlname="WNAclim",
-          name=wnaclim$WNASEQ, description=description, 
-          icon="http://www.google.com/mapfiles/kml/paddle/wht-diamond.png")
-```
-
-Here's a second example, with polygon data (the Syracuse polygons). Note that as these are in a UTM projection, we need to reproject to latitude/longitude coordinates, then can write out to a KML file:
-```{r eval=FALSE}
-ll.proj <- "+proj=longlat +ellps=WGS84"
-Syracuse.proj <- spTransform(Syracuse, CRS(ll.proj))
-
-kmlPolygons(Syracuse.proj, kmlfile = "syr.kml", 
-            col="white", border="black", lwd=3)
 ```
 
 ## Exercises
