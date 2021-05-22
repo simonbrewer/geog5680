@@ -238,24 +238,13 @@ Vector data
 \begin{frame}{Working with raster data}
 Raster data
 \begin{itemize}
-\item \textbf{raster} package (uses GDAL library, $\approx 150$ formats)
-\item Allows import and export of most raster formats (ArcInfo/GeoTIFF/ESRI/Most RS images/NetCDF)
-\item Will work with large files and stacks/bricks (multi-band raster data)
-\item See also \texttt{readAsciiGrid()} in \textbf{maptools} (reads ESRI grids), \textbf{ncdf4} package, \textbf{landsat} package for remote sensing image correction
-\item \textbf{stars} package for working with space-time data in dense arrays
-
-\end{itemize}
-\end{frame}
-
-%--- Slide ----------------%
-\begin{frame}{Data import/export}
-Raster data
-\begin{itemize}
-\item \textbf{raster} package (uses GDAL library, $\approx$ 150 formats)
-\item Allows import and export of most raster formats (ArcInfo/GeoTIFF/ESRI/Most RS images/NetCDF)
-\item Will work with large files and stacks/bricks (multi-band raster data)
-\item See also \texttt{readAsciiGrid()} in \textbf{maptools} (reads ESRI grids), \textbf{ncdf4} package, \textbf{landsat} package for remote sensing image correction
-\item \textbf{stars} package for working with space-time data in dense arrays
+  \item \textbf{raster} package (uses GDAL library, $\approx 150$ formats)
+  \begin{itemize}
+    \item Allows import and export of most raster formats (ArcInfo/GeoTIFF/ESRI/Most RS images/NetCDF)
+    \item Will work with large files and stacks/bricks (multi-band raster data)
+  \end{itemize}
+  \item \textbf{stars} package for working with space-time data in dense arrays
+  \item See also \texttt{readAsciiGrid()} in \textbf{maptools} (reads ESRI grids), \textbf{ncdf4} package, \textbf{landsat} package for remote sensing image correction
 
 \end{itemize}
 \end{frame}
