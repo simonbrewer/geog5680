@@ -34,7 +34,7 @@ The excel file *clouds.csv* contains information about a set of cloud seeding ex
 
 1. Explore the difference in rainfall between seeding and non-seeding experiments by looking at the statistical characteristics (mean, sd, etc) of the experiments and by using visualization. Use a *t*-test to see whether there is a significant difference.
 
-2. Build a multiple linear regression model to model the effects of seeding on rainfall. Include cloudcover, prewetness, echomotion and 'sne' as independent variables. Explore the model using the `summary()` and `anova()` functions. Which variables appear to influence rainfall the most? 
+2. Build a multiple linear regression model to model the effects of seeding on rainfall. Include `cloudcover`, `prewetness`, `echomotion` and `sne` as independent variables. Explore the model using the `summary()` and `anova()` functions. Which variables appear to influence rainfall the most? 
 
 3. As the suitability index (sne) appears to have a relationship with rainfall, build two new models relating this variable to rainfall, one for the seeding experiments, one for the non-seeding experiments. Compare the coefficients for the two models, and produce a figure showing the two models. What does the difference in slope suggest?
 
