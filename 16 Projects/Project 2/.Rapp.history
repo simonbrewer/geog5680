@@ -1,0 +1,2 @@
+load("/Users/sbrewer/Documents/Classes/GEOG5963/Project Data/Project 2/Rdata.rds")
+ls()
