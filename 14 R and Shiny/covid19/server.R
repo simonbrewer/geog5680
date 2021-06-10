@@ -8,7 +8,7 @@ library(ggplot2)
 
 ## Load data
 covid_dat = read.csv("./data/covid_dat.csv")
-covid_dat$date = as.Date(covid_dat$date, format = "%Y-%m-%d")
+covid_dat$date = as.Date(covid_dat$date, format = "%m/%d/%y")
 covid_dat$doy = as.POSIXlt(covid_dat$date)$yday
 
 # Define server logic required to draw a histogram
@@ -16,7 +16,7 @@ shinyServer(function(input, output) {
 
     output$choose_country <- renderUI({
         # Get the data set with the appropriate name
-        countries <- sort(unique(covid_dat$country))
+        countries <- sort(unique(covid_dat$administrative_area_level_1))
         
         # Create the buttons and check the first by default
         selectInput("country", "Choose country", 
