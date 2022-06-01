@@ -59,7 +59,20 @@ We'll tackle the first 4 of these in this document.
 
 ## Setting up a GitHub account
 
-Go to this site: https://github.com and follow the instructions. Choose your username wisely - remember that this is way that potential employers can see your work!
+Go to this site: https://github.com and follow the instructions. Choose your username wisely - remember that this is way that potential employers can see your work! 
+
+**UPDATE 2022** You will also need to create a Personal Access Token (PAT). 
+
+- Log in to github, then click your profile photo, then click `Settings` (top right corner). 
+- In the left sidebar, click `Developer settings`
+- In the left sidebar, click `Personal access tokens`
+- Click `Generate new token`
+- Give your token a descriptive name
+- It's worth setting an expiration time for your token. Pick 30 days from the drop-down menu, which will cover the duration of this class. After that, you will need to repeat these steps to generate a new token
+- Below this you have the option to select the scopes, or permissions, you'd like to grant this token. This limits access to different parts of your account. For now, just check the box labelled `repo`
+- Click `Generate token`
+
+On the next page, you will see the new token. This is a long string of characters starting with the characters `ghp_`. Copy this into a word document or text file so that you can use it later. 
 
 ## Update R and RStudio
 
@@ -155,7 +168,7 @@ This will open a form with several options. Enter the following:
 
 Click button [Create repository.]
 
-Once this is created, we will now link to this from your computer. Click the button [Clone or download], and copy the HTTPS URL (if you click on the little clipboard icon this will get copied to your clipboard).
+Once this is created, we will now link to this from your computer. Click the green button [Code], and copy the HTTPS URL (if you click on the little clipboard icon this will get copied to your clipboard).
 
 Go back to the terminal on your computer. Change your working directory until you are somewhere where you are happy to be making a copy of your repository. In a terminal:
 
@@ -192,7 +205,7 @@ We will make a simple change to the `READ.md` file, and then check to see if we 
 echo "A line I wrote on my local computer" >> README.md
 ```
 
-Now if you look at the status of git, it will tell you that one file (README.md) has been modified. 
+Now if you type `git status` to show the current state of your repository, it will tell you that one file (`README.md`) has been modified. 
 
 ```
     modified:   README.md
@@ -206,9 +219,11 @@ git commit -m "A commit from my local computer"
 git push
 ```
 
-The description of changes is a key part of the way git works, and you will not be allowed to push changes without this. The goal here is to make the description brief but informative, and in turn the commits you make should be relatively small increments each time. Remember that the goal of these comments is to allow collaborators and other users to understand what is going on and how this is affecting the code. 
+When you run this last command (`git push`) you should be prompted for your username and password. The username is your GitHub name (not your email) and the password is the token you created earlier. 
 
 Depending on your operating system, this might open a browser page for GitHub's credential manager, which can be used to store your login details. Here, you need to click the green button [Authorize GitCredentialManager], then enter your password. This may not work in certain browsers (e.g. Windows Edge). If the button is grayed out and you can't click it, close the browser and stop the `push` command (press `Ctrl-C` in the terminal). Now set you default browser to something else (e.g. Chrome) and try and run the `git push` command again. 
+
+The description of changes is a key part of the way git works, and you will not be allowed to push changes without this. The goal here is to make the description brief but informative, and in turn the commits you make should be relatively small increments each time. Remember that the goal of these comments is to allow collaborators and other users to understand what is going on and how this is affecting the code. 
 
 If this has worked, you should see some output similar to this:
 
@@ -232,29 +247,89 @@ If you have got to this point, you now have a successfully working git installat
 
 # R and GitHub
 
-In the previous section, we went through the somewhat laborious steps of setting up your computer to talk to GitHub. We will now look at how to integrate this with R/RStudio, how to set up a R project with GitHub, and how to clone an existing repository. 
+In the previous section, we went through the somewhat laborious steps of setting up your computer to talk to GitHub. We will now look at how to integrate this with R/RStudio, which is generally a lot easier! 
 
 ## 1. Make a new repository on GitHub
 
-We covered this briefly in the previous instructions, but let's do this again. Go to [GitHub][ghID], make sure you are logged in and go to [Repositories]. Click the green button to make a new repository. Call this `myrrepo`, and add a short description (something like `testing RStudio setup`). Make sure the check-box to initialize the repository with a README is checked and click [Create repository]. Once created, click the button [Clone or download], and copy the HTTPS URL (if you click on the little clipboard icon this will get copied to your clipboard).
+We covered this briefly in the previous instructions, but let's do this again. Go to [GitHub][ghID], make sure you are logged in and go to [Repositories]. Click the green button to make a new repository. Call this `my_r_repo`, and add a short description (something like `testing RStudio setup`). Make sure the check-box to initialize the repository with a README is checked and click [Create repository]. Once created, click the green button [Code], and copy the HTTPS URL (if you click on the little clipboard icon this will get copied to your clipboard).
 
 ## 2. Make a new RStudio project
 
-To connect this to RStudio, we need to make an RStudio project. This is a little different from the regular R scripts, and acts like a git repository to store a bunch of files in a common setting. Open RStudio, and make a new project from [File] > [New Project]. Click on [Version Control], then [Git] (Clone a project from a Git repository). 
+To connect this to RStudio, we need to make an RStudio project. This is a little different from the regular R scripts, and acts like a local git repository to store a bunch of files in a common setting. Open RStudio, and make a new project from [File] > [New Project]. Click on [Version Control], then [Git] (Clone a project from a Git repository). 
 
 On the next screen, add the URL you copied from GitHub to the box labeled [Repository URL]. For the next box, accept the given project directory name (this should be the same as the GitHub repository). The final box gives the directory where the repository will be cloned to on your computer. Make sure this is ok, and that the check-box [Start in new session] is checked. Now click [Create project].
 
-RStudio will appear to restart, launching a new local RStudio Project that connects to the repository on GitHub. It will download the README file, and this should appear in the file browser panel. 
+RStudio will appear to restart, launching a new local RStudio Project that connects to the repository on GitHub. It will download the README file, and this should appear in the file browser panel. You should also see the name of the project appear in the top-right hand corner of the RStudio window:
 
-If all this has worked, congratulations - you have successfully linked RStudio to your GitHub account, and can now make changes and push these to GitHub. Note that nearly all these instructions only need to be carried out once. The only part of this you will do routinely is the last part: creating new projects for different bits of work you are carrying out. 
+```{r fig.width=4, fig.height=2., echo=FALSE}
+img <- readPNG("images/project1.png")
+grid.raster(img)
+```
 
-## 3. Start making changes to your project
+## 3. Saving your Github credentials
 
-Let's try and make some changes. First, make sure the README.md file is open in the files panel. If not, click on the file browser, which will show you the contents of the project directory, and double click the README.md file. Add a small amount of text to this (I’ll leave this up to you). 
+Before working with the repository, you need to store the token you created earlier (otherwise you'll be asked for it each time you try to make a change). Fortunately, there is a library to help with this. Install **gitcreds**:
 
-If you now look at the RStudio panel with the Environment, History and Connections tabs, you should see a new one labeled ‘Git’. Click on this and you should see your READ.md file with a small blue ‘M’ next to it. This indicates that this file has been modified and is different from the version downloaded from GitHub. If you’re happy with the changes you made, click on the check-box next to the ‘M’ (under the heading ‘Staged’) to stage these changes for uploading.
+```{r eval=FALSE}
+install.packages("gitcreds")
+```
 
-Now click the [Commit] button. A new window will open showing a) all the files; b) the staged files with a check mark; c) a blank panel to add a commit message; d) a display of which lines have been changed in the currently highlit file (green for additions, red for deletions). Check that your file is still listed as ‘Staged’ and add a commit message; a short description of the changes. Once this is done, click [Commit] to commit your changes. This effectively creates an updated local version of the repository, including the staged changes. However, if you check your GitHub repository, and look at the README file there, you will see that the changes have not yet been uploaded. To do this, we need to push the changes, so click this button – you should see a short message detailing the upload. Go back to your browser and recheck the README file and you should see your changes appear (refresh the browser page if they are not there). 
+And load the library:
+
+```{r eval=FALSE}
+library(gitcreds)
+```
+
+Now run the following command. 
+
+```{r eval = FALSE}
+gitcreds_set()
+```
+
+This should show your current credentials:
+
+```
+-> Your current credentials for 'https://github.com':
+
+  protocol: https
+  host    : github.com
+  username: USERNAME
+  password: <-- hidden -->
+
+-> What would you like to do? 
+
+1: Keep these credentials
+2: Replace these credentials
+3: See the password / token
+```
+
+Select `2` to add your token, copy-paste it and hit Enter. It should something like:
+
+```
+-> Adding new credentials...
+-> Removing credetials from cache...
+-> Done.
+```
+
+If all this has worked, congratulations - you have successfully linked RStudio to your GitHub account, and can now make changes and push these to GitHub. Note that nearly all these instructions only need to be carried out once, with a couple of key exceptions:
+
+- You will need to replace your token when it expires
+- You will need to create a new repository for different projects and clone it to a R project (this is just to keep things organized) 
+
+## 4. Start making changes to your project
+
+Let's try and make some changes. First, make sure the `README.md` file is open in the files panel. If not, click on the file browser, which will show you the contents of the project directory, and double click the README.md file. Add a small amount of text to this (I'll leave this up to you). 
+
+If you now look at the RStudio panel with the Environment, History and Connections tabs, you should see a new one labeled [Git]. Click on this and you should see your `READ.md` file with a small blue `M` next to it. This indicates that this file has been modified and is different from the version downloaded from GitHub. If you're happy with the changes you made, click on the check-box next to the `M` (under the heading `Staged`) to stage these changes for uploading.
+
+Now click the [Commit] button. A new window will open showing a) all the files; b) the staged files with a check mark; c) a blank panel to add a commit message; d) a display of which lines have been changed in the currently highlit file (green for additions, red for deletions). Check that your file is still listed as `Staged` and add a commit message; a short description of the changes. Once this is done, click [Commit] to commit your changes. This effectively creates an updated local version of the repository, including the staged changes. However, if you check your GitHub repository, and look at the README file there, you will see that the changes have not yet been uploaded. To do this, we need to push the changes, so click the [Push] button. You should now see a short message detailing the upload. 
+
+```{r fig.width=4, fig.height=2., echo=FALSE}
+img <- readPNG("images/push.png")
+grid.raster(img)
+```
+
+Go back to your browser and recheck the README file on your Github repository and you should see your changes appear (refresh the browser page if they are not there). 
 
 Now let’s add an R script. In RStudio, click [File] > [New File] > [R Script] to open a blank R script. Add the following R code to this script:
 
@@ -267,7 +342,7 @@ fit = lm(y ~ x)
 summary(fit)
 ```
  
-This simply generates some correlated random numbers and builds a linear model between them, and prints out the results of that model. Save the script file as ‘lmExample.R’ and then click ‘Run’ from the scripting window. This will run all the code and allow you to check for mistakes. If all is ok, go through the same steps to commit the changes:
+This simply generates some correlated random numbers and builds a linear model between them, and prints out the results of that model. Save the script file as `lmExample.R` and then click [Run] from the scripting window. This will run all the code and allow you to check for mistakes. If all is ok, go through the same steps to commit the changes:
 
 -	Click on [Commit] from the ‘Git’ tab
 -	Stage the files you want to push
