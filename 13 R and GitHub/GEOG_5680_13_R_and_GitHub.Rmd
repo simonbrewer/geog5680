@@ -342,15 +342,17 @@ fit = lm(y ~ x)
 summary(fit)
 ```
  
-This simply generates some correlated random numbers and builds a linear model between them, and prints out the results of that model. Save the script file as `lmExample.R` and then click [Run] from the scripting window. This will run all the code and allow you to check for mistakes. If all is ok, go through the same steps to commit the changes:
+This simply generates some correlated random numbers and builds a linear model between them, and prints out the results of that model. Save the script file as `lmExample.R` and then click [Run] from the scripting window. This will run all the code and allow you to check for mistakes. 
 
--	Click on [Commit] from the ‘Git’ tab
--	Stage the files you want to push
+Now if you check your Git tab, you should now see this file, with a small 'A' to indicate this is a new file added to the repository. If all is ok, go through the same steps to commit the changes:
+
+-	Click on [Commit] from the [Git] tab
+-	Stage the files you want to push (the new R script)
 -	Add a commit message
 -	Push to GitHub
 -	Check that your changes made it
 
-Let’s add a couple more changes. First, we’ll add code to plot the data, and the model fit to the end of the file: 
+Let's add a couple more changes. First, we'll add code to plot the data, and the model fit to the end of the file: 
 
 ```{r fig.keep='none'}
 plot(x,y)
@@ -365,7 +367,7 @@ Finally, get the Mauna Loa csv file from the slack channel and add it to the pro
 getwd()
 ```
 
-Now if you check your Git tab, you should now see this file, with a small 'A' to indicate this is a new file added to the repository. Open a new script to load and plot this
+Now if you check your Git tab after copying the file, you should see it with a small 'A' next to it.  to indicate this is a new file added to the repository. Open a new script to load and plot this
 
 ```{r fig.keep='none'}
 co2 = read.csv("co2_mm_mlo.csv")
@@ -398,59 +400,6 @@ There is no additional work to do for this module's exercise. Simply submit the 
 | CO2int | CO2 conc. with missing values filled |
 | Trend | Long-term trend | 
 | Full | All days in month recorded | 
-
-# Appendix: Setup SSH
-
-[NOTE THAT THIS SECTION MAY NO LONGER BE NEEDED IF YOU HAVE USED GITHUB CREDENTIAL MANAGER]
-
-To avoid having to type in your GitHub password every time you make a request (commit, clone, etc), we can set up an SSH key pair. The key pair consists of a public and private key. The public key can be given to any server you want to connect to. When this is paired with a client that has the private key (your computer), the server unlocks without need for a password. 
-
-To do this, we need to 
-
-- Generate the SSH key pair
-- Add the private key to your local SSH client
-- Add the public key to GitHub
-
-There are a variety of ways of doing this, but the easiest is to rely on built-in tools in RStudio, so start this up now. 
-
-First, it's worth checking to see if there is already an existing key pair. Go to [Tools] > [Global Options] > [Git/SVN]. If you see something like `~/.ssh/id_rsa` in the SSH RSA Key box, you have existing keys that can be used, and you can skip the next section. If you don't see anything, but you know that there should be a key already present, you can check this by looking at the contents of the `.ssh` directory on your computer:
-
-```
-ls -al ~/.ssh/
-```
-
-If you see a different key pair present, you can use these later on.
-
-If not, you can generate a key pair by clicking on the [Create RSA Key...] button. RStudio will prompt you for a passphrase, but it is probably easiest to skip this for now and add it later. Click [Create] and RStudio will generate an SSH key pair, stored in the files ~/.ssh/id_rsa and ~/.ssh/id_rsa.pub (and the first of these should be shown in the SSH RSA Key box.
-
-Now let's add the private key to the local ssh agent. You will need to do this from a terminal. Again, the easiest way is to open the terminal in RStudio (go to [Tools] > [Terminal] > [New Terminal]) to open a terminal in the console panel. Here, first type the following to check that `ssh-agent` (the local SSH client) is running:
-
-```
-eval "$(ssh-agent -s)"
-```
-And you should see a process ID like this:
-```
-# Agent pid 95727
-```
-
-Now add the key you have created using the following command:
-```
-ssh-add ~/.ssh/id_rsa
-```
-
-Note that if your key pair has a different name, you will need to use that here. 
-
-Finally, we need to add the public key to GitHub. Go to [Tools] > [Global Options] > [Git/SVN]. If your key pair has the usual name, id_rsa.pub and id_rsa, RStudio will see it and offer to “View public key”. Do that and accept the offer to copy to your clipboard. If your key pair is named differently, open it using a text editor and copy the contents to your clipboard.
-
-Now open a browser, go to [GitHub][ghID] and sign in. Click on the profile picture in the top right hand corner and go to [Settings] > [SSH and GPG keys]. Click [New SSH key] and then paste what you just copied into this box. Give it a title (this can be anything you like) and click [Add SSH key]. 
-
-And that's it! If you've made it this far, everything should be in place for you to connect to GitHub directly as you use R. To test the connection, go back to the terminal on your computer and enter the following:
-
-```
-ssh -T git@github.com
-```
-
-And you should see a confirmation that the RSA host key has been permanently added. 
 
 
 [ghID]: https://github.com
