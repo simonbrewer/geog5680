@@ -4,7 +4,7 @@ author: |
   | Simon Brewer
   | Geography Department
   | University of Utah
-date: "May 02, 2021"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
   html_document:
     toc: true
@@ -623,11 +623,13 @@ There are two parts to this exercise, all based on the code introduced above. Ma
 
 ### Part 1
 
-The file *BirdFlu.csv* contains the annual number of confirmed cases and deaths of human Avian Influenza A/(H5N1) for several countries as reported to the World Health Organization (WHO). The data were taken from the WHO website (www.who.int/en/) and reproduced for educational purposes. 
+The file *BirdFlu_deaths.csv* contains the annual number of confirmed deaths resulting from human Avian Influenza A/(H5N1) for several countries as reported to the World Health Organization (WHO). Each row represents one country, and the columns give the number of deaths from 2003 to 2008. The data were taken from the WHO website (www.who.int/en/) and reproduced for educational purposes. 
 
-Read the data into R, and use the functions `names()` and `str()` in R to view the data and get a overview of its structure. Make a new vector containing the number of bird flu cases by country in 2003 and then a second new vector containing the number of deaths by country for the same year. 
-
-Use the `sort()` function to find the country has had the most deaths from bird flu in 2005
+- Read the data into R
+- Use the functions `names()`, `head()` and `str()` in R to view the data and get a overview of its structure
+- Find the row containing maximum number of deaths for 2005 using the `which()` function
+- Use this (the row number) to identify the country with the maximum number of deaths in 2005, using R's indexing notation (`[row, col]`)
+- Use the same method to find the maximum number of deaths in 2007
 
 ### Part 2
 
