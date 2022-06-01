@@ -399,7 +399,7 @@ Now make some time series plots of temperature and salinity time series. We will
 temp$decdate <- temp$Year + temp$dDay3 / 365
 ```
 - Now, using this variable make a scatterplot of temperature and salinity over time
-- Make a scatterplot of salinity, grouped using `facet_by()` into different 'Areas'
+- Make a scatterplot of salinity, grouped using `facet_wrap()` into different 'Areas'
 - Make a lineplot of salinity for each station, grouped into different 'Areas'
 - *Bonus: do the same but only for area 'OS'*
 
