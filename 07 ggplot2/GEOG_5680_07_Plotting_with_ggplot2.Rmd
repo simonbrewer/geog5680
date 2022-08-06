@@ -4,7 +4,7 @@ author: |
   | Simon Brewer
   | Geography Department
   | University of Utah
-date: "May 17, 2021"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
   html_document:
     toc: true
@@ -395,9 +395,13 @@ Alternatively, you can use R Markdown and **knitr** to produce an html page that
 ### Part 2
 
 Now make some time series plots of temperature and salinity time series. We will need a variable to represent continuous time from the start of the observations and can do this by creating a decimal date as the sum of the year and the day number / 365 (if `temp` is the dataframe holding the data):
+
 ```{r eval=FALSE}
 temp$decdate <- temp$Year + temp$dDay3 / 365
 ```
+
+You will need to use this new variable (`decdate`) as the x-axis for each plot:
+
 - Now, using this variable make a scatterplot of temperature and salinity over time
 - Make a scatterplot of salinity, grouped using `facet_wrap()` into different 'Areas'
 - Make a lineplot of salinity for each station, grouped into different 'Areas'
