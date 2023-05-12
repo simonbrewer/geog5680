@@ -6,7 +6,7 @@
 \usecolortheme{seahorse}
 
 % Standard header (will need to change date!)
-\title[GEOG 5680/6680 Summer '21]{GEOG 5680 / 6680\\Introduction to R}
+\title[GEOG 5680/6680 Summer '23]{GEOG 5680 / 6680\\Introduction to R}
 \subtitle[Intro]{00: Class Introduction}
 \author[S. Brewer]{Simon Brewer}
 \institute[Univ. Utah]{
@@ -15,7 +15,7 @@
   Salt Lake City, Utah 84112\\[1ex]
   \texttt{simon.brewer@geog.utah.edu}
 }
-\date[May 11, 2021]{May 11, 2021}
+\date[May 15, 2023]{May 15, 2023}
 
 \begin{document}
 %\SweaveOpts{concordance=TRUE}
@@ -97,16 +97,6 @@
 \end{itemize}
 \end{frame}
 
-%--- Slide ----------------%
-\begin{frame}{Getting help with labs}
-\begin{itemize}
-  \item Slack channel (geog568066802021.slack.com)
-  \item Canvas
-  \item Email (simon.brewer@geog.utah.edu)
-  \item Office hours: Tuesday/Thursday mornings
-\end{itemize}
-\end{frame}
-
 %--- Slide 15 ----------------%
 \begin{frame}{Reading material}
 \begin{columns}
@@ -145,7 +135,7 @@
     \item Provide R code as a script
     \item Copy-paste results and/or figures to Word document
     \item Submission through Canvas
-    \item All exercises to be submitted by Wednesday, June 25
+    \item All exercises to be submitted by Friday, June 23
   \end{itemize}
   \item<2-> Course project (25 pts)
   \begin{itemize}
@@ -178,7 +168,7 @@
       \item Results including figures
       \item Brief discussion of project and results
   	\end{itemize}
-  	\item Due Friday, June 25 through Canvas
+  	\item Due Friday, June 23 through Canvas
   \end{itemize}
 \end{itemize}
 \end{frame}
