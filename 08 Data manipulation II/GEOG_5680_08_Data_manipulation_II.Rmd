@@ -4,7 +4,7 @@ author: |
   | Simon Brewer
   | Geography Department
   | University of Utah
-date: "May 18, 2021"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
   html_document:
     toc: true
@@ -327,7 +327,7 @@ Now use the commands introduced above to do the following:
 - Using `filter()` make a new data frame containing only the first subject
 - Using `filter()` make a new data frame containing only the first *four* subjects
 - Using `group_by()`, calculate the average concentration per subject (across all times)
-- Using `filter()` make a new data frame containing only the first subject*and* pipe this to `ggplot()` to make a line plot with `Time` on the x-axis and `conc` on the y-axis
+- Using `filter()` make a new data frame containing only the first subject *and* pipe this to `ggplot()` to make a line plot with `Time` on the x-axis and `conc` on the y-axis
 - Using `select()` to extract just the `Subject`, `Time` and `conc` variables *and* pipe this to `ggplot()` to make a line plot with `Time` on the x-axis, `conc` on the y-axis and the lines colored by subject
 - Using `select()` to extract just the `Subject`, `Time` and `conc` variables *and* pipe this to ggplot to make a line plot with `Time` on the x-axis, `conc` on the y-axis and faceted by the subject ID
 
