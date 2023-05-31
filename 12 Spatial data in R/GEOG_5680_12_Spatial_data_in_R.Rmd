@@ -1148,7 +1148,7 @@ We created a simple feature object earlier with the location of samples in Weste
 
 ```{r}
 
-wna_air_temp_df <- extract(air_temp, 
+wna_air_temp_df <- extract(jan_temp, 
                            wna_climate, 
                            method = 'bilinear',
                            df = TRUE) 
@@ -1163,23 +1163,36 @@ This same approach allows you to extract pixels by polygon overlays.
 
 ```{r}
 
-china <- subset(countries, NAME == "China")
+china <- countries[countries$NAME == "China", ]
 
-china_air_temp_df <- extract(air_temp, china, df = TRUE)
+china_air_temp_df <- extract(jan_temp, china, df = TRUE)
 
 head(china_air_temp_df)
 
 ```
 
-When this function is used with a set of polygons, the output is in a list, but we can retrieve whatever we want from that list.
+Note that the first column is an ID corresponding to the polygon that was used. When this function is used with a set of polygons, the output is in a list, but we can retrieve whatever we want from that list.
 
 ```{r}
 
 two_countries <- rbind(china, canada)
 
-china_tjan <- extract(air_temp, two_countries)[[1]]
+two_countries_tjan <- extract(jan_temp, two_countries)
 
-hist(china_tjan)
+head(two_countries_tjan)
+
+```
+
+And we can make a quick plot with **ggplot2** to show the two distributions of temperature:
+
+```{r}
+
+library(ggplot2)
+library(dplyr)
+two_countries_tjan %>%
+  mutate(NAME = ifelse(ID == 1, "China", "Canada")) %>%
+  ggplot(aes(x = air_1, fill = NAME)) +
+  geom_histogram(position = 'identity', alpha = 0.75)
 
 ```
 
@@ -1187,9 +1200,11 @@ The `extract()` function also takes an argument `fun`. This allows you to calcul
 
 ```{r}
 
-countries$Jan_Tmp <- extract(air_temp, countries, fun = mean)[,1]
+countries$Jan_Tmp <- extract(jan_temp, countries, fun = mean)[, 'air_1']
 
-ggplot(countries) +
+countries_sf <- st_as_sf(countries)
+
+ggplot(countries_sf) +
   geom_sf(aes(fill = Jan_Tmp)) +
   labs(fill = "Temperature",
        title = "Country average January temperature")
