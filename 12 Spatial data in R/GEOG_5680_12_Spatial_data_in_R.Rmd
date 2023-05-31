@@ -944,31 +944,55 @@ The **terra** package offers a wide array of functions for dealing with gridded 
 
 ### Read and Write Rasters
 
-To read in gridded data, use the `raster()` function. 
+To read in gridded data, use the `rast()` function. 
 
 ```{r, eval = FALSE}
 
 air_temp <- rast("./air.mon.ltm.nc")
 
-```
-
-Note that we have only read the first layer (January). R will tell you that it loaded the variable called *air*. To avoid this message you can specify this directly, which is important for files containing multiple variables:
-
-```{r}
-
-air_temp <- raster("./air.mon.ltm.nc", varname = "air")
-
 air_temp
 
 ```
 
+When we print the `rast` object created, the second line of the output lists the dimensions of the data. Note that here, this has 73 rows, 144 columns and 24 layers (each representing a different variable)
+
+In this case, `rast` has not set the spatial extent of the data correctly, so we can do that by hand. The NCAR data span from 0-360 longitude and -90 to 90 latitude:
+
+```{r}
+
+set.ext(air_temp, value = c(0, 360, -90, 90))
+
+ext(air_temp)
+
+```
+
+We can convert this to the more commonly used (and UK-centric :) ) -180 to 180 by the function `rotate()`:
+
+```{r}
+
+air_temp = rotate(air_temp)
+
+```
+
+You can access any of the layers using R's list notation (e.g. `rast[[1]]`). To extract the first layer (here, January air temperature):
+
+```{r}
+
+jan_temp = air_temp[[1]]
+
+jan_temp
+
+```
 <br>
 
-We can write `raster` objects back to file using `writeRaster()` (I'll bet you never thought it would be called that). Here we write out to a TIFF format. You can see the full list of available formats for reading and writing by running the `writeFormats()` function in the console. 
+
+We can write `rast` objects back to file using `writeRaster()` (I'll bet you never thought it would be called that). Here we write out to a TIFF format. You can see the full list of available formats for reading and writing by running the `writeFormats()` function in the console. 
 
 ```{r, eval = FALSE}
 
-writeRaster(air_temp, filename = "./air_temp.tif")
+writeRaster(jan_temp, 
+            filename = "./jan_temp.tif",
+            overwrite = TRUE)
 
 ```
 
@@ -981,8 +1005,7 @@ Set CRS:
 
 ```{r, message = FALSE, warning = FALSE}
 
-air_temp <- rotate(air_temp)
-crs(air_temp) <- "+proj=longlat +ellps=WGS84 +towgs84=0,0,0 +no_defs"
+crs(jan_temp) <- "EPSG:4326"
 
 ```
 
@@ -994,61 +1017,59 @@ Get CRS:
 
 ```{r}
 
-crs(air_temp)
+crs(jan_temp, proj = TRUE)
 
 ```
 
-Also, note that `crs` is for rasters, `st_crs` for vectors. 
+Also, note that `crs` is for `rasters`rast` objects, `st_crs` for vectors. 
 
 <br>
 
-Transform CRS:
+Transform CRS. Note that **terra** can also uses the PROJ4-string syntax. It's a holdover from its original development:
 
 ```{r, warning = FALSE}
 
 weird_crs <- crs("+proj=tmerc +lat_0=0 +lon_0=15 +k=0.999923 +x_0=5500000 +y_0=0 +ellps=GRS80 +units=m +no_defs")
 
-air_temp_weird_crs <- projectRaster(air_temp, crs = weird_crs)
+jan_temp_weird_crs <- project(jan_temp, weird_crs)
 
-crs(air_temp_weird_crs)
+crs(jan_temp_weird_crs, proj = TRUE)
 
 ```
-
-Note that **raster** still uses the PROJ4-string syntax. It's a holdover from its original development.  
 
 <br>
 
 ### Basic Plotting
 
-`air_temp` is a raster object and has information about grid spacing, coordinates etc. Note that the description of the object tells you whether it is held in memory (small raster files) or on disk.
+`jan_temp` is a `rast` object and has information about grid spacing, coordinates etc. Note that the description of the object tells you whether it is held in memory (small raster files) or on disk.
 
 ```{r}
 
-plot(air_temp, main = "NCEP NCAR January LTM Tair")
+plot(jan_temp, main = "NCEP NCAR January LTM Tair")
 
 ```
 
 <br>
 
-And you should be able to see the outline of the continents. By default, NCAR NetCDF files have longitudes running from 0 to 360. We can convert this to the more commonly used (and UK-centric :) ) -180 to 180 by the function `rotate()`. We can also use a different color palette and overlay country polygons:
+And you should be able to see the outline of the continents. We can also use a different color palette and overlay country polygons. You can use `sf` objects for this, or use the **terra** package own vector format (`vect`). We'll use that here, as it has some advantages for spatial overlays. To read in a shapefile in this format, use the `vect` function:
 
 ```{r}
 
-air_temp = rotate(air_temp)
+# air_temp = rotate(air_temp)
 
 # using RColorBrewer
 my.pal <- brewer.pal(n = 9, name = "OrRd")
 
-plot(air_temp, 
+plot(jan_temp, 
      main = "NCEP NCAR January LTM Tair", 
      col = my.pal)
 
-countries <- st_read("./ne_50m_admin_0_countries/ne_50m_admin_0_countries.shp", 
-                     quiet = TRUE)
+countries <- vect("./ne_50m_admin_0_countries/ne_50m_admin_0_countries.shp")
 
-plot(st_geometry(countries), add = TRUE)
+plot(countries, add = TRUE)
 
 ```
+
 To see other color palettes in the **RColorBrewer** package, run `display.brewer.all()` in the console. You can find out more details and explore visualizations with these palettes [here](https://colorbrewer2.org/).
 
 <br>
@@ -1059,9 +1080,9 @@ The function `cellStats()` can be used to calculate most summary statistics for 
 
 ```{r}
 
-cellStats(air_temp, mean)
+global(jan_temp, mean)
 
-cellStats(air_temp, sd)
+global(jan_temp, sd)
 
 ```
 
@@ -1074,23 +1095,27 @@ If we want to use only a subset of the original raster layer, the function `crop
 ```{r}
 
 # extent method
-canada_ext <- extent(c(xmin = -142, 
-                       xmax = -52, 
-                       ymin = 41,
-                       ymax = 84))
+canada_ext <- ext(c(xmin = -142, 
+                    xmax = -52, 
+                    ymin = 41,
+                    ymax = 84))
 
-# this produces a slightly different result because I rounded the coordinates
-canada_air_temp <- crop(air_temp, canada_ext)
+canada_air_temp <- crop(jan_temp, canada_ext)
 
-# spatial method
-canada <- subset(countries, NAME == "Canada")
+```
 
-canada_air_temp <- crop(air_temp, canada)
+If we extract the polygon corresponding to the outline of Canada, we can use that insteadL
+
+```{r}
+
+canada <- countries[countries$NAME == "Canada", ]
+
+canada_air_temp <- crop(jan_temp, canada)
 
 # plot
 plot(canada_air_temp, main = "NCEP NCAR January LTM Tair", col = my.pal)
 
-plot(st_geometry(canada), add = TRUE)
+plot(canada, add = TRUE)
 
 ```
 
@@ -1103,7 +1128,7 @@ canada_air_temp <- mask(canada_air_temp, mask = canada)
 # plot
 plot(canada_air_temp, main = "NCEP NCAR January LTM Tair", col = my.pal)
 
-plot(st_geometry(canada), add = TRUE)
+plot(canada, add = TRUE)
 
 ```
 
@@ -1115,15 +1140,7 @@ Values can be extracted from individual locations (or sets of locations) using `
 
 ```{r}
 
-extract(air_temp, cbind(-111.9,40.76))
-
-```
-
-By default this gives you the value of the cell in which the point falls. The value can equally be estimated by bilinear interpolation from the four closest cells with `method='bilinear'`:
-
-```{r}
-
-extract(air_temp, cbind(-111.9,40.76), method = 'bilinear')
+extract(jan_temp, cbind(-111.9,40.76))
 
 ```
 
