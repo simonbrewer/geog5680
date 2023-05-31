@@ -1,7 +1,10 @@
 ---
 title: "GEOG 5680 6680 12 Spatial data in R"
-author: "Simon Brewer and Blake Vernon"
-date: "May 20, 2021"
+author: | 
+  | Simon Brewer and Blake Vernon
+  | Geography and Anthropology Departments
+  | University of Utah
+date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
   html_document:
     toc: true
@@ -34,8 +37,7 @@ Make sure to unzip the zip files so that R can access the content. Note that on 
 Base R has no structure for spatial data, so you will need to install the following packages (you should have some of these from previous modules):
 
 - **sf**
-- **raster**
-- **ncdf4**
+- **terra**
 - **RColorBrewer**
 - **ggplot2**
 - **viridis**
@@ -43,8 +45,7 @@ Base R has no structure for spatial data, so you will need to install the follow
 ```{r, message = FALSE}
 
 library(ggplot2)
-library(raster)
-library(ncdf4)
+library(terra)
 library(RColorBrewer)
 library(sf)
 library(viridis)
@@ -819,6 +820,8 @@ Multiple layers can be added to a plot by adding additional `geom_sf` functions.
 
 ```{r, message = FALSE}
 
+sf::sf_use_s2(FALSE)
+
 bingies_neighbors <- st_filter(NY8, binghamton)
 
 random_pnts <- st_sample(bingies_neighbors, size = 25)
@@ -916,18 +919,18 @@ ggplot() +
 
 Up till now, we have been working with _vector_ spatial data. These are geometries composed of points defined by their coordinates. An alternative form of spatial data is known as a _raster_. This is gridded data. It takes the form of a rectangle composed of squares of equal size, which are sometimes called 'cells' or 'pixels'. Each cell stores some kind of value. 
 
-This simplifies the geometry, which can be specified by two pieces of information: the spatial extent of the raster and the resolution of the cells. Here we create a blank raster using the `raster` function, and assign random values to each cell:
+This simplifies the geometry, which can be specified by two pieces of information: the spatial extent of the raster and the resolution of the cells. Here we create a blank raster with 10 rows and 10 columns using the `rast()` function, and assign random values to each cell:
 
 ```{r, echo = TRUE}
 
-r <- raster(nrow = 10, ncol = 10)
+r <- rast(nrow = 10, ncol = 10)
 
 r[] <- runif(n = 100)
 
 r
 ```
 
-`raster` objects can be plotted using the base `plot()` command:
+`rast` objects can be plotted using the base `plot()` command:
 
 ```{r}
 
@@ -935,7 +938,7 @@ plot(r)
 
 ```
 
-The **raster** package offers a wide array of functions for dealing with gridded data, including the ability to read from many widely used file formats, like remote sensing images (e.g. GeoTiffs), NetCDF, and HDF formats. We will use it here to work with gridded air temperature data (*air.mon.ltm.nc*) from the [NCAR NCEP reanalysis project](https://www.cpc.ncep.noaa.gov/products/wesley/reanalysis.html). This is the long term means for each month from 1981-2010. The file has 12 layers (one per month) and one variable (*air*). 
+The **terra** package offers a wide array of functions for dealing with gridded data, including the ability to read from many widely used file formats, like remote sensing images (e.g. GeoTiffs), NetCDF, and HDF formats. We will use it here to work with gridded air temperature data (*air.mon.ltm.nc*) from the [NCAR NCEP reanalysis project](https://www.cpc.ncep.noaa.gov/products/wesley/reanalysis.html). This is the long term means for each month from 1981-2010. The file has 12 layers (one per month) and one variable (*air*). 
 
 <br>
 
@@ -945,7 +948,7 @@ To read in gridded data, use the `raster()` function.
 
 ```{r, eval = FALSE}
 
-air_temp <- raster("./air.mon.ltm.nc")
+air_temp <- rast("./air.mon.ltm.nc")
 
 ```
 
@@ -978,7 +981,8 @@ Set CRS:
 
 ```{r, message = FALSE, warning = FALSE}
 
-crs(air_temp) <- "+proj=longlat +ellps=WGS84 +towgs84=0,0,0 +no_defs "
+air_temp <- rotate(air_temp)
+crs(air_temp) <- "+proj=longlat +ellps=WGS84 +towgs84=0,0,0 +no_defs"
 
 ```
 
