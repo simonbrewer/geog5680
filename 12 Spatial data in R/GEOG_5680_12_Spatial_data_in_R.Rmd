@@ -946,7 +946,7 @@ The **terra** package offers a wide array of functions for dealing with gridded 
 
 To read in gridded data, use the `rast()` function. 
 
-```{r, eval = FALSE}
+```{r, eval = TRUE}
 
 air_temp <- rast("./air.mon.ltm.nc")
 
@@ -963,14 +963,6 @@ In this case, `rast` has not set the spatial extent of the data correctly, so we
 set.ext(air_temp, value = c(0, 360, -90, 90))
 
 ext(air_temp)
-
-```
-
-We can convert this to the more commonly used (and UK-centric :) ) -180 to 180 by the function `rotate()`:
-
-```{r}
-
-air_temp = rotate(air_temp)
 
 ```
 
@@ -1051,11 +1043,11 @@ plot(jan_temp, main = "NCEP NCAR January LTM Tair")
 
 <br>
 
-And you should be able to see the outline of the continents. We can also use a different color palette and overlay country polygons. You can use `sf` objects for this, or use the **terra** package own vector format (`vect`). We'll use that here, as it has some advantages for spatial overlays. To read in a shapefile in this format, use the `vect` function:
+And you should be able to see the outline of the continents. We can convert this to the more commonly used (and UK-centric :) ) -180 to 180 by the function `rotate()`. We'll also use a different color palette and overlay country polygons. You can use `sf` objects for this, or use the **terra** package own vector format (`vect`). We'll use that here, as it has some advantages for spatial overlays. To read in a shapefile in this format, use the `vect` function:
 
 ```{r}
 
-# air_temp = rotate(air_temp)
+jan_temp = rotate(jan_temp)
 
 # using RColorBrewer
 my.pal <- brewer.pal(n = 9, name = "OrRd")
@@ -1206,8 +1198,10 @@ countries_sf <- st_as_sf(countries)
 
 ggplot(countries_sf) +
   geom_sf(aes(fill = Jan_Tmp)) +
+  scale_fill_viridis(option = "inferno") +
   labs(fill = "Temperature",
-       title = "Country average January temperature")
+       title = "Country average January temperature") + 
+  theme_bw()
 
 ```
 
@@ -1215,37 +1209,27 @@ ggplot(countries_sf) +
 
 ### Raster Stacks
 
-A useful extension to the basic raster functions is the use of stacks. These are a stack of raster layers which represent different variables, but have the same spatial extent and resolution. We can then read in and store all 12 months from the NetCDF file, and then work with this. We read these in with `stack()` and crop them.
+A useful extension to the basic raster functions is the use of stacks. These are a stack of raster layers which represent different variables, but have the same spatial extent and resolution. There's nothing special that you need to do here - when we originally read in the air temperature data, the `rast` object contained all 24 layers from the NetCDF file. This included 12 monthly layers and 12 layers indicating data quality. We'll re-read this, but this time only include the 12 monthly layers from the NetCDF file, and then work with this. We read these in with `rast()`, specifying the layers with `lyrs=`. We also set the extent and rotate the data. 
 
 ```{r}
 
-air_temp_stk <- stack("./air.mon.ltm.nc", varname = "air")
+air_temp <- rast("./air.mon.ltm.nc", lyrs = 1:12)
 
-air_temp_stk <- rotate(air_temp_stk)
+crs(air_temp) <- "EPSG:4326"
 
-myext <- extent(c(-130,-60,25,50))
+set.ext(air_temp, value = c(0, 360, -90, 90))
 
-air_temp_stk <- crop(air_temp_stk, myext)
+air_temp = rotate(air_temp)
 
 ```
 
-You can retrieve the a subset of rasters from the stack like you would values from a vector:
+we can see that this has 12 layers, each with 280 cells and the extent, etc. The names attributed to each layer are often unreadable, so we can add our own names:
 
 ```{r}
 
-air_temp_substk <- air_temp_stk[[1:3]]
+names(air_temp) <- paste("TAS", month.abb, sep = "_")
 
-air_temp_substk
-
-```
-
-By typing the name of the stack object, we can see that this has 12 layers, each with 280 cells and the extent, etc. The names attributed to each layer are often unreadable, so we can add our own names:
-
-```{r}
-
-names(air_temp_stk) <- paste("TAS", month.abb)
-
-names(air_temp_stk)
+names(air_temp)
 
 ```
 
@@ -1254,20 +1238,21 @@ And now you can also pull out rasters by name:
 ```{r}
 
 # method 1
-air_temp_jan <- air_temp_stk$TAS.Jan
+jan_temp <- air_temp$TAS_Jan
 
 # method 2
-air_temp_jan <- air_temp_stk[["TAS.Jan"]]
+jan_temp <- air_temp[["TAS_Jan"]]
 
 ```
 
-A useful feature of raster `stack`s is that any of the functions we used previously with one layer will be used across all layers when applied to the `stack.` The `plot()` function, for example, returns a grid with one plot per layer. Setting the `zlim` argument ensures that all figures use the same range of colors:
+A useful feature when working with stacks is that any of the functions we used previously with one layer will be used across all layers when applied to the stack. The `plot()` function, for example, returns a grid with one plot per layer. Setting the `range` argument ensures that all figures use the same range of colors:
 
 ```{r}
 
-plot(air_temp_stk, 
+plot(air_temp, 
      col = my.pal, 
-     zlim = c(-35, 35))
+     type = 'continuous',
+     range = c(-40, 40))
 
 ```
 
@@ -1276,11 +1261,13 @@ Adding a shapefile (or other spatial information) is a little more complex. We c
 ```{r}
 
 addBorder = function(){ plot(as_Spatial(countries), add = TRUE) }
+addBorder = function(){ lines(vect) }
 
-plot(air_temp_stk, 
+plot(air_temp, 
      col = my.pal, 
-     zlim = c(-35,35), 
-     addfun = addBorder)
+     type = 'continuous',
+     breaks = seq(-35, 40, by = 5), 
+     fun = function() lines(countries))
 
 ```
 
@@ -1288,44 +1275,46 @@ The `cellStats()` function now returns the mean (or other statistic) for all lay
 
 ```{r}
 
-tavg <- cellStats(air_temp_stk, mean)
+tavg <- global(air_temp, mean)
 
-plot(1:12, tavg, 
+plot(1:12, tavg$mean, 
      type = 'l', 
      xlab = "Month", 
      ylab = "Avg T (C)")
 
 ```
 
-And we can do the same for an individual location using `extract()`:
+And we can do the same for an individual location using `extract()`. We'll convert this to a dataframe and plot using **ggplot2**:
 
 ```{r fig.keep='none'}
 
-slc.tavg <- extract(air_temp_stk, cbind(-111.9,40.76), method = 'bilinear')
-
-plot(1:12, 
-     slc.tavg, 
-     type = 'l', 
-     xlab = "Month", 
-     ylab = "Avg T (C)")
+slc.tavg <- t(extract(air_temp, cbind(-111.9,40.76)))
+plot_df <- data.frame(month = 1:12,
+                      tavg = slc.tavg[, 1])
+ggplot(plot_df, aes(x = month, y = tavg)) +
+  geom_line() +
+  scale_x_continuous("Month") +
+  scale_y_continuous("Deg C") +
+  ggtitle("SLC Temperatures (LTM)") +
+  theme_bw()
 
 ```
 
-## Exercises
+# Exercises
 
 The exercise for the module will get you to make some simple maps with new datasets. You should submit the results as an R script with the commands you used, and a Word (or equivalent) with any results or figures *or* as an html page generated from an R Markdown document
 
 
-### Exercise 1
+## Exercise 1
 In the zipfile *countries.zip* is a global shapefile with various socio-economic indicators for different countries. Load this file into R and make plots of any two of the following variables (the variable names are given in brackets). Try different color scales and transformations of the data to get the most informative maps
 
 - Median GDP: (`gdp_md_est`)
 - Population: (`pop_est`)
 - Income group: (`income_grp`)
 
-### Exercise 2
+## Exercise 2
 
-The NetCDF file *air.mon.mean.nc* contains air temperature data from the NCAR NCEP project, but as mean monthly temperature for every year between 1948 and the present. Using the functions introduced in this lab, read in the data and make a time series of globally average temperature from January 1948 to present. 
+The NetCDF file *air.mon.mean.nc* contains air temperature data from the NCAR NCEP project, but as mean monthly temperature for every year between 1948 and the present. Using the functions introduced in this lab, read in the data and make a dataset with the globally averaged temperature for every layer in the file (i.e. from January 1948 to present). Use this data to make a line plots, either using base R or **ggplot2**
 
 ----
 [projID]: http://trac.osgeo.org/proj/
