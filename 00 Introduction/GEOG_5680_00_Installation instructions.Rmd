@@ -22,7 +22,7 @@ library(grid)
 
 This document will walk you through installing R and RStudio on your computer for use in the class. [R][cranid] is the main piece of software, and comes with a fairly simple graphical user interface (GUI). [RStudio][rstudioid] provides a full integrated development environment (IDE), with a bunch of tools to help programming and debugging your code. These instructions are modified from the [RStudio website][instid].
 
-NOTE: These labs were developed and tested under various versions of R up to 4.0.3
+NOTE: These labs were developed and tested under various versions of R up to 4.4.0
 
 ## Installing R
 
@@ -34,7 +34,7 @@ To install R on Windows, click the "Download R for Windows" link, then click "ba
 
 ### Mac
 
-To install R on a Mac, click the “Download R for Mac” link, then download the package link (`R-4.0.0.pkg`). Once this has downloaded, click on the file to run the installer. There are some options during the installation, but I'd recommend using the defaults for these. If your computer requires a password before installing new programs, you’ll need it here.
+To install R on a Mac, click the “Download R for Mac” link, then download the package link (`R-4.4.0.*.pkg`). You'll see a choice of two package. The first (`arm64`) is for the newer Macs with the M1/M2/M3 chips and the second (`x86_64`) is for the older intel-based Macs. If you're not sure which one to choose go to the Apple menu (top left) and click on `About This Mac` to see your chip. Once this has downloaded, click on the file to run the installer. There are some options during the installation, but I'd recommend using the defaults for these. If your computer requires a password before installing new programs, you’ll need it here.
 
 ### Linux
 
@@ -42,7 +42,7 @@ R comes pre-installed on many Linux systems, but is often an older version, and 
 
 ## Using R
 
-Once you've installed R, you can start it in the usual way. On Windows machines, go to the Start Menu, scroll down until you find a folder called 'R', then click the `R` icon to get the following screen. In general, I'd recommend using the 64-bit version of R, unless your computer has relatively little memory (<4Gb ram).
+Once you've installed R, you can start it in the usual way. On Windows machines, go to the Start Menu, scroll down until you find a folder called 'R', then click the `R` icon to get the following screen. If there are options to run 32- or 64bit versions, I'd recommend choosing the 64-bit version, unless your computer has relatively little memory (<4Gb ram).
 
 ```{r fig.width=6.5, fig.height=4., echo=FALSE}
 img <- readPNG("images/r_console_win.png")
