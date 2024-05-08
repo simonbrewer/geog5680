@@ -30,7 +30,7 @@ In this first lab, we'll do the following:
 
 ## R
 
-An important point to note at the outset is that R is quite different from other statistical analysis packages (e.g. SPSS, Stata, etc). While these are designed principally for analysis with some programming ability tacked on, R is built from the ground up as a programming language, just one that is designed to make it suitable for data analysis. In this class, we will focus mainly on R as a language, with relatively few examples of specific analyses. The reason for this is that once you understand R's syntax and structure it is fairly easy to find a function to do a specific analysis. But if you want to go beyond this to do more complex analyses, then you need to understand how to program, in order to small scripts and functions for this. Or to use Greg Snow's analogy: 
+An important point to note at the outset is that R is quite different from other statistical analysis packages (e.g. SPSS, Stata, etc). While these are designed principally for analysis with some programming ability tacked on, R is built from the ground up as a programming language, just one that is designed to make it suitable for data analysis. In this class, we will focus mainly on R as a language, with relatively few examples of specific analyses. The reason for this is that once you understand R's syntax and structure it is fairly easy to find a function to do a specific analysis. But if you want to go beyond this to do more complex analyses, then you need to understand how to program, in order use to small scripts and functions for this. Or to use Greg Snow's analogy: 
 
 > Using functions in R is like riding a bus. Writing functions in R is like driving a car
 
@@ -145,9 +145,10 @@ y
 
 You should now have two variables in R's workspace. To see what variables are there, you can type:
 
-````{r}
+```{r}
 ls()
-```  
+```
+
 Or go to the 'Environment' tab in the top right panel. 
 
 ## Data import and export
@@ -335,7 +336,7 @@ When you are finished with R, exit by typing `q()` in the console (or going to [
 
 ## Exercise 01
 
-For this module, the only thing to submit is your finished script for the final section. Please change the name of this to include either your surname or your uID and upload this to Canvas by June 25th [5pts] 
+For this module, the only thing to submit is your finished script for the final section. Please change the name of this file to include either your surname or your uID and upload this to Canvas by June 21st [5pts] 
 
 ## Files used in lab
 
