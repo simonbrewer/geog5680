@@ -20,7 +20,7 @@ As a general rule, these labs are designed to give you examples of how R works. 
 
 Before starting, remember to create a working directory (e.g. `module01`). Then start RStudio, and change your working directory from the [Session] menu > [Set working directory] > [Choose directory...]. You will need to make sure this is correctly set to load a file later on.
 
-**This is one of the longest labs in this class, and contains some boring, but very useful information about working with data in R. I would suggest working through it in 2 or even 3 sessions. If you do this, remember to save you code in a script so you can continue working on it, and remember to re-set your working directory if you close and re-open RStudio.**
+**This is one of the longest labs in this class, and contains some boring, but very useful information about working with data in R. I would suggest working through it in 2 or even 3 sessions. If you do this, remember to save your code in a script so you can continue working on it, and remember to re-set your working directory if you close and re-open RStudio.**
 
 ### A simple dataset
 
@@ -627,9 +627,9 @@ The file *BirdFlu_deaths.csv* contains the annual number of confirmed deaths res
 
 - Read the data into R
 - Use the functions `names()`, `head()` and `str()` in R to view the data and get a overview of its structure
-- Find the row containing maximum number of deaths for 2005 using the `which()` function
-- Use this (the row number) to identify the country with the maximum number of deaths in 2005, using R's indexing notation (`[row, col]`)
-- Use the same method to find the maximum number of deaths in 2007
+- Find the row number containing highest number of deaths for 2005 using the `which()` function
+- Use this (the row number) to identify the country with the highest number of deaths in 2005, using R's indexing notation (`[row, col]`)
+- Use the same method to find the highest number of deaths in 2007
 
 ### Part 2
 
