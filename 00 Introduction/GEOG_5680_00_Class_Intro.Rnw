@@ -6,7 +6,7 @@
 \usecolortheme{seahorse}
 
 % Standard header (will need to change date!)
-\title[GEOG 5680/6680 Summer '23]{GEOG 5680 / 6680\\Introduction to R}
+\title[GEOG 5680/6680 Summer '24]{GEOG 5680 / 6680\\Introduction to R}
 \subtitle[Intro]{00: Class Introduction}
 \author[S. Brewer]{Simon Brewer}
 \institute[Univ. Utah]{
@@ -15,9 +15,10 @@
   Salt Lake City, Utah 84112\\[1ex]
   \texttt{simon.brewer@geog.utah.edu}
 }
-\date[May 15, 2023]{May 15, 2023}
+\date[May 13, 2024]{May 13, 2024}
 
 \begin{document}
+\SweaveOpts{concordance=TRUE}
 %\SweaveOpts{concordance=TRUE}
 
 %--- the titlepage frame -------------------------%
@@ -101,9 +102,9 @@
 \begin{frame}{Reading material}
 \begin{columns}
   \begin{column}{0.5\textwidth}
-    Dalgaard, Introductory statistics with R (Springer)
+    Wickham, R for Data Science (O'Reilly)
   	\begin{center}
-			\includegraphics[width=0.7\textwidth]{./images/dalgaardbook.jpg}
+			\includegraphics[width=0.5\textwidth]{./images/RDS.png}
 		\end{center}
 	\end{column}
 	\begin{column}{0.5\textwidth}
@@ -135,7 +136,7 @@
     \item Provide R code as a script
     \item Copy-paste results and/or figures to Word document
     \item Submission through Canvas
-    \item All exercises to be submitted by Friday, June 23
+    \item All exercises to be submitted by Friday, June 21
   \end{itemize}
   \item<2-> Course project (25 pts)
   \begin{itemize}
@@ -145,7 +146,6 @@
   		\item One of three predefined datasets
   		\item Your own dataset
   	\end{itemize}
-    %\item Project report to be submitted by Wednesday, June 25
   \end{itemize}
 \end{itemize}
 \end{frame}
@@ -168,7 +168,7 @@
       \item Results including figures
       \item Brief discussion of project and results
   	\end{itemize}
-  	\item Due Friday, June 23 through Canvas
+  	\item Due Friday, June 21 through Canvas
   \end{itemize}
 \end{itemize}
 \end{frame}
@@ -208,20 +208,20 @@ R is an integrated suite of software facilities for data manipulation, calculati
 \begin{frame}{What is R?}
 %Why R?
 \begin{itemize}
-	\item Programming language + interfaces
-	\item Extensive graphics capability
-	\item Easily transferable --- runs on Mac/Windows/Unix
-	\item Free, open source!
-	\item Highly extensible
+	\item At heart, it’s a programming language designed for the analysis of data
+	\item Free, open source! 
+	\item Large number of existing functions/packages 
 	\begin{itemize}
-		\item Large number of existing functions/packages
-		\item Ability to write personal functions
+    \item APIs to many services
+	  \item Ability to write personal functions 
 	\end{itemize}
-	\item Capability for mapping data, an asset not generally available in other statistical software
+	\item Extensive graphics capability and extensions
+	\item Works well with spatial data
 	\begin{itemize}
   	\item Several add-on packages specifically designed for the analysis of time and space data
 	\end{itemize}
-	\item Increasingly used in many disciplines
+	\item Easily transferable — runs on Mac/Windows/Unix 
+	\item Increasingly used in many disciplines and industry
 \end{itemize}
 \end{frame}
 
