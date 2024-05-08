@@ -14,9 +14,9 @@ output:
 
 ## Introduction
 
-So far, we have spent a lot of time looking at the manipulation of data in R. For the next class, we will introduce the basic plotting tools in R. Plotting in R start with very simple plots, but can be extended to produce publication quality figures with a little effort. Over the next couple of days, we will look at some of the ways in which they can be extended. 
+So far, we have spent a lot of time looking at the manipulation of data in R. For the next class, we will introduce the basic plotting tools in R. Plotting in R starts with very simple plots, but can be extended to produce publication quality figures with a little effort. Over the next couple of days, we will look at some of the ways in which they can be extended. 
 
-An important thing to note is that R does NOT produce interactive figures. Plotting is generally done by one or a few commands that gradually add features (symbols, lines, text, etc) to an existing plot. Once added, these features cannot be moved. For anything other than the most simple plots, I would highly recommend using a script to record all the code necessary to produce the plot. This will keep a copy of the commands that you can save and make it easy to change details of the plot and re-run it.  
+An important thing to note is that R does NOT produce interactive figures (although some add-on packages allow this). Plotting is generally done by one or more commands that gradually add features (symbols, lines, text, etc) to an existing plot. Once added, these features cannot be moved or removed. For anything other than the most simple plots, I would highly recommend using a script to record all the code necessary to produce the plot. This will keep a copy of the commands that you can save and make it easy to change details of the plot and re-run it.  
 
 For illustration, we use a vegetation dataset (*Vegetation2.csv*) published by Sikkink et al. (2007). They analyzed grassland data from a monitoring program conducted in two temperate communities, Yellowstone National Park and the National Bison Range, USA, to determine whether the biodiversity of these bunchgrass communities changed over time, and, if so, whether the changes in biodiversity related to particular environmental factors. Here we will use only the Yellowstone National Park data. Biodiversity was quantified using species richness (the column labeled `R` in the file), defined as the number of different species per site, and the . The study identified about 90 species. The data were measured in 8 transects, with each transect being assessed at intervals of 4–10 years, for a total of 58 observations.
 
@@ -70,7 +70,7 @@ plot(veg$BARESOIL, veg$R, xlab = "%",
      ylab = "n. Spp", main = "Species Richness vs. Exposed Soil")
 ```
 
-Note that each time we use the `plot()` function, it effectively starts a new figure by deleting anything that was previously in the plot window. In RStudio, it is possible to see previous plots using the arrows in the top left corner of the plot window. 
+Note that each time we use the `plot()` function, it effectively starts a new figure by clearing anything that was previously in the plot window. In RStudio, it is possible to see previous plots using the arrows in the top left corner of the plot window. 
 
 We might further want to alter the extent of the figure in the x (`xlim`) or y (`ylim`) directions:
 
