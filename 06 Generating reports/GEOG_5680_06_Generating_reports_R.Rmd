@@ -4,7 +4,7 @@ author: |
   | Simon Brewer
   | Geography Department
   | University of Utah
-date: "`r format(Sys.time(), '%d %B, %Y')`"
+  date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
   html_document:
     toc: true
@@ -20,7 +20,7 @@ library(grid)
 
 ## Introduction
 
-In this lab, we are going to explore how RStudio can be used to generate reports of your analyses as html files that contain text, code, figures and results. In order to do so, we need to first explore how R can be extended with add-on packages.
+In this lab, we are going to explore how RStudio can be used to generate reports of your analyses as html files that contain text, code, figures and results. In order to do so, we need to first look at how R can be extended with add-on packages.
 
 Before starting, remember to create a working directory (e.g. `module06`). Next download the files for today's lab from the Canvas page and move them to this directory. You'll need the following file:
 
@@ -39,6 +39,7 @@ Before we start looking into how to use packages, it is important to understand 
 If you close R, the packages are cleared from the workspace. Upon restarting R, you will need to reload any packages you were using. You do **not** need to reinstall the package, only reload it. 
 
 ## Using packages
+
 There are several ways to use a package once it is installed:
 
 - The command `library()` will load a package into the R workspace from the console (or from a script)
@@ -74,6 +75,7 @@ library(rpart)
 ```
 
 And now try using the function again:
+
 ```{r error=TRUE}
 rpart()
 ```
@@ -83,7 +85,8 @@ We still get an error, but now not because the function can't be found, but beca
 Now add the data in to the function. This function uses the relationship operator `~`, and here we state that we are interested in the relationship between the species of iris and the four flower characteristics.
 
 ```{r}
-rpart(Species ~ Sepal.Length + Sepal.Width + Petal.Length + Petal.Width, data=iris)
+rpart(Species ~ Sepal.Length + Sepal.Width + Petal.Length + Petal.Width, 
+      data=iris)
 ```
 The output from this function gives information about the classification tree, including the variables that were used to split the groups and some information about how successful these splits were. As with any function, if we want to store the output, we need to assign it to a variable. We can use anything for a variable name, but a simple method is to construct variables as a combination of the data (`iris`) and the function (`rpart`):
 
@@ -122,7 +125,7 @@ grid.raster(img)
 
 ## Installing non-default packages
 
-In addition to the default packages, there are a large number of add-on packages, the vast majority of which will not be installed on your computer. At the time of writing this lab there are 15581 add-on packages available on the main R website [CRAN][cranID], which provide functions for additional graphics, advanced statistical modeling and analysis, parallelization, spatial analysis, bioinformatics, machine learning, data mining and many other topic. To help R users find suitable packages, CRAN maintains a set of [taskviews][cranID], which group packages according to subject area.
+In addition to the default packages, there are a large number of add-on packages, the vast majority of which will not be installed on your computer. At the time of writing this lab there are 20705 add-on packages available on the main R website [CRAN][cranID], which provide functions for additional graphics, advanced statistical modeling and analysis, parallelization, spatial analysis, bioinformatics, machine learning, data mining and many other topic. To help R users find suitable packages, CRAN maintains a set of [taskviews][cranID], which group packages according to subject area.
 
 Packages can be installed in two ways:
 
@@ -130,7 +133,7 @@ Packages can be installed in two ways:
 - Go to the 'Packages' menu and select 'Install packages..'
 - In RStudio, go to the 'Tools' menu and select 'Install packages..'
 
-Here, we will use the third option. On the lab computers, it will ask you if you want to set up a personal library to hold the package information (you probably won't see this if using your own computer). Agree to this, and then the following window should appear:
+Here, we will use the third option. On the CSBS computers, it may ask you if you want to set up a personal library to hold the package information (you probably won't see this if using your own computer). Agree to this, and then the following window should appear (this should only appear the first time you do this):
 
 ```{r fig.width=6.5, fig.height=4., echo=FALSE}
 img <- readPNG("images/Capture2.PNG")
@@ -144,7 +147,9 @@ We will install a package called **rpart.plot** which can be used to make much n
 If everything has gone well (and there are no error messages), then the package is installed. Go to the 'Packages' tab, and scroll down, and you should see **rpart.plot** listed there. 
 
 ### Using an installed package
+
 Now load this package, either using the `library()` function or from the 'Packages' tab.
+
 ```{r}
 library(rpart.plot)
 ```
@@ -155,6 +160,7 @@ prp(iris.rpart)
 ```
 
 The fonts are better, and it has added labels so that we can understand what the decision is at each split of the tree (left = 'yes', right = 'no'). This function has a huge number of options (see the help page), but two simple ones are `type` and `extra`. An alternative, which puts the variable splits on the branches of the tree, and adds information about how well the splits separate the species is this:
+
 ```{r}
 prp(iris.rpart, type=3, extra=1)
 ```
@@ -170,7 +176,7 @@ knit_hooks$set(source = function(x, options){
     bef = sprintf('\n\n    ```{r %s}\n', opts, "\n")
     stringr::str_c(bef, paste(knitr:::indent_block(x, "    "), collapse = '\n'), "\n    ```\n")
   } else {
-     hook_source_def(x, options)
+    hook_source_def(x, options)
   }
 })
 ```
@@ -182,7 +188,7 @@ R has several add-on packages that allow you to write reports directly from R, i
 
 The report that you write as part of this course should be generated using **knitr** and markdown, and this lab should provide a sufficient introduction for you to be able to write your own documents. 
 
-### Markdown
+## Markdown
 
 We'll start with a quick introduction to markdown, before starting to introduce R code into our document. 
 
@@ -195,55 +201,73 @@ Writing directly in html is difficult, as it is necessary to remember all these 
 Here is a brief introduction to markdown syntax. Much more detail can be found [here][mdID]
 
 #### Headers
-Headers are indicated in markdown using hashmarks `#`. One is a top-level header, two a sub-header and so on up to six sub-headers. The main header can also be defined by adding a line of equal signs on the next line. The two following bits of code will do the same thing:
 
-    # My header
+Headers are indicated in markdown using hashmarks `#`. One `#` is a top-level header, two a sub-header and so on up to six sub-headers. The main header can also be defined by adding a line of equal signs on the next line. The two following bits of code will do the same thing:
 
-    My header
-    =========
+```
+# My header
+
+My header
+=========
+```
 
 #### Emphasis and bold
 
 Bold text can be written as
 
-    **This is bold text**
+```
+**This is bold text**
+```
 
 Emphasized text uses a single asterix:
 
-    *This text will be emphasized*
-  
+```
+*This text will be emphasized*
+```
+
 #### Lists
 
 markdown can generated unnumbered lists as a set of bullet points (as long as there is a blank line before the list):
 
-    - List item 1
-    - List item 2
-    - List item 3
-    
+```
+- List item 1
+- List item 2
+- List item 3
+```
+
 Or as numbered lists:
 
-    1. List item 1
-    2. List item 2
-    3. List item 3
-    
+```
+1. List item 1
+2. List item 2
+3. List item 3
+```
+
 #### Links
+
 Links to web pages can be included. Usually this is done in two ways. The word that will have the hyperlink is enclosed in `[,]`, and followed by a reference. Elsewhere in the document (usually at the end) the reference is connected to the full URL. For example:
 
-    I get 10 times more traffic from [Google][1] than from [Yahoo][2] or [MSN][3].
+```
+I get 10 times more traffic from [Google][1] than from [Yahoo][2] or [MSN][3].
 
-    [1]: http://google.com/        "Google"
-    [2]: http://search.yahoo.com/  "Yahoo Search"
-    [3]: http://search.msn.com/    "MSN Search"
+[1]: http://google.com/        "Google"
+[2]: http://search.yahoo.com/  "Yahoo Search"
+[3]: http://search.msn.com/    "MSN Search"
+```
 
 will convert the words "Google", "Yahoo" and "MSN" in the first line into hyperlinks. 
 
 #### Horizontal lines
 A horizontal line can be specified by a line of hyphens:
 
-    -----
+```
+-----
+```
 
 #### Code
+
 The ease in which programming code can be formatted in a document has made markdown a favorite tool for writing documents and tutorials on programming. For example, all of the lab documents for this course are written using markdown. Text that should be formatted as code is usually shown enclosed in backticks or by indenting the code by four spaces (one tab stop).
+
 ```
     ```
     Some code
@@ -251,7 +275,9 @@ The ease in which programming code can be formatted in a document has made markd
 ```    
 Or
 
-      Some code
+```
+    Some code
+```
 
 ### Processing markdown
 
@@ -265,7 +291,7 @@ Dillinger interface showing the markdown editor on the left and the processed ht
 
 [R Markdown][rmID] is a variant of Markdown developed by the same people who developed RStudio. It allows you to embed *chunks* of R code which is then used with the **knitr** package to create reproducible web-based reports. The clever part about **knitr** is that it will take this code, and actually run it in R. So any R code you include will be processed, and the results can be displayed. This has several advantages: 1) it makes sure that the results are exactly those produced by R (and that the code is consistent with the results); 2) it allows you to easily update your report using new or extra data; 3) the figures are produced directly in the report; 4) your reports are easy to publish on the web. 
 
-### knitr
+## knitr
 
 [knitr][knID] is a package developed by Yihui Xie to embed R code into different documents. This needs to be installed on your computer before you can start generating reports. Use the instructions from the previous lab to install this package. 
 
@@ -314,9 +340,17 @@ If you click on the down arrow next to the [Knit] button, you will see some othe
 
 We'll now add some R code into this document. Each block of code is called a 'chunk' and is preceded by three backticks and the string `{r}`. The chunk is ended by another three backticks. So a very simple example to add two numbers would be:
 
-    ```{r}`r ''`
+````markdown
+`r ''````{r}
+5 + 6
+```
+````
+
+```
+    ```{r}
     5 + 6
     ```
+```
 
 Add this to your markdown file, and click on the 'Knit HTML' button. Check the html preview window, and you should see the following lines added to your output:
 
@@ -327,38 +361,38 @@ The html output therefore has, not only the R code that you entered, but the res
 
 We'll now add more code to this example to read in some data and calculate summary statistics. Add the following code to read in the GISS global temperature data set *giss_temp.csv*, and calculate some summary statistics. 
 
-    ```{r}`r ''`
-    giss = read.csv("giss_temp.csv")
-    summary(giss)
-    ```
+```{r}`r ''`
+giss = read.csv("giss_temp.csv")
+summary(giss)
+```
 Add some text before and after the code to explain what is going on. Remember that you can  add sub-headers with two hashmarks `##`. Other formatting tips can be found by clicking on the button with a question mark, and selecting 'Markdown Quick Reference'. 
 
 Now add code to calculate the mean temperature deviation per year, and make a vector of years:
-    
-    ```{r}`r ''`
-    annualTemp = tapply(giss$TempAnom, giss$Year, mean)
-    years = unique(giss$Year)
-    ```
+
+```{r}`r ''`
+annualTemp = tapply(giss$TempAnom, giss$Year, mean)
+years = unique(giss$Year)
+```
 Again, add some text with outside of the backticks to explain what is going on. Click 'Knit HTML' to check the output. 
 
 Finally, we'll add a couple of plots to the output. Before doing this, we'll add a subheader to the file and a short amount of text
 
-    ## Plot section
-    First, a histogram showing the distribution of all temperature anomaly values. 
-    Second, a plot of annual temperature change.
+## Plot section
+First, a histogram showing the distribution of all temperature anomaly values. 
+Second, a plot of annual temperature change.
 
 Now start by plotting a histogram of all the temperature values:
-    
-    ```{r}`r ''`
-    hist(giss$TempAnom, breaks=20)
-    ```
+
+```{r}`r ''`
+hist(giss$TempAnom, breaks=20)
+```
 And a line plot showing the annual temperatures
-    
-    ```{r}`r ''`
-    plot(years, annualTemp, type='l', lwd=2, col=2, 
-          xlab="Years", ylab="Temp Anom")
-    abline(h=0, lty=2)
-    ```
+
+```{r}`r ''`
+plot(years, annualTemp, type='l', lwd=2, col=2, 
+xlab="Years", ylab="Temp Anom")
+abline(h=0, lty=2)
+```
 Add some text to explain what the code is doing, and click 'Knit HTML' to get the final report. When it is finished, go to your working directory, and double click the *.html file to open this in a browser. 
 
 ### Chunk options
