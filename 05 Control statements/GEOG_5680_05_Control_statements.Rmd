@@ -31,32 +31,39 @@ Before starting, remember to create a working directory (e.g. `module05`). Next 
 Then start RStudio, and change your working directory from the [Session] menu > [Set working directory] > [Choose directory...]. Remember to check that R can see the files by running the `list.files()` command. 
 
 ## Looping in R
+
 As a programming language, R has functions for loops and control flows. Looping, in particular, is a powerful extension that allows you to repeat or automate certain tasks. Further, looping, when combined with R's indexing functions provides an excellent way to perform the same set of analyses on different subsets of a dataset. 
 
-There are two main commands for looping: `for()` which repeats a set of commands a number of times, and `while()` which repeats a set of commands until a condition is reached. 
+There are three main commands to control your code: `for()` which repeats a set of commands a number of times, and `while()` which repeats a set of commands until a condition is reached. Finally, the `if()` function allows different code to be run dependent on the outcome of a test (e.g  if the value of some variable goes over a threshold).
 
 ## `for` loops
 
 The format of the `for()` function is: `for (counter in start:stop)`. The counter (or iterator) is an integer which is increased by one each time the loop runs. 'start' gives the initial value of the counter, and 'stop' gives the final value. The commands which are to be run within the loop are then enclosed within curly brackets `{...}`. 
 
 Open a new script in the editor and star by adding a very simple loop:
+
 ```{r}
 for (i in 1:12) {
   print(i)
 }
 ```
+
 The loop starts at 1 and runs to 12, and the iterator *i* is printed then increased by one at each step. 
 
 ### Plotting monthly global temperatures
+
 Now let's do something a little more useful. The file *giss_temp.csv* contains a dataset of global temperature *anomalies* from 1881 to 2012 (anomalies are differences in temperature from a reference average temperature). We will use this file to plot out the trends in temperature for each month for the 130 years of record (i.e. plot all the Januaries, then all the Februaries, etc). We will start by plotting these progressively to a figure, then extend this produce individual figures for each month, simply by looping through the months. 
 
 Open a new script in the editor, and add the following text to read the file. 
+
 ```{r results='hide'}
 giss = read.csv("giss_temp.csv")
 ```
+
 Save and run the script, then use `ls()` to make sure that the new data frame `giss` has been created, and `names()` and `str()` to examine the data frame. 
 
-We'll start by plotting the entire time series (you can do this in the script file or directly in the console). On the x-axis we use the variable `DecDate` which is decimal dates (e.g. January 1881 is 1881.042):
+We'll start by plotting the entire time series (you can do this in the script file or directly in the console). On the x-axis we use the variable `DecDate` which is decimal dates (e.g. January 1881 is 1881.042, February 1881 is 1881.125, etc):
+
 ```{r}
 plot(giss$DecDate, giss$TempAnom,
      xlab="Year", ylab="T Anomaly")
@@ -68,8 +75,7 @@ And we can see the well known temperature changes of the past century. So now, w
 2. In each loop - select all values in a given month
 3. Plot these values with their corresponding years
 4. Add appropriate labels
-5. (Added a smoothed line)
-6. Save the figure to a file (otherwise it will be overwritten by the next plot)
+5. Save the figure to a file (otherwise it will be overwritten by the next plot)
 
 We will start with steps 1 to 3. In your script, add the following code after the files has been read in:
 
@@ -83,9 +89,11 @@ for (i in 1:12) {
 The only new thing here, is that we create an index `monthID`, which in each loop contains the row numbers of every observation corresponding to a particular month. This can then be used to plot only the values of the columns `Year` and `TempAnom` corresponding to a given month. Save and run the plot. 
 
 ### Saving images to files
+
 When we run the script, it goes too fast to see the individual plots, so we will instead save the figures as graphic files. R can write to several different figure formats, and here we will write to a PNG file. To understand how this works, it is important to understand the idea of a graphics *device*. In R, this simply refers to the current figure that is being created, and includes the graphical window which is used by default, and different file types. If we want to write a figure to a different device that the default one, we have to first open that device (here using the `png()` function), plot our figure, then close the device (using the `dev.off()` function). 
 
 Change the loop in your script so it reads as follows:
+
 ```{r eval=FALSE}
 for (i in 1:12) {
   monthID = which(giss$Month == i)
@@ -95,19 +103,25 @@ for (i in 1:12) {
   dev.off()
 }
 ```
+
 Save and run. 
 
 If you check your working directory, you will see that a figure has been created called 'giss_temp.png'. Unfortunately, this only contains the last figure, as it is overwritten in each iteration of the loop. To avoid this, we need to change the name of file to include the loop number. We can do this using the `paste()` function introduced earlier. In the loop, change the `png()` function to:
+
 ```{r eval=FALSE}
-png(paste("giss_temp_",i,".png",sep=''))
+  png(paste("giss_temp_",i,".png",sep=''))
 ```
+
 Here we paste the first part of the file name as a character string to the current loop number (taken from the iterator *i*). This is then pasted to the extension ".png" for a png file. The option `sep=''` tells `paste()` to not insert spaces between the various parts (it will by default). Save and run, and you should now see 12 png files in your directory, one per month.
 
 ### Tweaking the plots
+
 At this point, we need to clean up the plots. We will start by adding a meaningful title. Here, we can take advantage of a built-in dataset called `month.abb`, a vector of abbreviated month names. To see this, type in the console:
+
 ```{r}
 month.abb
 ```
+
 We can again use the `paste()` function with this to add a title "`Month` temperature anomaly". Change the `plot()` function as follows:
 
 ```{r eval=FALSE}
@@ -115,17 +129,20 @@ plot(giss$Year[monthID], giss$TempAnom[monthID],
      xlab="Year", ylab="Temperature Anomaly",
      main=paste(month.abb[i],"temp. anom."))
 ```
+
 With reference to the previous lab also do the following:
 
 - Change the x and y labels
 - Change the symbol and symbol color
 
 Finally, we will set the extent of the y-limit, so that it is the same for all plots, to help in comparing different months. For this, we need to set the `ylim` option in the `plot()` function to the minimum and maximum of the temperature dataset. This option requires two values, so we could get these using the `min()` and `max()` functions, but a simpler way is to use `range()`, which gives us the two values we need. 
-````{r eval=FALSE}
+
+```{r eval=FALSE}
 plot(giss$Year[monthID], giss$TempAnom[monthID],
      xlab="Year", ylab="Temperature Anomaly",
      main=paste(month.abb[i],"temp. anom."), ylim=range(giss$TempAnom))
 ```
+
 Save and run, and check that the figures are made with a fixed y-extent. 
 
 ## `while` loops
@@ -149,7 +166,7 @@ print(myyear - 1)
 - The first thing we do is to read in the data. While you have already read in this file, it is always good practice to read in data at the start of your script in case you restart R and the memory is cleared
 - We then set the threshold that we want to use to stop the loop (here if the annual temperature exceeds this value we stop)
 = We set the starting year (`myyear`) to the first (minimum) year
-- We create variable `ann_temp` to hold the current annual average temperature anomaly. We set this to an arbitrary high negative value
+- We create variable `ann_temp` to hold the current annual average temperature anomaly. We set this to an arbitrary high negative value to allow the first iteration of the loop to run
 - We then start the loop. This does the following
     - First it checks to see if the existing annual temperature is above the threshold. If it is not, then the loop continues. If the value is above the threshold then the loop stops.
     - Next, we extract the 12 monthly values for the current year
