@@ -24,7 +24,7 @@ In the first couple of labs we have looked how to import and export data, and ho
 
 Remember to use RStudio's script editor (top left panel) to enter your commands and then copy-paste these to the console when you are ready. This will keep a copy of the commands that you can save and return to. 
 
-Before starting, remember to create a working directory (e.g. `module02`). Next download the files for today's lab from the Canvas page and move them to this directory. You'll need the following files
+Before starting, remember to create a working directory (e.g. `module04`). Next download the files for today's lab from the Canvas page and move them to this directory. You'll need the following files
 
 - *ssclimate2.txt*
 - *ssvegcode.txt*
@@ -50,6 +50,7 @@ names(clim)
 ```
 
 The monthly temperature values are found in columns 20 to 31. Now use the same functions to check the structure of the vegetation data - here we only need to keep the vegetation type (`vegcode`) and the elevation (`elev`). We'll make a new data frame with only the columns we need:
+
 ```{r results='hide'}
 temp = data.frame(vegcode=veg$vegcode, elev=veg$elev, clim[,20:31])
 names(temp)
@@ -77,10 +78,12 @@ mean(temp$Jan_Tmp, na.rm=TRUE)
 ```{r results='hide'}
 median(temp$Jan_Tmp, na.rm=TRUE)
 ```
+
 - 50th percentile (should match median). Note that here we tell the function that we want the value corresponding to 50% of the data (`0.5`):
 ```{r results='hide'}
 quantile(temp$Jan_Tmp, 0.5, na.rm=TRUE)
 ```
+
 #### Measures of range
 
 - Variance
@@ -97,6 +100,7 @@ sd(temp$Jan_Tmp, na.rm=TRUE)
 ```{r results='hide'}
 range(temp$Jan_Tmp, na.rm=TRUE)
 ```
+
 - Interquartile range. Again, we tell the function the percentiles that we want, here 25 and 75% (`c(0.25, 0.75)`):
 ```{r results='hide'}
 quantile(temp$Jan_Tmp, c(0.25, 0.75), na.rm=TRUE)
@@ -105,6 +109,7 @@ quantile(temp$Jan_Tmp, c(0.25, 0.75), na.rm=TRUE)
 We see here that the mean and median are close, suggesting at a first glance that the data is roughly normally distributed, we have a standard deviation of about 3 and an overall range of 13. 
 
 ### The `*apply()` functions
+
 Of more interest would be to know if the different vegetation classes have different mean values. From an earlier lab, we know that we can do this by a conditional selection on the vegetation class:
 
 ```{r results='hide'}
@@ -127,6 +132,7 @@ tapply(temp$Jan_Tmp, temp$vegcode, mean, na.rm=TRUE)
 ```
 
 In this case, we have used the mean, but we can also use the standard deviation (function `sd()`), variance (function `var()`), length (function `length()`), maximum (function `max()`) and so on.The following lines of code calculate some of these functions for the vegetation data:
+
 ```{r results='hide'}
 Me <- tapply(temp$Jan_Tmp, temp$vegcode, mean, na.rm=TRUE)
 Sd <- tapply(temp$Jan_Tmp, temp$vegcode, sd, na.rm=TRUE)
@@ -140,6 +146,7 @@ To calculate the mean, minimum, maximum, standard deviation, and length of the f
 To help with this, R provides other functions similar to `tapply()` to address this situation: `apply()` and `sapply()`. The `apply()` function applies a function to a dimension of a dataset, specified by the parameter `MARGIN`. As the data frame is a 2D data set, this means we can use it on either the rows (margin 1) or columns (margin 2). 
 
 So, to calculate the average monthly temperatures across all locations, we use the column margin (2):
+
 ```{r results='hide'}
 apply(temp[,3:14], MARGIN = 2, FUN = mean, na.rm = TRUE)
 ```
@@ -153,8 +160,9 @@ apply(temp[,3:14], 2, mean, na.rm=TRUE)
 ```
 
 However, this will not:
-```{r results='hide'}
-apply(temp[,3:14], 2, mean, na.rm=TRUE)
+
+```{r results='hide', eval=FALSE}
+apply(temp[,3:14], mean, 2, na.rm=TRUE)
 ```
 
 
@@ -168,6 +176,7 @@ apply(temp[,3:14], 1, mean, na.rm=TRUE)
 ### The `aggregate()` function
 
 Th `apply()` function allowed us to use a function either for subsets of the data or across a set of variables. The `aggregate()` function allows us to combine these two approaches. For example, we might want to calculate the average monthly temperature for each month, for each vegetation group. The syntax is similar to the `apply()` function, but note that the grouping variable must be given as a list:
+
 ```{r results='hide'}
 aggregate(temp[,3:14], list(temp$vegcode), mean, na.rm=TRUE)
 ```
@@ -184,6 +193,7 @@ aggregate(temp[,3:14], list(temp$vegcode, temp$elevcode), mean, na.rm=TRUE)
 ### The `summary()` function
 
 The `summary()` provides another way to get basic descriptive statistics for a dataset. It can be applied to a vector or data frame and will adapt to form of the input data:
+
 ```{r results='hide'}
 summary(temp$Jan_Tmp)
 summary(temp)
@@ -295,7 +305,7 @@ Next let's add the argument to specify a fixed length of the sequence:
 seq(0, 10, 2, length.out = 20)
 ```
 
-This failed as there is a conflict in the arguments. Let's remove the `by` argument to generate a sequence that is exactly 20 values long. Note that as the `lenght.out` argument is now in an incorrect position we *have* to give the argument name:
+This failed as there is a conflict in the arguments. Let's remove the `by` argument to generate a sequence that is exactly 20 values long. Note that as the `length.out` argument is now in an incorrect position we *have* to give the argument name:
 
 ```{r error=TRUE}
 seq(0, 10, length.out = 20)
@@ -317,7 +327,7 @@ head(cars)
 length(cars)
 ```
 
-These are called *generic* functions, and in general are calling a lower-level function to do the work. THe `seq()` function actually calls a function called `seq.default()`. If you type just the name of this function in the console without parentheses this will display the code in the function:
+These are called *generic* functions, and in general are calling a lower-level function to do the work. The `seq()` function actually calls a function called `seq.default()`. If you type just the name of this function in the console without parentheses this will display the code in the function:
 
 ```
 seq.default
@@ -389,7 +399,8 @@ minmax = function(x) {
 }
 ```
 
-Now try to rescale the temperature data, and you should see that these values have been ignored:
+Now try to rescale the temperature data, and you should see that the NA values have been ignored:
+
 ```{r results='hide'}
 jantmp_minmax = minmax(temp$Jan_Tmp)
 jantmp_minmax
@@ -407,7 +418,7 @@ $$
 \mbox{MinMax2}(x_i) = (\mbox{MinMax}(x_i) \times (\mbox{max_offset} - \mbox{min_offset})) + \mbox{min_offset}
 $$
 
-So we add a `min_offset` and `max_offset` argument to the function. We set the defaults to 0 and 1, respectively, so if these are not set, the function will produce a 0/1 rescling by default. 
+So we add a `min_offset` and `max_offset` argument to the function. We set the defaults to 0 and 1, respectively, so if these are not set, the function will produce a 0/1 rescaling by default. 
 
 ```{r eval=TRUE}
 minmax = function(x, min_offset = 0, max_offset = 1) {
@@ -419,13 +430,14 @@ minmax = function(x, min_offset = 0, max_offset = 1) {
 }
 ```
 
-Now compare
+Now compare:
+
 ```{r}
 elev_minmax = minmax(temp$elev)
 range(elev_minmax, na.rm = TRUE)
 ```
 
-with 
+with:
 
 ```{r}
 elev_minmax = minmax(temp$elev, min_offset = 100, max_offset = 200)
