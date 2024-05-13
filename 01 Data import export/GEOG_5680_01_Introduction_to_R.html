@@ -1481,13 +1481,13 @@ border-radius: 0px;
 <h4 class="author"><div class="line-block">Simon Brewer<br />
 Geography Department<br />
 University of Utah</div></h4>
-<h4 class="date">10 May, 2024</h4>
+<h4 class="date">13 May, 2024</h4>
 
 </div>
 
 
-<div id="introduction" class="section level2">
-<h2>Introduction</h2>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
 <p>In this first lab, we’ll do the following:</p>
 <ul>
 <li>Introduce R</li>
@@ -1496,8 +1496,8 @@ University of Utah</div></h4>
 <li>Introduce the use of scripts to save (and run) your code</li>
 </ul>
 </div>
-<div id="r" class="section level2">
-<h2>R</h2>
+<div id="r" class="section level1">
+<h1>R</h1>
 <p>An important point to note at the outset is that R is quite different
 from other statistical analysis packages (e.g. SPSS, Stata, etc). While
 these are designed principally for analysis with some programming
@@ -1561,8 +1561,8 @@ in the week.</p>
 interface (also freeware), which has an organized layout and several
 extra options. All the code examples will run in base R if you don’t
 have access to RStudio</p>
-<div id="a-quick-note-on-formatting" class="section level3">
-<h3>A quick note on formatting</h3>
+<div id="a-quick-note-on-formatting" class="section level2">
+<h2>A quick note on formatting</h2>
 <p>In this and subsequent labs, code that can be entered into R will be
 highlit, e.g.:</p>
 <pre class="r"><code>plot(x, y)</code></pre>
@@ -1577,8 +1577,8 @@ font. File names will be given in <em>italics</em> and will be available
 in the ‘Datafiles’ directory on the course Canvas site.</p>
 </div>
 </div>
-<div id="rstudio-layout" class="section level2">
-<h2>RStudio layout</h2>
+<div id="rstudio-layout" class="section level1">
+<h1>RStudio layout</h1>
 <p>The RStudio interface consists of several windows. Start RStudio from
 the ‘Start’ menu under Windows, and the following window should appear
 (you may not see all of these panels the first time you open it):</p>
@@ -1603,8 +1603,8 @@ or use the help function. You can change the size of the windows by
 dragging the gray bars between the windows.</li>
 </ul>
 </div>
-<div id="working-with-r" class="section level2">
-<h2>Working with R</h2>
+<div id="working-with-r" class="section level1">
+<h1>Working with R</h1>
 <p>Much of your time spent with R will involve typing commands in at the
 console, and RStudio has some help with this.</p>
 <ul>
@@ -1619,8 +1619,8 @@ you entered. Try typing <code>pri</code> and pressing ‘Tab’ - you should
 see <code>print</code> as part of the list, and you can click on this,
 or scroll down to use it from the list.</li>
 </ul>
-<div id="workspace" class="section level3">
-<h3>Workspace</h3>
+<div id="workspace" class="section level2">
+<h2>Workspace</h2>
 <p>R has a <em>workspace</em> where variables and data are stored as you
 use it. This is held in the memory of the computer, so if you are
 working from a file, you will need to read it in to the R workspace, and
@@ -1628,8 +1628,8 @@ then work on the values held in memory. This means that you only access
 files to read in or write out data, the rest of the time you are working
 on a copy in the workspace.</p>
 </div>
-<div id="working-directory" class="section level3">
-<h3>Working directory</h3>
+<div id="working-directory" class="section level2">
+<h2>Working directory</h2>
 <p>R defines the working directory as the folder in which it is
 currently working. When you ask R to open a certain file, it will look
 in the working directory for this file, and when you tell R to save a
@@ -1650,7 +1650,6 @@ capitals where necessary.</p>
 directory] &gt; [Choose directory…] and browse to your directory. Once
 you’ve found it, click on it to highlight it, then click [Open].</p>
 </div>
-</div>
 <div id="using-the-console" class="section level2">
 <h2>Using the console</h2>
 <p>In the console, the <code>&gt;</code> is the prompt, and your
@@ -1668,8 +1667,9 @@ We’ll spend quite a bit of time on these indices in a later class.</p>
 natural log or square root of 2:</p>
 <pre class="r"><code>log(2)
 sqrt(2)</code></pre>
-<div id="variables-in-r" class="section level3">
-<h3>Variables in R</h3>
+</div>
+<div id="variables-in-r" class="section level2">
+<h2>Variables in R</h2>
 <p>One of the main ways in which R differs from spreadsheet software is
 that it uses a <em>workspace</em> in the memory of your computer, and
 the data you use and create is stored there as a <em>variable</em>: an
@@ -1706,8 +1706,8 @@ variables are there, you can type:</p>
 <p>Or go to the ‘Environment’ tab in the top right panel.</p>
 </div>
 </div>
-<div id="data-import-and-export" class="section level2">
-<h2>Data import and export</h2>
+<div id="data-import-and-export" class="section level1">
+<h1>Data import and export</h1>
 <p>R can read a variety of different file types, and we’ll illustrate a
 few examples here. You’ll need to download the following files from
 Canvas</p>
@@ -1733,8 +1733,8 @@ setting the working directory is a very common problem when starting
 working with R, so don’t worry if this takes you a couple of tries.
 [It’s can also be a problem for people who’ve been working with R for a
 while…]</p>
-<div id="csv-files" class="section level3">
-<h3>CSV files</h3>
+<div id="csv-files" class="section level2">
+<h2>CSV files</h2>
 <p>Comma-separated value (csv) files are one of the most commonly used
 formats, as these can be written from and read by Excel, giving you an
 easy way to transfer between R and Excel. The main function to read
@@ -1818,8 +1818,8 @@ save:</p>
 file has been created (<em>iris2.csv</em>). Open this in Excel, and you
 should see that the new variable has been added.</p>
 </div>
-<div id="ascii-text-files" class="section level3">
-<h3>Ascii text files</h3>
+<div id="ascii-text-files" class="section level2">
+<h2>ASCII text files</h2>
 <p>Another common format is a simple space or tab delimited text file
 (extension <code>*.txt</code>). We can read these using the
 <code>read.table()</code> function. This is a much more flexible
@@ -1847,8 +1847,8 @@ head(co2)</code></pre>
 you can force R to read them by adding <code>header = TRUE</code> in the
 function.</p>
 </div>
-<div id="other-software" class="section level3">
-<h3>Other software</h3>
+<div id="other-software" class="section level2">
+<h2>Other software</h2>
 <p>R comes with a set of functions for reading data from other software
 packages, including most main statistical applications. In order to read
 an SPSS file (<code>*.sav</code>) for example, we can load this library,
@@ -1861,8 +1861,8 @@ and Stata output, as well as Data Interchange Format, Epidata and
 several others.</p>
 </div>
 </div>
-<div id="r-scripts" class="section level2">
-<h2>R scripts</h2>
+<div id="r-scripts" class="section level1">
+<h1>R scripts</h1>
 <p>So far, you have been entering commands in the console to get R to
 run different functions. However, this can quickly become tedious,
 especially for complex analysis, or if you make a mistake in a long line
@@ -1933,8 +1933,9 @@ the dataframe to a new file:</p>
 <pre class="r"><code>## Estimate petal area and save
 iris$Petal.Area = pi * iris$Petal.Length * iris$Petal.Width
 write.csv(iris, &quot;iris2.csv&quot;, row.names = FALSE)</code></pre>
-<div id="quitting-r" class="section level3">
-<h3>Quitting R</h3>
+</div>
+<div id="quitting-r" class="section level1">
+<h1>Quitting R</h1>
 <p>When you are finished with R, exit by typing <code>q()</code> in the
 console (or going to [File &gt; Quit RStudio]). You will be asked if you
 want to save your workspace. This creates a ‘snap-shot’ of your
@@ -1944,18 +1945,17 @@ general, I would not recommend doing this, as it can create some large
 easier to make sure your code is safely saved in a script, and you can
 then re-run this the next time you open R.</p>
 </div>
-</div>
-<div id="exercise-01" class="section level2">
-<h2>Exercise 01</h2>
+<div id="exercise-01" class="section level1">
+<h1>Exercise 01</h1>
 <p>For this module, the only thing to submit is your finished script for
 the final section. Please change the name of this file to include either
 your surname or your uID and upload this to Canvas by June 21st
 [5pts]</p>
 </div>
-<div id="files-used-in-lab" class="section level2">
-<h2>Files used in lab</h2>
-<div id="iris.csv" class="section level3">
-<h3><em>iris.csv</em></h3>
+<div id="files-used-in-lab" class="section level1">
+<h1>Files used in lab</h1>
+<div id="iris.csv" class="section level2">
+<h2><em>iris.csv</em></h2>
 <p>Fisher’s iris morphology dataset:</p>
 <table>
 <thead>
@@ -1992,8 +1992,8 @@ your surname or your uID and upload this to Canvas by June 21st
 </tbody>
 </table>
 </div>
-<div id="co2_mm_mlo.txt" class="section level3">
-<h3><em>co2_mm_mlo.txt</em></h3>
+<div id="co2_mm_mlo.txt" class="section level2">
+<h2><em>co2_mm_mlo.txt</em></h2>
 <p>Observed atmospheric carbon dioxide concentration from Mauna Loa from
 1958 to present</p>
 <table>
