@@ -18,7 +18,7 @@ library(png)
 library(grid)
 ```
 
-## Introduction
+# Introduction
 
 In this lab, we are going to explore how RStudio can be used to generate reports of your analyses as html files that contain text, code, figures and results. In order to do so, we need to first look at how R can be extended with add-on packages.
 
@@ -32,7 +32,7 @@ So far, we have been using many of the standard functions that come with the bas
 
 There are two types of packages: default packages that come with the base installation of R (i.e. are installed along with R), and packages that must be downloaded and installed. We will cover the installation of new packages later in this lab, but for now just be aware that R comes with tools to manage this installation. 
 
-## Packages and the R workspace
+# Packages and the R workspace
 
 Before we start looking into how to use packages, it is important to understand how these work with R. Packages that are installed are kept in the R library directory, usually buried away in the computer system files. However, even when installed, a package and its functions are not available until it has been *loaded* into the R workspace. Once this is done you can use it's functions, as you would those in the base version.
 
@@ -182,7 +182,7 @@ knit_hooks$set(source = function(x, options){
 ```
 
 
-## Report generation
+# Report generation
 
 R has several add-on packages that allow you to write reports directly from R, incorporating the code, analyses and plots that you would make. These include **Sweave**, **knitr** and **pander**. These can be used to generate a wide variety of output documents, including LaTeX, RTF, the open document format (ODF) and html. One of the most advanced of these is **knitr**, which integrates extremely well with RStudio. Using **knitr**, reports can be generated in html using *markdown*, a simplified version of the full html markup language. 
 
@@ -287,11 +287,11 @@ Once the markdown file is written, it can be processed into html. There are quit
 
 Dillinger interface showing the markdown editor on the left and the processed html on the right. 
 
-### R Markdown
+## R Markdown
 
 [R Markdown][rmID] is a variant of Markdown developed by the same people who developed RStudio. It allows you to embed *chunks* of R code which is then used with the **knitr** package to create reproducible web-based reports. The clever part about **knitr** is that it will take this code, and actually run it in R. So any R code you include will be processed, and the results can be displayed. This has several advantages: 1) it makes sure that the results are exactly those produced by R (and that the code is consistent with the results); 2) it allows you to easily update your report using new or extra data; 3) the figures are produced directly in the report; 4) your reports are easy to publish on the web. 
 
-## knitr
+### knitr
 
 [knitr][knID] is a package developed by Yihui Xie to embed R code into different documents. This needs to be installed on your computer before you can start generating reports. Use the instructions from the previous lab to install this package. 
 
@@ -346,56 +346,63 @@ We'll now add some R code into this document. Each block of code is called a 'ch
 ```
 ````
 
-```
-    ```{r}
-    5 + 6
-    ```
-```
-
 Add this to your markdown file, and click on the 'Knit HTML' button. Check the html preview window, and you should see the following lines added to your output:
 
 ```{r}
 5 + 6
 ```
+
 The html output therefore has, not only the R code that you entered, but the result of that code. 
 
 We'll now add more code to this example to read in some data and calculate summary statistics. Add the following code to read in the GISS global temperature data set *giss_temp.csv*, and calculate some summary statistics. 
 
-```{r}`r ''`
+````markdown
+`r ''````{r}
 giss = read.csv("giss_temp.csv")
 summary(giss)
 ```
+````
+
 Add some text before and after the code to explain what is going on. Remember that you can  add sub-headers with two hashmarks `##`. Other formatting tips can be found by clicking on the button with a question mark, and selecting 'Markdown Quick Reference'. 
 
 Now add code to calculate the mean temperature deviation per year, and make a vector of years:
 
-```{r}`r ''`
+````markdown
+`r ''````{r}
 annualTemp = tapply(giss$TempAnom, giss$Year, mean)
 years = unique(giss$Year)
 ```
+````
+
+
 Again, add some text with outside of the backticks to explain what is going on. Click 'Knit HTML' to check the output. 
 
 Finally, we'll add a couple of plots to the output. Before doing this, we'll add a subheader to the file and a short amount of text
 
-## Plot section
 First, a histogram showing the distribution of all temperature anomaly values. 
 Second, a plot of annual temperature change.
 
 Now start by plotting a histogram of all the temperature values:
 
-```{r}`r ''`
+````markdown
+`r ''````{r}
 hist(giss$TempAnom, breaks=20)
 ```
+````
+
 And a line plot showing the annual temperatures
 
-```{r}`r ''`
+````markdown
+`r ''````{r}
 plot(years, annualTemp, type='l', lwd=2, col=2, 
 xlab="Years", ylab="Temp Anom")
 abline(h=0, lty=2)
 ```
+````
+
 Add some text to explain what the code is doing, and click 'Knit HTML' to get the final report. When it is finished, go to your working directory, and double click the *.html file to open this in a browser. 
 
-### Chunk options
+## Chunk options
 
 **knitr** has a set of [options][opID] for modifying the way in which the chunks are run. This is done by adding options in between brackets at the start of the chunk (`{r}`). For example, `{r echo=FALSE}` will run the code, but not display it in the document. Some other options are:
 
@@ -419,16 +426,16 @@ grid.raster(img)
 
 If you click on this, RStudio will upload your document to RPubs. R will likely prompt you to install some add-on packages and you will need to create an account. Note that this is a public website, and your code and results will be visible to anyone.
 
-## Exercise
+# Exercise
 
 - Choose any one of the previous exercises from this class. Create a new R markdown file with the code you used in this exercise, and some text to describe what the code is doing. Use **knitr** to convert this to html. 
 - Set up an account on RPubs.com and publish your html page there
 
 You can either submit the html page through Canvas, or a link to the page on your RPubs account
 
-## Files used in lab
+# Files used in lab
 
-### *giss_temp.csv*
+## *giss_temp.csv*
 
 GISS northern hemisphere temperature dataset
 

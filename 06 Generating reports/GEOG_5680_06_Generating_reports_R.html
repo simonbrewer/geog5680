@@ -1482,13 +1482,13 @@ RMarkdown</h1>
 <h4 class="author"><div class="line-block">Simon Brewer<br />
 Geography Department<br />
 University of Utah</div>
-<p>date: “12 May, 2024”</p></h4>
+<p>date: “13 May, 2024”</p></h4>
 
 </div>
 
 
-<div id="introduction" class="section level2">
-<h2>Introduction</h2>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
 <p>In this lab, we are going to explore how RStudio can be used to
 generate reports of your analyses as html files that contain text, code,
 figures and results. In order to do so, we need to first look at how R
@@ -1517,8 +1517,8 @@ that must be downloaded and installed. We will cover the installation of
 new packages later in this lab, but for now just be aware that R comes
 with tools to manage this installation.</p>
 </div>
-<div id="packages-and-the-r-workspace" class="section level2">
-<h2>Packages and the R workspace</h2>
+<div id="packages-and-the-r-workspace" class="section level1">
+<h1>Packages and the R workspace</h1>
 <p>Before we start looking into how to use packages, it is important to
 understand how these work with R. Packages that are installed are kept
 in the R library directory, usually buried away in the computer system
@@ -1530,7 +1530,6 @@ version.</p>
 restarting R, you will need to reload any packages you were using. You
 do <strong>not</strong> need to reinstall the package, only reload
 it.</p>
-</div>
 <div id="using-packages" class="section level2">
 <h2>Using packages</h2>
 <p>There are several ways to use a package once it is installed:</p>
@@ -1706,8 +1705,9 @@ smaller widths correctly classify 49 ‘versicolor’, but also 5
 ‘virginica’.</p>
 </div>
 </div>
-<div id="report-generation" class="section level2">
-<h2>Report generation</h2>
+</div>
+<div id="report-generation" class="section level1">
+<h1>Report generation</h1>
 <p>R has several add-on packages that allow you to write reports
 directly from R, incorporating the code, analyses and plots that you
 would make. These include <strong>Sweave</strong>,
@@ -1722,7 +1722,6 @@ language.</p>
 using <strong>knitr</strong> and markdown, and this lab should provide a
 sufficient introduction for you to be able to write your own
 documents.</p>
-</div>
 <div id="markdown" class="section level2">
 <h2>Markdown</h2>
 <p>We’ll start with a quick introduction to markdown, before starting to
@@ -1825,8 +1824,9 @@ online free processors and editors are <a href="https://stackedit.io">stackedit<
 <p>Dillinger interface showing the markdown editor on the left and the
 processed html on the right.</p>
 </div>
-<div id="r-markdown" class="section level3">
-<h3>R Markdown</h3>
+</div>
+<div id="r-markdown" class="section level2">
+<h2>R Markdown</h2>
 <p><a href="http://rmarkdown.rstudio.com">R Markdown</a> is a variant of
 Markdown developed by the same people who developed RStudio. It allows
 you to embed <em>chunks</em> of R code which is then used with the
@@ -1839,14 +1839,13 @@ by R (and that the code is consistent with the results); 2) it allows
 you to easily update your report using new or extra data; 3) the figures
 are produced directly in the report; 4) your reports are easy to publish
 on the web.</p>
-</div>
-</div>
-<div id="knitr" class="section level2">
-<h2>knitr</h2>
+<div id="knitr" class="section level3">
+<h3>knitr</h3>
 <p><a href="http://yihui.name/knitr/">knitr</a> is a package developed
 by Yihui Xie to embed R code into different documents. This needs to be
 installed on your computer before you can start generating reports. Use
 the instructions from the previous lab to install this package.</p>
+</div>
 <div id="a-first-r-markdown-document" class="section level3">
 <h3>A first R Markdown document</h3>
 <p>Go to the [File] menu &gt; [New File] &gt; [R Markdown…]. A window
@@ -1896,14 +1895,6 @@ very simple example to add two numbers would be:</p>
 <pre class="markdown"><code>```{r}
 5 + 6
 ```</code></pre>
-<pre><code>    
-    ```r
-    5 + 6
-    ```
-    
-    ```
-    ## [1] 11
-    ```</code></pre>
 <p>Add this to your markdown file, and click on the ‘Knit HTML’ button.
 Check the html preview window, and you should see the following lines
 added to your output:</p>
@@ -1915,35 +1906,45 @@ but the result of that code.</p>
 calculate summary statistics. Add the following code to read in the GISS
 global temperature data set <em>giss_temp.csv</em>, and calculate some
 summary statistics.</p>
-<p><code>{r} giss = read.csv(&quot;giss_temp.csv&quot;) summary(giss)</code> Add
-some text before and after the code to explain what is going on.
+<pre class="markdown"><code>```{r}
+giss = read.csv(&quot;giss_temp.csv&quot;)
+summary(giss)
+```</code></pre>
+<p>Add some text before and after the code to explain what is going on.
 Remember that you can add sub-headers with two hashmarks
 <code>##</code>. Other formatting tips can be found by clicking on the
 button with a question mark, and selecting ‘Markdown Quick
 Reference’.</p>
 <p>Now add code to calculate the mean temperature deviation per year,
 and make a vector of years:</p>
-<p><code>{r} annualTemp = tapply(giss$TempAnom, giss$Year, mean) years = unique(giss$Year)</code>
-Again, add some text with outside of the backticks to explain what is
+<pre class="markdown"><code>```{r}
+annualTemp = tapply(giss$TempAnom, giss$Year, mean)
+years = unique(giss$Year)
+```</code></pre>
+<p>Again, add some text with outside of the backticks to explain what is
 going on. Click ‘Knit HTML’ to check the output.</p>
 <p>Finally, we’ll add a couple of plots to the output. Before doing
 this, we’ll add a subheader to the file and a short amount of text</p>
-</div>
-</div>
-<div id="plot-section" class="section level2">
-<h2>Plot section</h2>
 <p>First, a histogram showing the distribution of all temperature
 anomaly values. Second, a plot of annual temperature change.</p>
 <p>Now start by plotting a histogram of all the temperature values:</p>
-<p><code>{r} hist(giss$TempAnom, breaks=20)</code> And a line plot
-showing the annual temperatures</p>
-<p><code>{r} plot(years, annualTemp, type=&#39;l&#39;, lwd=2, col=2,  xlab=&quot;Years&quot;, ylab=&quot;Temp Anom&quot;) abline(h=0, lty=2)</code>
-Add some text to explain what the code is doing, and click ‘Knit HTML’
-to get the final report. When it is finished, go to your working
+<pre class="markdown"><code>```{r}
+hist(giss$TempAnom, breaks=20)
+```</code></pre>
+<p>And a line plot showing the annual temperatures</p>
+<pre class="markdown"><code>```{r}
+plot(years, annualTemp, type=&#39;l&#39;, lwd=2, col=2, 
+xlab=&quot;Years&quot;, ylab=&quot;Temp Anom&quot;)
+abline(h=0, lty=2)
+```</code></pre>
+<p>Add some text to explain what the code is doing, and click ‘Knit
+HTML’ to get the final report. When it is finished, go to your working
 directory, and double click the *.html file to open this in a
 browser.</p>
-<div id="chunk-options" class="section level3">
-<h3>Chunk options</h3>
+</div>
+</div>
+<div id="chunk-options" class="section level2">
+<h2>Chunk options</h2>
 <p><strong>knitr</strong> has a set of <a href="http://yihui.name/knitr/options/">options</a> for modifying the
 way in which the chunks are run. This is done by adding options in
 between brackets at the start of the chunk (<code>{r}</code>). For
@@ -1965,7 +1966,6 @@ long time to run</li>
 e.g. <code>{r fig.width=10,fig.height=7}</code> will make a 10x7 figure
 in the output.</p>
 </div>
-</div>
 <div id="publishing-your-markdown-documents" class="section level2">
 <h2>Publishing your markdown documents</h2>
 <p>If you use <strong>knitr</strong> to compile your document to an html
@@ -1980,8 +1980,9 @@ will likely prompt you to install some add-on packages and you will need
 to create an account. Note that this is a public website, and your code
 and results will be visible to anyone.</p>
 </div>
-<div id="exercise" class="section level2">
-<h2>Exercise</h2>
+</div>
+<div id="exercise" class="section level1">
+<h1>Exercise</h1>
 <ul>
 <li>Choose any one of the previous exercises from this class. Create a
 new R markdown file with the code you used in this exercise, and some
@@ -1992,10 +1993,10 @@ convert this to html.</li>
 <p>You can either submit the html page through Canvas, or a link to the
 page on your RPubs account</p>
 </div>
-<div id="files-used-in-lab" class="section level2">
-<h2>Files used in lab</h2>
-<div id="giss_temp.csv" class="section level3">
-<h3><em>giss_temp.csv</em></h3>
+<div id="files-used-in-lab" class="section level1">
+<h1>Files used in lab</h1>
+<div id="giss_temp.csv" class="section level2">
+<h2><em>giss_temp.csv</em></h2>
 <p>GISS northern hemisphere temperature dataset</p>
 <table>
 <thead>
