@@ -18,7 +18,7 @@ library(png)
 library(grid)
 ```
 
-## Introduction
+# Introduction
 
 Before starting, remember to create a working directory (e.g. `module08`). Next download the files for today's lab from the Canvas page and move them to this directory. You'll need the following file:
 
@@ -26,7 +26,7 @@ Before starting, remember to create a working directory (e.g. `module08`). Next 
 
 Then start RStudio, and change your working directory from the [Session] menu > [Set working directory] > [Choose directory...]. Remember to check that R can see the files by running the `list.files()` command. 
 
-In this lab, we will look at the add-on package **dplyr**. This is a powerful R-package to transform and summarize tabular data with rows and columns. The package contains a set of functions (or "verbs"") that perform common data manipulation operations such as filtering for rows, selecting specific columns, re-ordering rows, adding new columns and summarizing data. (This lab borrows heavily from Rafael Irizarry and Michael Love's [blog](http://genomicsclass.github.io/book/pages/dplyr_tutorial.html))
+In this lab, we will look at the add-on package **dplyr**. This is a powerful R-package to transform and summarize tabular data with rows and columns. The package contains a set of functions (or "verbs") that perform common data manipulation operations such as filtering for rows, selecting specific columns, re-ordering rows, adding new columns and summarizing data. (This lab borrows heavily from Rafael Irizarry and Michael Love's [blog](http://genomicsclass.github.io/book/pages/dplyr_tutorial.html))
 
 
 These functions are designed to replace the base R functions that we have worked with so far, such as `subset()`, `apply()`, `sapply()`, `lapply()`, `tapply()` and `aggregate()`. Compared to base functions in R, the functions in **dplyr** are easier to work with, are more consistent in the syntax and are targeted for data analysis around data frames instead of just vectors.
@@ -45,7 +45,7 @@ str(gap)
 head(gap)
 ```
 
-### Important dplyr verbs 
+# Important dplyr verbs 
 
 **dplyr** has a wide variety of operations, but the most important ones are:
 
@@ -58,7 +58,7 @@ head(gap)
 | `summarise()` | summarize values |
 | `group_by()` | allows for group operations | 
 
-## Selecting by column and row
+## Selecting by column
 
 The `select()` function allows the selection of columns by name:
 
@@ -94,6 +94,8 @@ Here are some additional functions to select columns based on a specific criteri
 - `matches()` = Select columns that match a regular expression
 - `one_of()` = Select columns names that are from a group of names
 
+## Selecting by row
+
 The `filter()` function allows the selection of rows. To filter the data for rows where the life expectancy is over 65 years:
 
 ```{r results='hide'}
@@ -123,7 +125,7 @@ Note that there is also a `slice()` function, which simply extracts rows accordi
 slice(gap, 20:25)
 ```
 
-### The pipe operator
+## The pipe operator
 
 The package **magrittr** has a pipe operator which we can use to start to chain together **dplyr** functions. This is loaded automatically with **dplyr** so you don't need to worry about loading it. The pipe operator is written as `%>%`, and takes the output from one function and *pipes* it directly to another function. So in the very first example of the `select()` function, we used select to obtain some columns from the data frame then used `head()` to examine the first few rows:
 
@@ -148,10 +150,12 @@ gap %>%
 
 ## The `arrange()` function
 
-This function allows us to arrange (or re-order) rows by a particular column. So to arrange by increasing life expectancy: 
+This function allows us to arrange (or re-order) rows by a particular column. So to arrange by increasing life expectancy (you can remove the `head()` function to see all the output): 
 
 ```{r}
-gap %>% arrange(lifeExp) %>% head()
+gap %>% 
+  arrange(lifeExp) %>% 
+  head()
 ```
 
 Now, we will select four columns from the dataset, arrange the rows by the life expectancy then pass this to `head()` to show the first few rows:
@@ -281,7 +285,7 @@ gap %>%
   arrange(avgLE)
 ```
 
-## **dplyr** and **ggplot2**
+# **dplyr** and **ggplot2**
 
 The **dplyr** package integrates nicely with the **ggplot2** function (they were both largely written by the same person). So we can use the same process based on pipes to subset a data frame, and pass the output directly to the `ggplot()` function. For example, to extract the time series of GDP for the United States and plot this as a line graph (first load **ggplot2**):
 
@@ -300,13 +304,14 @@ gap %>%
 ```
 
 Alternatively, we can get values for a given year, and make histograms by continent:
+
 ```{r message=FALSE, fig.keep='none'}
 gap %>% 
   filter(year == 1992) %>%
   ggplot(aes(x=lifeExp)) + geom_histogram() + facet_wrap(~continent)
 ```
 
-## Exercises
+# Exercises
 
 The exercise for this lab uses data from the file *theoph.csv*. This contains results from a study on the pharmacokinetics of theophylline, an anti-asthmatic drug. Twelve subjects were given oral doses of theophylline then serum concentrations were measured at 11 time points over the next 25 hours. The variables include the subject ID, their weight, the dose of the drug administered, the time at which samples were drawn and the concentration of the drug. 
 
@@ -331,9 +336,9 @@ Now use the commands introduced above to do the following:
 - Using `select()` to extract just the `Subject`, `Time` and `conc` variables *and* pipe this to `ggplot()` to make a line plot with `Time` on the x-axis, `conc` on the y-axis and the lines colored by subject
 - Using `select()` to extract just the `Subject`, `Time` and `conc` variables *and* pipe this to ggplot to make a line plot with `Time` on the x-axis, `conc` on the y-axis and faceted by the subject ID
 
-## Files used in lab
+# Files used in lab
 
-### *gapminderData5.csv*
+## *gapminderData5.csv*
 
 GapMinder dataset on global inequality
 
@@ -346,7 +351,7 @@ GapMinder dataset on global inequality
 | lifeExp | Life expectancy |
 | gdpPercap | Per capita GDP (US$ 2010) |
 
-### *theoph.csv*
+## *theoph.csv*
 
 Theophylline pharmacokinetic dataset
 
