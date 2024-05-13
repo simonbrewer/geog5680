@@ -12,7 +12,7 @@ output:
     fig_caption: true
 ---
 
-## Introduction
+# Introduction
 
 So far, we have spent a lot of time looking at the manipulation of data in R. For the next class, we will introduce the basic plotting tools in R. Plotting in R starts with very simple plots, but can be extended to produce publication quality figures with a little effort. Over the next couple of days, we will look at some of the ways in which they can be extended. 
 
@@ -42,7 +42,7 @@ And use `str()` to look at the structure of the data:
 str(veg)
 ```
 
-## The `plot()` function
+# The `plot()` function
 
 The main object of this study is understanding the controls on biodiversity across the set of locations. For example, we may want to model richness (`R`) as a function of `BARESOIL` (or any of the other soil and climate variables). Let's make a simple scatterplot of these two variables to see if there is any visible relationship between the. The basic function to plot any data is `plot()`, so we can plot these by simply specifying the two vectors we want to use (note that we use the dollar notation):
 
@@ -59,7 +59,7 @@ plot(R ~ BARESOIL, data = veg)
 
 This will produce the same graph, even though the variables are reversed. The tilde (`~`) is an important character in R, as it implies a relationship (i.e. that richness is a *function* of bare soil), and we'll see this later when we introduce modeling in R. We'll stick with the standard `x, y` syntax for the rest of this lab.  
 
-### Modifying the basic plot
+## Modifying the basic plot
 
 The `plot()` function has a large number of options that allow you to modify the basic plot (see the help page for this function for some details). 
 
@@ -98,7 +98,7 @@ dev.off()
 ```
 
 
-### Changing symbols 
+## Changing symbols 
 
 By default, the plot function uses open circles (open dots) as plotting characters, but characters can be selected from about 20 additional symbols. The plotting character is specified with the `pch` option in the plot function. When this is not specified, the default value for this is 1 (the open circle). Setting it to another value will change it to the corresponding symbol in this figure:
 
@@ -140,7 +140,7 @@ plot(veg$BARESOIL, veg$R, xlab = "%",
      pch = veg$Transect)
 ```
 
-### Adding a legend
+## Adding a legend
 
 Unless your memory is very good, it would be useful to have a legend to explain what the different symbols represent. The `legend()` function does just this: adds a text box with the symbols and labels to the plot. The basic syntax for this function is `legend(position, text, symbols)`, where `position` can be descriptive (e.g. topright) or using the coordinates of the figure. 
 
@@ -175,7 +175,7 @@ veg$Time3 [veg$Time > 1974] = 16
 veg$Time3
 ```
 
-### Changing colors
+## Changing colors
 
 As an alternative to changing the symbols, we can change the symbol color using the `col` option in `plot()`. This will re-make our plot, but now using red filled circles:
 
@@ -228,7 +228,7 @@ legend("bottomleft", pch=rep(1:8,each=2), col=c(4,2), ncol=8, cex=0.7,
        legend=paste(paste("T",rep(1:8,each=2), " ", rep(c("<74",">74")),sep='')))
 ```
 
-### Changing symbol size
+## Changing symbol size
 
 The size of the symbols can be changed using the `cex` option in the `plot()` function. This stands for *character expansion* and the default value is 1. A value of 0.5 will plot symbols at half the current size, and a value of 1.5 will plot symbols 50% larger. Here we plot the symbols at twice the default:
 
@@ -266,7 +266,7 @@ legend("bottomleft", pch=1, pt.cex=mysize/10,
        legend=mysize, title="PctSand", ncol=5)
 ```
 
-### Adding a smoothing line
+## Adding a smoothing line
 
 The scatter plot we have made so far shows a rough negative relationship between our two variables. We can add a smoothing line to this to emphasize the main trend in this relationship. The function `scatter.smooth()` can be used for this. This fits a smoothed curve using *loess*, a locally weighted polynomial, and produces a plot:
 
@@ -281,50 +281,59 @@ More flexibility in fitting smoothing curves can be obtained by using the functi
 
 We have previously looked at the `plot()` command to make scatterplots of our datasets. R has many more function for making figures, and we will go through some of these here. We start with plots that summarize data including charts and histograms, then look at some other methods for two or more variables including line graphs, boxplots and surfaces. 
 
-## Summary plots
+# Summary plots
 
 Summary plots are generally used to visualize a single variable. In general, what we are interested in seeing is the distribution of that variable: what the range is, where the middle or most common value is, etc. 
 
-### Pie charts
+## Pie charts
+
 Pie charts are a very common way of showing how values are distributed among a set of groups. Most statisticians and data visualizers tend to dislike these, as they tend to bias toward larger values. These can be displayed using the `pie()` function. 
 
 Start by loading the file *VADeaths.csv*. This contains data on death rates in Virginia for different age groups and social groups (rural vs. urban, male vs. female), Download this file and copy it to your working directory. This file has a slightly different structure, in which the first column contains row names. Rather than deleting these, we can tell R to include these as labels or row names as follows:
+
 ```{r}
 VADeaths <- read.csv("VADeaths.csv", row.names = 1)
 VADeaths
 ```
 
 Each row refers to an age group, and each column then has the death rates for a given group. We can plot these as a pie chart, by referring to the column:
+
 ```{r fig.keep='none'}
 pie(VADeaths[,1])
 ```
 
 More usefully, we can label each segment using the row names of the data frame. The function `rownames()` simply extracts a vector of strings of the row names:
+
 ```{r fig.keep='none'}
 pie(VADeaths[,1], labels = rownames(VADeaths))
 ```
 
 And as an alternative representation, we can make a pie chart of the distribution among different social groups for a given age, by using a row index instead of a column:
+
 ```{r fig.keep='none'}
 pie(as.numeric(VADeaths[4,]), labels = colnames(VADeaths))
 ```
 
 We use the `as.numeric()` function to force R to consider these data as a vector of numbers. 
 
-### Bar charts
+## Bar charts
+
 A somewhat better representation of these numbers can be made using a bar chart. This simply plots a bar with the height of the value in a group. For example:
+
 ```{r fig.keep='none'}
 barplot(VADeaths[,1], names = rownames(VADeaths))
 ```
 
 If we use the entire data frame, then this function will plot sets of bars by group:
+
 ```{r fig.keep='none'}
 barplot(as.matrix(VADeaths), beside = T, legend = rownames(VADeaths))
 ```
 
 Bar charts can also be misleading, as the bar is generally drawn from zero to a given height. If the heights are similar but large, then any differences tend to be obscured.
 
-### Histograms
+## Histograms
+
 A much better way to summarize a set of numbers is using a histogram. Histograms tend to be preferred as it is possible to see not only the limits of the data, but get an idea of the *distribution* and where the most common values lie. 
 
 To illustrate histograms, we will use the data set of iris morphology in the file *iris.csv*. Load this into to R, and produce a simple histogram of the sepal lengths. As this data set contains a variable that can be used to group data (`Species`), we use the `stringsAsFactors` argument to force R to read these as factors rather than characters. 
@@ -392,11 +401,13 @@ In a final step, we can add a 'rug' plot, which adds small ticks to show where t
 rug(iris$Petal.Length, side = 1)
 ```
 
-### Boxplots
+#
+## Boxplots
 
 Boxplots are one of the most useful tools for visualizing data, especially when working with a continuous numerical response (dependent) variable and categorical explanatory (independent) variables. Its purpose is threefold: detection of outliers, and displaying heterogeneity of distribution and effects of explanatory variables. Boxplots can be made using the function `boxplot()`, and can be used with single variables, or more often, variables for different groups. 
 
 The following code plots a single boxplot using the iris sepal lengths:
+
 ```{r}
 boxplot(iris$Sepal.Width)
 ```
@@ -417,7 +428,7 @@ boxplot(Petal.Width ~ Species, data = iris, col = "lightblue",
         main = "Iris Petal Width")
 ```
 
-## Plotting multiple data series
+# Plotting multiple data series
 
 We have previously used the `plot()` function to make a scatterplot of two variables. In this section, we will look at how to extend a scatterplot by adding more than one series of data points. We will use the Virginia death rate data set, and plot the death rate for each group against the age of that group. You should create a new script and use this to build and run the plotting commands for figure, as it will save you a fair amount of typing.
 
@@ -449,11 +460,8 @@ points(agegrp, VADeaths$Urban.Female, pch = 4, col = 4)
 
 So now we have the four data series. If you look at the youngest and oldest group, you should notice that some values are missing. This is because the extent of the x and y axes is set by the first `plot()` command, using the first data series. We need to extend the range of the y-axis to account for the lower rates among females and higher rates among urban males. Show the data frame to get an idea of the range of data, or use the `range()` function to estimate what this is. Now add the option `ylim` to the original `plot()` function and remake the plot. 
 
-### Adding a legend
+Now add a a legend to explain the colors and symbols:
 
-Unless your memory is very good, it would be useful to have a legend to explain what the different symbols represent. The `legend()` function does just this: adds a text box with the symbols and labels to the plot. The syntax for this function is `legend(position, text, symbols)`, where `position` can be descriptive (e.g. topright) or using the coordinates of the figure. 
-
-The following will add a legend to our plot:
 ```{r eval=FALSE}
 legend("topleft", legend = c("Rural Male", "Rural Female", "Urban Male", "Urban Female"), 
 	col = c(1,2,3,4), pch = c(1,2,3,4))
@@ -471,7 +479,7 @@ legend("topleft", legend = c("Rural Male", "Rural Female", "Urban Male", "Urban 
   col = c(1,2,3,4), pch = c(1,2,3,4))
 ```
 
-## Line plots
+# Line plots
 
 The `plot()` function can also be used to draw line graphs, which is particularly useful when there is a sequence to your data (a good example is data collected over time). The file *ipccScenario_1900_2100.csv* contains global temperature output from the Intergovernmental Panel on Climate Change simulations of future climate change. The file contains output for models run under a set of scenarios from a small amount of change to extreme warming. Get this file and read it into R. We use the summary function to both show the list of variables and their ranges to set up our plot (again, start a new script to plot this out, as we will be making several modifications as we go):
 
@@ -525,7 +533,7 @@ While we did not use this here, a further option for line plots '`lty`' allows y
 
 Add a legend to the IPCC temperature plot. Note that rather than using `pch` to represent different symbols, you can use `fill` to get simple filled blocks, or `lty` to get a simple line. 
 
-### Adding error bars
+## Adding error bars
 
 There is no specific function in R for adding error bars, but we can use the `arrows()` function, which draws a line between two points to get the same effect. To see how this works, start by selecting a subset of the IPCC data between 2050 and 2100, then plot the commitMed variable:
 
@@ -547,7 +555,7 @@ arrows(ipcc.sub$yrs, ipcc.sub$a2Med,
 ```
 
 
-### Histogram plots
+## Histogram plots
 
 The data can also be represented as a vertical line between each points and the zero line. This is called a 'histogram' scatterplot (not the same as a standard histogram), and is useful for showing where data is above or below a reference points:
 
@@ -563,7 +571,7 @@ lines(ipcc$yrs[negID], ipcc$a1bMed[negID], col = "blue", type = 'h')
 lines(ipcc$yrs[-negID], ipcc$a1bMed[-negID], col = "red", type = 'h')
 ```
 
-## Plotting surfaces
+# Plotting surfaces
 
 R has several functions for plotting a matrix or two-dimensional array as a surface. Most of these functions require the matrix of surface values, plus a set of x and y coordinates. We will demonstrate these here using a simple DEM, read from a space-delimited text file *volcanodem.txt*. We start by reading in the data. As this is not a CSV file, we use the function `read.table()` to get the data:
 ```{r}
@@ -606,7 +614,7 @@ persp(x, y, volcano, theta = 130, phi = 15)
 
 Where `theta` controls the viewing direction (between 0 and 360) and `phi` controls the vertical view angle (between -90 and 90). Try different values for these options to see the effect. 
 
-## Multiple figures
+# Multiple figures
 
 By default, R will fit your figure to the window it is currently using. If you would like to have a multipanel plot, the easiest way is to define the number of rows or columns that you need as follows:
 
@@ -629,11 +637,11 @@ plot(x3, y3)
 
 More complex layouts can be made using the `layout()` function, which allows you to divide the window into arbitrary sets of plotting regions. 
 
-## Exercises
+# Exercises
 
 The exercise for this lab is in two parts. For each you will need to submit a) your R script and b) a Word document containing the figures you have made. Figures can be directly exported from RStudio by clicking the [Export] button or by writing directly to a PDF file (see above for an example). 
 
-### Part 1
+## Part 1
 
 Use the data from the *iris.csv* file to make the following plots:
 
@@ -644,7 +652,7 @@ Use the data from the *iris.csv* file to make the following plots:
 - A plot of Petal Length (x) vs Petal Width (y), with symbols scaled by the value of the Sepal Width and colored by species
 - A plot of Petal Length (x) vs Petal Width (y), with a smoothing line
 
-### Part 2
+## Part 2
 
 In a previous lab, we used a file containing observations of squid capture around Scotland (*squid.csv*). Load this file and make the following plots:
 
@@ -653,9 +661,9 @@ In a previous lab, we used a file containing observations of squid capture aroun
 - A boxplot showing the relationship of GSI to the sex of the squid (hint: you may need to create a new variable which is the log of the GSI values with `log()` to more clearly show the differences)
 - A boxplot showing the relationship of GSI to the locations where the squid were caught
 
-## Files used in lab
+# Files used in lab
 
-### *iris.csv* 
+## *iris.csv* 
 
 Fisher's Iris morphology dataset: 
 
@@ -668,7 +676,7 @@ Fisher's Iris morphology dataset:
 | Species | Species name |
 | Code | Species code |
 
-### *VADeaths.csv*
+## *VADeaths.csv*
 
 Virginia mortality dataset: 
 
@@ -680,7 +688,7 @@ Virginia mortality dataset:
 | Urban.Male | Urban male death rates per 1000 |
 | Urban.Female | Urban female death rates per 1000 |
 
-### *ipccScenario_1900_2100.csv*
+## *ipccScenario_1900_2100.csv*
 
 Projected global temperatures from 1900 to 2100 from the IPCC AR4
 
@@ -700,7 +708,7 @@ Projected global temperatures from 1900 to 2100 from the IPCC AR4
 | a2Med | A2 scenario median estimate |
 | a2Hi | A2 scenario high estimate |
 
-### *tar-isam_CO2.csv*
+## *tar-isam_CO2.csv*
 
 IPCC CO2 concentration scenarios from the third assessment report
 
@@ -710,11 +718,11 @@ IPCC CO2 concentration scenarios from the third assessment report
 | Cols 2-12 | CO2 concentration under different |
 |  | emission scenarios |
 
-### *volcanodem.txt*
+## *volcanodem.txt*
 
 Maunga Whau DEM: Flat ASCII format, with each value representing elevation in a single 10x10 m cell
 
-### *squid.csv* 
+## *squid.csv* 
 
 Scottish squid dataset
 
