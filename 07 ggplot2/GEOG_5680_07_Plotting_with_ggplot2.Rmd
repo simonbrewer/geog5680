@@ -18,27 +18,31 @@ library(png)
 library(grid)
 ```
 
-## Introduction
+# Introduction
 
 Before starting, remember to create a working directory (e.g. `module07`). Then start RStudio, and change your working directory from the [Session] menu > [Set working directory] > [Choose directory...]. Remember to check that R can see any files you have downloaded by running the `list.files()` command (the files are listed below). 
 
-R contains many functions for plotting and visualizing data, including many that are available in add-on packages (e.g. the **rpart.plot** package) that greatly extend the basic functionality. We have looked so far at examples of plotting bivariate data through scatterplots and boxplots. 
+R contains many functions for plotting and visualizing data, including many that are available in add-on packages (e.g. the **rpart.plot** package that we looked at previously) that greatly extend the basic functionality, but we have mainly looked so far at using base R functions for plotting. 
 
 The **ggplot2** package was written by Hadley Wickham, and implements the [Grammar of Graphics][gg1ID] framework developed by Leland Wilkinson. The idea behind the grammar of graphics is that all plots can be described by a common language, rather than considering them as separate barplots, line charts, etc. What differs is the coordinate system and *geometry* used to place the data on the page. Using this package requires a little more work than standard plots, but the results are usually worth while.
 
 The **ggplot2** package comes with two main functions: `qplot()`, a simple plotting routine which is designed to replace the base `plot()` function in R; and `ggplot()`, which provides a much greater range of functions. We'll look briefly at the first of these before going on examples with `ggplot()` in more detail. 
 
-## Datasets
-Start by installing and loading the **ggplot2** package:
+## Installing **ggplot2**
+
+Start by installing and loading the **ggplot2** package. Remember you will only need to install it once, but load it in each new R session.
+
 ```{r eval=FALSE}
 install.packages("ggplot2")
 library(ggplot2)
 ```
+
 ```{r echo=FALSE, message=FALSE}
 library(ggplot2)
 ```
 
-### Datasets
+## Datasets
+
 We'll use several datasets in this lab:
 
 - the Iris morphological dataset (*iris.csv*)
@@ -59,9 +63,10 @@ VADeaths = read.csv("VADeaths.csv")
 VADeaths
 ```
 
-### Reshaping tables into dataframes for plotting
+## Reshaping tables into dataframes for plotting
 
 Note that the Virginia death rate dataset is simply a table. To use this with ggplot, we need to change it from a table into a data frame, with columns of age groups, social groups and death rates. When you installed the **ggplot2** package, it should have installed a helper package called **reshape2** with it. This has a number of routines for reshaping data into suitable organizations for plotting. One of these functions `melt()` takes tabular data and converts it into a data frame:
+
 ```{r}
 library(reshape2)
 VADeaths2 = melt(VADeaths, variable.name="DemClass", value.name="DeathRate")
@@ -74,27 +79,35 @@ Have a look at the new data frame to see how the `melt()` function has reorganiz
 ```{r}
 VADeaths2
 ```
-## Simple plots with `qplot()`
 
-### Scatterplots
+# Simple plots with `qplot()`
+
+There are two main approaches to working with **ggplot2** - a 'quick' plot function (`qplot`) and a more complex, but much more flexible approach using `ggplot()`. We'll start with the first of these
+
+## Scatterplots
+
 A basic scatterplot. Note that the syntax matches the original `plot()` function, but the output is quite different:
+
 ```{r fig.keep='none'}
 qplot(Sepal.Length, Petal.Length, data = iris)
 ```
 
 Coloring the symbols by species (note that a legend is automatically added):
+
 ```{r fig.keep='none'}
 qplot(Sepal.Length, Petal.Length, data = iris, 
       color = Species)
 ```
 
 Adding further information by resizing the symbols with a third variable (petal width):
+
 ```{r fig.keep='none'}
 qplot(Sepal.Length, Petal.Length, data = iris, 
       color = Species, size = Petal.Width)
 ```
 
 Finally, we add labels and a title, and make the symbols transparent using the parameter `alpha`, in order to make it clear where these overlap:
+
 ```{r fig.keep='none'}
 qplot(Sepal.Length, Petal.Length, data = iris, 
       color = Species, size = Petal.Width, alpha=I(0.7),
@@ -103,27 +116,31 @@ qplot(Sepal.Length, Petal.Length, data = iris,
 ```
 
 By default, `qplot()` makes a scatterplot, but this can be changed to a different plot type or geometry, by using the `geom` argument. For example, to make a histogram:
+
 ```{r fig.keep='none'}
 qplot(Sepal.Width, data=iris, geom='histogram', binwidth=0.1)
 ```
 
 Or a  set of boxplots:
+
 ```{r fig.keep='none'}
 qplot(Species, Sepal.Width, data=iris, geom='boxplot')
 ```
 
 Line plots can be made with `geom="line"`. Try this with the set of Orange trees:
+
 ```{r fig.keep='none'}
 qplot(age, circumference, data=orange, geom='line')
 ```
 
 As this is plotting all five trees together, the line doesn't make much sense. We can separate out the different trees by telling `qplot` to use the tree number as a color. As this is a continuous variable, we first convert this into a factor to indicate the different groups (trees):
+
 ```{r fig.keep='none'}
 orange$Tree = factor(orange$Tree)
 qplot(age, circumference, data=orange, color=Tree, geom='line')
 ```
 
-## More advanced figures with `ggplot()`
+# More advanced figures with `ggplot()`
 
 The `ggplot()` function offers more control over your plots. It works in quite a different way to the other plotting functions, that start with a base plot, then add other points, lines, etc to the figure. Instead, `ggplot` creates a plot *object*, which can be adjusted and added to as you proceed. 
 
@@ -161,7 +178,7 @@ Now typing `myplot` makes the plot appear. This allows you to experiment with di
 
 We could now add other geometries, statistics or other effects to the plot figure to change the way that it looks. Instead, we'll work through several different examples now, using the Gapminder dataset to look at the different functions that are available. 
 
-### Histograms
+## Histograms
 
 A simple histogram of life expectancy for all countries:
 ```{r fig.keep='none'}
@@ -198,14 +215,16 @@ The dataset also includes the year that the data was taken in. We can use this a
 myplot + geom_histogram(fill='darkorange') + facet_grid(year ~ continent)
 ```
 
-### Density plots
+## Density plots
+
 An alternative display of univariate, continuous data is through density plots (`geom_density()`). These fit a small gaussian window around each observation, then add the value of all the windows across the range of data. The result is a smoothed, continuous looking histogram. As before, we can use the `fill` parameter to separate out continents. We add an alpha value again to make the results transparent:
 
 ```{r}
 myplot + geom_density(aes(fill=continent), alpha=0.4)
 ```
 
-### Boxplots
+## Boxplots
+
 We have already looked at boxplots using the base R functions. Here, we need to specify the grouping within the plot aesthetic as `x`, and the continuous variable as `y`. As we need both `x` and `y`, we need to make a new `ggplot` object:
 ```{r fig.keep='none'}
 myplot = ggplot(gapdata, aes(x=continent, y=lifeExp))
@@ -217,9 +236,10 @@ By default, the order of the groups is alphabetical, but it might be useful to o
 myplot + geom_boxplot(aes(x=reorder(continent, lifeExp, median)))
 ```
 
-### Barcharts
+## Barcharts
 
 Two types of barchart can be produced by **ggplot2**. By default, the barcharts are presented as summary of the variable of interest. With factor or categorical variables, this is simply a count of each category. For example:
+
 ```{r fig.keep='none'}
 myplot = ggplot(gapdata, aes(x=continent))
 myplot + geom_bar()
@@ -245,25 +265,29 @@ Second, by using faceting the data using `facet_wrap()` (we also use `coord_flip
 myplot + geom_bar(stat="identity") + facet_wrap(~ DemClass) + coord_flip()
 ```
 
-### Scatterplots
+## Scatterplots
 
 Scatterplots are the simplest way to display bivariate data. **ggplot2** has several different geometries, including points and lines. To make a simple figure of life expectancy against per capita GDP from the gapminder dataset:
+
 ```{r}
 myplot = ggplot(gapdata, aes(x = gdpPercap, y = lifeExp)) 
 myplot + geom_point()
 ```
 
 Given the distribution of the GDP variable, a clearer display could be obtained by transforming it into log10 values. We can do this simply by adding the transformation in call to `ggplot()`:
+
 ```{r fig.keep='none'}
 ggplot(gapdata, aes(x = log10(gdpPercap), y = lifeExp)) + geom_point()
 ```
 
 But we can also manipulate the axis scale directly, which keeps the original values on the axis labels:
+
 ```{r fig.keep='none'}
 myplot + geom_point() + scale_x_log10()
 ```
 
 As this will be useful for future plots, will modify the underlying `ggplot` object:
+
 ```{r fig.keep='none'}
 myplot = myplot + scale_x_log10()
 ```
@@ -277,16 +301,19 @@ myplot + geom_point() + geom_smooth()
 The basic method uses either a type of spline or a local regression (loess) to fit the line. A simple linear fit can be added using the parameter `method='lm'`
 
 As before, we can use an extra variable to identify different parts of the data set. The Gapminder data contains a column indicating which continent the observations came from. We'll use this first to color the points by changing the aesthetic:
+
 ```{r fig.keep='none'}
 myplot + geom_point(aes(color = continent))
 ```
 
 If we now add a best fit line, however, we only get a single line for the whole dataset:
+
 ```{r fig.keep='none'}
 myplot + geom_point(aes(color = continent)) + geom_smooth(method='lm')
 ```
 
 This is a little tricky to explain, but basically, we have only changed the aesthetic in the geometry of the points, rather than the underlying `ggplot` object. The simplest way around this is to remake the object with the color included, then add the smoother:
+
 ```{r fig.keep='none'}
 myplot = ggplot(gapdata, aes(x = gdpPercap, y = lifeExp, color=continent)) + scale_x_log10()
 myplot + geom_point() + geom_smooth(method='lm')
@@ -295,22 +322,26 @@ myplot + geom_point() + geom_smooth(method='lm')
 Note that if you drop the `geom_point()`, you will just obtain the trend lines.
 
 We can also split the data into facets, which will automatically split the data when adding trend lines:
+
 ```{r fig.keep='none'}
 myplot = ggplot(gapdata, aes(x = gdpPercap, y = lifeExp)) + scale_x_log10()
 myplot + geom_point() + facet_wrap(~ continent)
 ```
 
 And we can add a linear fit by continent:
+
 ```{r}
 myplot + geom_point() + facet_wrap(~ continent) + geom_smooth(method='lm')
 ```
 
 Finally, we can facet by both continent and year by using `facet_grid()`:
+
 ```{r warning=FALSE,  fig.keep='none'}
 myplot + geom_point() + facet_grid(year ~ continent) + geom_smooth(method='lm')
 ```
 
 Line plots are a good method for displaying data over time. We'll make a spaghetti diagram of the change in life expectancy for each country, broken out by continent. To do this, we tell the `geom_line()` function to use groupings based on the country name for each line:
+
 ```{r fig.keep='none'}
 myplot = ggplot(gapdata, aes(x = year, y = lifeExp))
 myplot + facet_wrap(~ continent) + geom_line(aes(group=country, color=continent))
@@ -329,7 +360,7 @@ ggplot(subset(gapdata, country %in% jCountries),
        aes(x = year, y = lifeExp, color = country)) + geom_line() + geom_point() 
 ```
 
-## Saving your **ggplot2** figures
+# Saving your **ggplot2** figures
 
 In this section we'll make a figure and save it to a file. We'll start by building the figure, then add various elements, including axis labels and a title, and finally save it to a file using `ggsave()`. Note that as we make the figure, we update the `ggplot`` object each time:
 
@@ -360,7 +391,8 @@ ggsave("lifeexp_vs_gdp.png", myplot,
        width=6, height=4)
 ```
 
-## Themes
+# Themes
+
 THIS IS AN OPTIONAL SECTION
 
 **ggplot2** has a default theme with a gray background to the plot. There are a number of included themes that can simply applied to change this. Two of the built in themes are 'classic' and 'bw':
@@ -379,20 +411,20 @@ myplot + theme_wsj()
 myplot + theme_fivethirtyeight()
 ```
 
-## Exercises
+# Exercises
 
 We'll use the dataset *Temperature.csv*, a file with sea temperature and salinity recorded from 31 stations over 15 years. The stations are located in one of 10 areas. Download this file, move it to your working directory and read it into R. There are two parts to this exercise. For each part, you should submit the results as an R script with the commands you used, and a Word (or equivalent) with the plots. Remember that you can export plots directly from the plot window, or by using `pdf()` to export to a file. 
 
 Alternatively, you can use R Markdown and **knitr** to produce an html page that contains both the code *and* the plots. If you have the time to do this, I would highly recommend it, as it is a great way to keep all your results in one place.
 
-### Part 1
+## Part 1
 - Use `ggplot()` to produce a histogram of salinity values 
 - Make a histogram of salinity values for each year of study, and then for each month
 - Make a boxplot of temperature values for each station 
 - Save the last figure to a png file
 - *Bonus: Reorganize the boxplot from low to high median temperatures*
 
-### Part 2
+## Part 2
 
 Now make some time series plots of temperature and salinity time series. We will need a variable to represent continuous time from the start of the observations and can do this by creating a decimal date as the sum of the year and the day number / 365 (if `temp` is the dataframe holding the data):
 
@@ -407,9 +439,9 @@ You will need to use this new variable (`decdate`) as the x-axis for each plot:
 - Make a lineplot of salinity for each station, grouped into different 'Areas'
 - *Bonus: do the same but only for area 'OS'*
 
-## Files used in lab
+# Files used in lab
 
-### *iris.csv* 
+## *iris.csv* 
 
 Fisher's Iris morphology dataset
 
@@ -422,7 +454,7 @@ Fisher's Iris morphology dataset
 | Species | Species name |
 | Code | Species code |
 
-### *VADeaths.csv*
+## *VADeaths.csv*
 
 Virginia mortality dataset
 
@@ -434,7 +466,7 @@ Virginia mortality dataset
 | Urban.Male | Urban male death rates per 1000 |
 | Urban.Female | Urban female death rates per 1000 |
 
-### *orange.csv*
+## *orange.csv*
 
 Growth of CA orange trees: 
 
@@ -444,7 +476,7 @@ Growth of CA orange trees:
 | age | Tree age |
 | circumference | Tree circumference (cm) |
 
-### *gapminderData5.csv*
+## *gapminderData5.csv*
 
 GapMinder dataset on global inequality
 
@@ -457,7 +489,7 @@ GapMinder dataset on global inequality
 | lifeExp | Life expectancy |
 | gdpPercap | Per capita GDP (US$ 2010) |
 
-### *Temperature.csv*
+## *Temperature.csv*
 
 Dutch ocean monitoring dataset
 
@@ -481,3 +513,5 @@ Dutch ocean monitoring dataset
 | CHLFa | Chlorophyll-a conc. |
 
 [gapID]: https://www.gapminder.org
+[gg1ID]: https://link.springer.com/book/10.1007/0-387-28695-0
+
