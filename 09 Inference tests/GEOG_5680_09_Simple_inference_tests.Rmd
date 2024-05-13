@@ -16,10 +16,10 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 library(png)
 library(grid)
-set.seed(1234)
+set.seed(42)
 ```
 
-## Introduction
+# Introduction
 
 In this lab, we will introduce R functions for working with probability distributions and dealing with basic inference tests. 
 
@@ -31,7 +31,7 @@ Before starting, remember to create a working directory (e.g. `module09`). Next 
 
 Then start RStudio, and change your working directory from the [Session] menu > [Set working directory] > [Choose directory...]. Remember to check that R can see the files by running the `list.files()` command. 
 
-## Distributions
+# Distributions
 The standard installation of R comes with about 20 standard statistical distributions (e.g. normal, uniform, binomial, beta, gamma, etc). Each of the distributions
 
 Each distribution has four associated functions:
@@ -43,13 +43,14 @@ Each distribution has four associated functions:
 
 We will look briefly at examples with a) the Poisson distribution as an example of a discrete probability distribution and b) the normal distribution as an example of a continuous distribution. For information on the other distributions and the parameters that they require, type: `help(Distributions)`.
 
-### Poisson distribution
+## Poisson distribution
 
 The Poisson distribution is used to describe count data, e.g. number of cars on a road, number of fires in a year, number of people in a household. The main parameter for the Poisson distribution is $\lambda$, the average count across observations. The probability of observing a count of $k$ in a given observation is then given by:
 
 $$p(k) = \frac{\lambda^k e^{-\lambda}}{k!}$$
 
-#### `d*` functions
+### `d*` functions
+
 The `d`-functions gives the probability density for a given value. These are useful for comparing relative probability densities for two or more values of the variable of interest, and visualizing the distribution. `d`-functions require as input:
 
 - a vector (or scalar) of values for which we want to probability density calculated
@@ -70,7 +71,8 @@ And we can use this to obtain the probability of a count of 2 in a random sample
 dpois(2, 4)
 ```
 
-#### `p*` functions
+### `p*` functions
+
 These functions return the probability of being equal to, or lower than a given value in the distribution by default. This is effectively the *cumulative* probability distribution of obtaining that value or lower. For the Poisson distribution, we obtain this with `ppois()`, which again takes two parameters
 
 - lambda
@@ -93,7 +95,8 @@ Which is 1 less the probability of the lower tail.
 1-ppois(2,4, lower.tail = TRUE)
 ```
 
-#### `q*` functions
+### `q*` functions
+
 The `q`-functions provide the inverse to the `p`-functions, providing the value of $x$ corresponding to a given percentile of the distribution. This can be used to answer what values of $x$ would we expect 10\% of a distribution to fall below. For the Poisson distribution, the function is `qpois()`, and this provides the value of $x$ which would be greater than 5% of random samples for $\lambda=4$:
 
 ```{r results='hide'}
@@ -107,7 +110,8 @@ qpois(0.05, 4, lower.tail=FALSE)
 
 Which tells us that 5% of samples will be `r qpois(0.05, 4)` or higher.
 
-#### `r*` functions
+### `r*` functions
+
 `r`-functions provide random number generation, with numbers drawn from a given distribution. The likelihood of a number being drawn is driven by the shape of the probability curve, and corresponds to the density function. These functions are extensively used in randomization procedures and Monte Carlo methods.
 
 These functions require a parameter given the number of random numbers to be drawn, plus distribution parameters. Try running the following line several times to get a single random draw from a Poisson distribution with $\lambda=4$:
@@ -117,7 +121,6 @@ rpois(1, 10)
 
 To demonstrate that these numbers are taking from a given distribution, we can plot a histogram of a large number of random numbers with the theoretical density. We will use a Poisson distribution with $\lambda=10$:
 ```{r fig.keep='none'}
-set.seed(999)
 xx.r = rpois(1000, 10)
 hist(xx.r, breaks=seq(0,25), freq=FALSE)
 xx.u = seq(0,25,by=1)
@@ -125,7 +128,7 @@ pp = dpois(xx.u, 10)
 lines(xx.u, pp)
 ```
 
-### Normal distribution
+## Normal distribution
 For the normal distribution, the functions are written as `*norm()`, and these take two distribution parameters:
 
 - the mean (0 by default)
@@ -136,7 +139,7 @@ $$
 p(x) = \frac{1}{\sigma \sqrt{2 \pi}}e^{-\frac{(x-\mu)^2}{2 \sigma^2}}
 $$
 
-#### `d*` functions
+### `d*` functions
 
 The `d`-functions gives the density function. As before we need to give a value, or vector of values of $x$, for which we calculate the probability density. This gets density values for (and plots) the standard normal distribution:
 
@@ -155,7 +158,7 @@ dnorm(xx, 10, 5)
 
 These densities equate to the likelihood of these values given a probability distribution, and this forms the basis for maximum likelihood approaches and Bayesian inference. 
 
-#### `p*` functions
+### `p*` functions
 
 The following returns the probability of obtaining a value of 0 or lower in the normal standard distribution (mean = 0, s.d. = 1), which not too surprisingly is 0.5 as the normal distribution is symmetrical around zero:
 ```{r}
@@ -180,7 +183,8 @@ pp = pnorm(xx, 0, 1)
 plot(xx, pp, type='l', main="pnorm, mean=0, sd=1")
 ```
 
-#### `q*` functions
+### `q*` functions
+
 The `q`-functions provide the inverse to the `p`-functions. In other words, this calculates the value corresponding to a given percentile of the distribution. To know what value corresponds to 90% of a normal distribution with mean=4000 and s.d.=250 (i.e. we expect 90% of values to be lower than this)
 ```{r results='hide'}
 qnorm(0.9, 4000, 250)
@@ -193,7 +197,8 @@ pp = qnorm(qq, 0, 1)
 plot(qq, pp, type='l', main="qnorm, mean=0, sd=1")
 ```
 
-#### `r*` functions
+### `r*` functions
+
 `r`-functions provide random number generation, with numbers drawn from a given distribution. The likelihood of a number being drawn is driven by the shape of the probability curve, and corresponds to the density function. These functions are extensively used in randomization procedures and Monte Carlo methods.
 
 These functions require a parameter given the number of random numbers to be drawn, plus mean/s.d. or other information about the shape. Try running the following line several times:
@@ -210,9 +215,9 @@ pp = dnorm(xx.u, 200, 10)
 lines(xx.u, pp)
 ```
 
-## Inference tests
+# Inference tests
 
-### The *t*-test
+## The *t*-test
 
 Our first example of a statistical test is based on the comparison of means, using a *t*-test. We will use the example presented in class to test if the heights of actors auditioning for the roles of Aragorn and Gimli in the Lord of the Rings films are similar , or if there is a significant difference. 
 
@@ -234,6 +239,7 @@ Now we first form our null and alternative hypothesis. We will use a two-sided *
 - Alternative $H_a$: The two groups of actors have different heights
 
 Now we run the test, using the `t.test()` function. This requires two vector of values for the two sample *t*-test (or a vector and a value $\mu$ for a one sample test). We also set the parameter `alternative`, which states whether this is two-sided or one-sided. As our alternative hypothesis is simply that the two sets of actors are *different*, we use the two-sided test:
+
 ```{r}
 t.test(aragorn, gimli, alternative="two.sided")
 ```
@@ -246,13 +252,14 @@ We might wish to restate our hypothesis - after all we know that Gimli is a dwar
 t.test(aragorn, gimli, alternative="greater")
 ```
 
-### Analysis of variance
+## Analysis of variance
 
 If we need to test the difference in the means between more that two groups, we can use an analysis of variance (ANOVA). Here, we look at the ratio of variance between the groups, over the variance within the groups. This ratio follows an *F*-distribution, where large values indicate substantial differences between groups, and we can use this to test its significance. 
 
 We will run it here on the three groups of actors created in the previous step (you will need to have done exercise 1). There are two functions for calculating ANOVA in R. Here we will use `aov()`. This requires a single vector of all the heights, and a matching vector which assigns each observation to one of the groups. Code to create this is at the end of this document, but you should be able to do this using the material we have covered in previous labs. 
 
 Once you have the two vectors, the syntax for the ANOVA is as follows:
+
 ```{r echo=FALSE}
 legolas = rnorm(50, 195, 15)
 actors = c(rep("Aragorn", 50), rep("Gimli", 50), rep("Legolas", 50))
@@ -262,45 +269,53 @@ fit = aov(heights ~ actors)
 ```{r}
 aov(heights ~ actors)
 ```
+
 This provides information about how the variance is partitioned in the groups, with $`r summary(fit)[[1]]["Sum Sq"][1,1]`$ explained by the groups, and $`r summary(fit)[[1]]["Sum Sq"][2,1]`$ in residual variance. In order to test if this is significant, you can just use the `summary()` function:
 
 ```{r}
 summary(aov(heights ~ actors))
 ```
+
 We now have extra information: the 'Mean Sq` gives the variance averaged across the degrees of freedom, and the 'F value' is the ratio of the two 'Mean Sq' values. The *p*-value is very low, indicating a significant difference. This should not be too surprising after the *t*-tests, but here we have tested all groups together, so we avoid the problem of carrying out multiple comparisons. 
 
-### The *F*-test
+## The *F*-test
+
 An alternative test is to ask if the observations coming from two different sample sets have the same variance. For this, we use the *F*-test, a test of the ratio of the variances of the two sets. If this ratio is close to one, then it is likely that they have the same variance. If the ratio is much larger or smaller, then it is likely that the variances are different. 
 
 We can test the samples of actors to see if the variances in their heights differ, by using the function `var.test()`. 
+
 ```{r}
 var.test(aragorn,gimli)
 ```
+
 In this test, the value of *p* is high (=$`r round(var.test(aragorn,gimli)$p.value,4)`$), suggesting that there is *no* significant difference in variance. 
 
-### Correlation tests
+## Correlation tests
 Correlation in R is provided by the `cor()` function. However, this simply calculates the correlation value using Pearson's, Kendall's or Spearman's formula, here for two of the variables in the Iris dataset: 
+
 ```{r}
 cor(iris$Sepal.Length, iris$Sepal.Width)
 ```
 
 To test if the correlation is significantly different from correlation resulting from randomly sampled, unassociated variables, the correlation can be converted to a *t*-statistic, then tested against a *t*-distribution with *n*-2 degrees of freedom. In R, we can do this using the `cor.test()` function:
+
 ```{r}
 cor.test(iris$Sepal.Length, iris$Sepal.Width)
 ```
 
-### Chi-squared tests
+## Chi-squared tests
+
 Chi-squared tests are used to examine if the distribution of observations among classes (or factors) is uniform or as close to uniform as might be expected with sampling error. 
 
 We'll examine this using the data in *Deer.csv*. Load this file into your workspace and use `table()` to look at the number of animals of both sexes:
+
 ```{r}
 deer = read.csv("Deer.csv")
-```
-```{r}
 table(deer$Sex)
 ```
 
 And you will see that there are more male (1) deer recorded than female (2). To test if this is a significance difference, we can run the chi-squared test on the table output:
+
 ```{r}
 chisq.test(table(deer$Sex))
 ```
@@ -316,7 +331,7 @@ While there are many more non-TB deer than TB deer, the differences among female
 chisq.test(table(deer$Sex, deer$Tb))
 ```
 
-## Exercises
+# Exercises
 
 This exercise will get you to repeat several of the tests introduced above. Your answer should consist of your R code and answers to the questions given, including the output of the R functions. You can either use a Word document to record all of this, or use R Markdown to generate a html page containing all results and answers (recommended).
 
@@ -327,9 +342,9 @@ This exercise will get you to repeat several of the tests introduced above. Your
     - If there are significant differences in the number of deer caught per month
     - If the cases of tuberculosis are uniformly distributed across all farms
 
-## Files used in lab
+# Files used in lab
 
-### *Deer.csv*
+## *Deer.csv*
 
  Spanish deer health dataset
 
@@ -345,7 +360,7 @@ This exercise will get you to repeat several of the tests introduced above. Your
 | Ecervi | Elaphostrongylus cervi presence (0/1) |
 | Tb | Tuberculosis presence (0/1) |
 
-### *iris.csv* 
+## *iris.csv* 
 
 Fisher's Iris morphology dataset
 
