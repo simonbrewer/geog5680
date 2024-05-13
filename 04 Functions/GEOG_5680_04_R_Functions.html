@@ -1481,13 +1481,13 @@ border-radius: 0px;
 <h4 class="author"><div class="line-block">Simon Brewer<br />
 Geography Department<br />
 University of Utah</div></h4>
-<h4 class="date">10 May, 2024</h4>
+<h4 class="date">13 May, 2024</h4>
 
 </div>
 
 
-<div id="introduction" class="section level2">
-<h2>Introduction</h2>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
 <p>In the first couple of labs we have looked how to import and export
 data, and how to manipulate this by conditional selection and
 subsetting. In this lab, we’ll cover two things. First, we’ll look at
@@ -1513,7 +1513,6 @@ following files</p>
 [Session] menu &gt; [Set working directory] &gt; [Choose directory…].
 Remember to check that R can see the files by running the
 <code>list.files()</code> command.</p>
-</div>
 <div id="simple-functions-for-describing-data" class="section level2">
 <h2>Simple functions for describing data</h2>
 <p>We’ll start by calculating some summary statistics using the values
@@ -1551,8 +1550,8 @@ removes any missing values from the vector prior to calculating the
 statistic.</p>
 <pre class="r"><code>mean(temp$Jan_Tmp, na.rm=TRUE)</code></pre>
 <pre><code>## [1] -3.361191</code></pre>
-<div id="measures-of-central-tendency" class="section level4">
-<h4>Measures of central tendency:</h4>
+<div id="measures-of-central-tendency" class="section level3">
+<h3>Measures of central tendency:</h3>
 <ul>
 <li>Mean</li>
 </ul>
@@ -1568,8 +1567,8 @@ function that we want the value corresponding to 50% of the data
 </ul>
 <pre class="r"><code>quantile(temp$Jan_Tmp, 0.5, na.rm=TRUE)</code></pre>
 </div>
-<div id="measures-of-range" class="section level4">
-<h4>Measures of range</h4>
+<div id="measures-of-range" class="section level3">
+<h3>Measures of range</h3>
 <ul>
 <li>Variance</li>
 </ul>
@@ -1591,8 +1590,9 @@ that we want, here 25 and 75% (<code>c(0.25, 0.75)</code>):</li>
 glance that the data is roughly normally distributed, we have a standard
 deviation of about 3 and an overall range of 13.</p>
 </div>
-<div id="the-apply-functions" class="section level3">
-<h3>The <code>*apply()</code> functions</h3>
+</div>
+<div id="the-apply-functions" class="section level2">
+<h2>The <code>*apply()</code> functions</h2>
 <p>Of more interest would be to know if the different vegetation classes
 have different mean values. From an earlier lab, we know that we can do
 this by a conditional selection on the vegetation class:</p>
@@ -1672,8 +1672,8 @@ or more variables, using all observations.</p>
 <code>MARGIN</code> to 1:</p>
 <pre class="r"><code>apply(temp[,3:14], 1, mean, na.rm=TRUE)</code></pre>
 </div>
-<div id="the-aggregate-function" class="section level3">
-<h3>The <code>aggregate()</code> function</h3>
+<div id="the-aggregate-function" class="section level2">
+<h2>The <code>aggregate()</code> function</h2>
 <p>Th <code>apply()</code> function allowed us to use a function either
 for subsets of the data or across a set of variables. The
 <code>aggregate()</code> function allows us to combine these two
@@ -1691,8 +1691,8 @@ each group at low <em>and</em> high elevations:</p>
 <pre class="r"><code>temp$elevcode = factor(temp$elev &gt; 1500, labels=c(&quot;low&quot;,&quot;high&quot;))
 aggregate(temp[,3:14], list(temp$vegcode, temp$elevcode), mean, na.rm=TRUE)</code></pre>
 </div>
-<div id="the-summary-function" class="section level3">
-<h3>The <code>summary()</code> function</h3>
+<div id="the-summary-function" class="section level2">
+<h2>The <code>summary()</code> function</h2>
 <p>The <code>summary()</code> provides another way to get basic
 descriptive statistics for a dataset. It can be applied to a vector or
 data frame and will adapt to form of the input data:</p>
@@ -1705,8 +1705,8 @@ function adapts to the input data and produces different output for a
 vector, a matrix, a data frame or, as we will see later, a model
 object.</p>
 </div>
-<div id="the-table-function" class="section level3">
-<h3>The <code>table()</code> function</h3>
+<div id="the-table-function" class="section level2">
+<h2>The <code>table()</code> function</h2>
 <p>The functions we have looked at so far work well to summarize
 numerical data, but do not play well with categorical data or factors -
 the <code>table()</code> function can be used instead. To demonstrate
@@ -1746,8 +1746,8 @@ each farm, which may give us an idea of uneven sampling:</p>
 years, there are a couple with samples from just one year.</p>
 </div>
 </div>
-<div id="functions" class="section level2">
-<h2>Functions</h2>
+<div id="functions" class="section level1">
+<h1>Functions</h1>
 <p>We’ve already used a lot of R functions, but it is worth taking a
 look at how they work in a little detail. Any function in R is designed
 to carry out a specific operation, either on some data (e.g. the
@@ -1811,8 +1811,8 @@ an incorrect position we <em>have</em> to give the argument name:</p>
 ##  [7]  3.1578947  3.6842105  4.2105263  4.7368421  5.2631579  5.7894737
 ## [13]  6.3157895  6.8421053  7.3684211  7.8947368  8.4210526  8.9473684
 ## [19]  9.4736842 10.0000000</code></pre>
-<div id="function-code" class="section level3">
-<h3>Function code</h3>
+<div id="function-code" class="section level2">
+<h2>Function code</h2>
 <p>So how does this function work? R is object oriented, which means
 that a given function might give different output depending on the
 object it is used with. For example, the <code>length()</code> function
@@ -1936,8 +1936,8 @@ range(elev_minmax, na.rm = TRUE)</code></pre>
 <pre><code>## [1] 100 200</code></pre>
 </div>
 </div>
-<div id="exercises" class="section level2">
-<h2>Exercises</h2>
+<div id="exercises" class="section level1">
+<h1>Exercises</h1>
 <p>The exercise for this lab uses the file <em>Temperature.csv</em>.
 This contains temperature and salinity observations made at 31 locations
 along the Dutch coastline. The data were collected and provided by the
@@ -1971,10 +1971,10 @@ observations:
 </ul></li>
 </ul>
 </div>
-<div id="files-used-in-lab" class="section level2">
-<h2>Files used in lab</h2>
-<div id="ssclimate2.txt" class="section level3">
-<h3><em>ssclimate2.txt</em></h3>
+<div id="files-used-in-lab" class="section level1">
+<h1>Files used in lab</h1>
+<div id="ssclimate2.txt" class="section level2">
+<h2><em>ssclimate2.txt</em></h2>
 <p>North American climate dataset:</p>
 <table>
 <thead>
@@ -2023,8 +2023,8 @@ observations:
 </tbody>
 </table>
 </div>
-<div id="ssvegcode.txt" class="section level3">
-<h3><em>ssvegcode.txt</em></h3>
+<div id="ssvegcode.txt" class="section level2">
+<h2><em>ssvegcode.txt</em></h2>
 <p>North American landcover dataset:</p>
 <table>
 <thead>
@@ -2049,8 +2049,8 @@ observations:
 </tbody>
 </table>
 </div>
-<div id="deer.csv" class="section level3">
-<h3><em>Deer.csv</em></h3>
+<div id="deer.csv" class="section level2">
+<h2><em>Deer.csv</em></h2>
 <p>Spanish deer health dataset</p>
 <table>
 <thead>
@@ -2099,8 +2099,8 @@ observations:
 </tbody>
 </table>
 </div>
-<div id="temperature.csv" class="section level3">
-<h3><em>Temperature.csv</em></h3>
+<div id="temperature.csv" class="section level2">
+<h2><em>Temperature.csv</em></h2>
 <p>Dutch ocean monitoring dataset:</p>
 <table>
 <thead>
