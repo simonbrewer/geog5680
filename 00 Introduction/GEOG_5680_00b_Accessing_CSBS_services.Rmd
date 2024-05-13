@@ -18,7 +18,7 @@ library(png)
 library(grid)
 ```
 
-## Introduction
+# Introduction
 
 This class requires access to two pieces of software, R and RStudio. These are both open source and freely available, and I highly recommend installing them on your own computer (see the other document for installation instructions). If this is not possible, you can access these through the CSBS virtual lab. For this, you will need to access the [Horizon Client][horizID], and log on using your University credentials. You can access Horizon by downloading an app or through a web browser. A full description of how to do this can be found [here][csbsID]. 
 
