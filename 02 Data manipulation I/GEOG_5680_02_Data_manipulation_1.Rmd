@@ -12,7 +12,7 @@ output:
     fig_caption: true
 ---
 
-## Introduction
+# Introduction
 
 In this lab, we'll introduce the main data types you will work with in R: vectors, data frames and lists. This will show how to create these, how to manipulate them to extract subsets of data and how to use them in simple functions. 
 
@@ -22,7 +22,7 @@ Before starting, remember to create a working directory (e.g. `module01`). Then 
 
 **This is one of the longest labs in this class, and contains some boring, but very useful information about working with data in R. I would suggest working through it in 2 or even 3 sessions. If you do this, remember to save your code in a script so you can continue working on it, and remember to re-set your working directory if you close and re-open RStudio.**
 
-### A simple dataset
+## A simple dataset
 
 The following table contains measurements for different body parts of 8 sparrows (this is part of a much larger dataset) as well as their sex. 
 
@@ -37,11 +37,11 @@ The following table contains measurements for different body parts of 8 sparrows
 | 53 | 20.6 | 32.5 | 15.6 | M |
 | 55 | 21.5 | NA | 15.7 | M |
 
-## Vectors 
+# Vectors 
 
 Vectors are one-dimensional data structures containing data of the same mode. For example, the set of wing length values would make a *numerical* vector of length 8, and the set of sex values would make a *character* vector, also of length 8. 
 
-### Making vectors
+## Making vectors
 
 The easiest way to make a vector in r is with the `c()` function, which concatenates or sticks a set of individual values into a vector:
 
@@ -100,7 +100,7 @@ If you would like more detail on these functions including other arguments that 
 ?seq
 ```
 
-### Vector indexing
+## Vector indexing
 
 To access the individual values in a vector, we use the index, the position of that value. These indexes are entered between brackets `[ ]`, so to get the first value, type:
 
@@ -126,7 +126,7 @@ You can reverse indexes by using a minus sign. This prints all *except* the seco
 wing[-2]
 ```
 
-### Vectors and functions
+## Vectors and functions
 
 We can now use functions directly on these vectors, for example to calculate the sum of wing lengths:
 
@@ -184,7 +184,7 @@ help(sum)
 
 Adding `na.rm = TRUE` will work for many basic functions (e.g. `mean`, `min`, `max`, etc), but not all of them, so it is worth checking the help when faced by missing values, and in general when working with a new function. 
 
-#### Character vectors
+## Character vectors
 
 One of the vectors we created contained character values  (`sex`). You can use all the same indexing with this as with a numerical vector:
 
@@ -198,7 +198,7 @@ You can also get the count of each character string in the vector with `table()`
 table(sex)
 ```
 
-### Factor vectors
+## Factor vectors
 
 R has another data type, which is similar to character strings called *factors*. The main difference with factors is that R can use these to identify observations belonging to different groups. In contrast, R does not recognize two identical character strings as belonging to a distinct group. This seems like a very small difference, but factors are very important in modeling, to define hierarchical structures or dummy variables in regression (we will use these later in the class). To convert a character vector to a factor, you can use the `factor()` function:
 
@@ -222,7 +222,7 @@ levels(sex_f)
 levels(sex_f2)
 ```
 
-### Boolean vectors
+## Boolean vectors
 
 A last data type that you may encounter in R is Boolean (true/false). These usually result from conditional selections (e.g. equal to or greater/less than). For example, if we check which of the sex values are male, we can do this:
 
@@ -233,7 +233,7 @@ sex_b
 
 We'll use this more extensively below to subset data. 
 
-## Matrices
+# Matrices
 
 Matrices in R are simply 2D arrays containing the same data mode (numeric, character, etc). You can create these using the `cbind()` function, which combine different vectors together by converting them into the columns of a matrix(`cbind` = column bind):
 
@@ -248,7 +248,7 @@ Note that if you include the character vector `sex` in the matrix, *all* the val
 cbind(wing, leg, head, wt, sex)
 ```
 
-### Matrix indexing
+## Matrix indexing
 
 Note that at the start of each line, the index is given as `[1,]` or `[2,]` etc. The comma in the brackets indicates that this is a matrix, and that each value has two indexes, one for the row, and one for the column (the format is `[row,col]`). So to access the value on the first row, first column:
 
@@ -303,7 +303,7 @@ bird_mat2 = rbind(wing, leg, head, wt)
 bird_mat2
 ```
 
-#### Functions and matrices
+## Functions and matrices
 
 The functions described above will work with matrices. For example, to calculate the mean and standard deviation of our matrix `bird_mat` (with missing values removed):
 
@@ -319,7 +319,7 @@ bird_blank = matrix(NA, nrow = 8, ncol = 4)
 bird_blank
 ```
 
-### Data frames
+# Data frames
 
 Data frames are one of the most frequently used data objects in R. These have two dimensions, like a matrix, but can have mixed data modes (numeric, categorical, etc) in them. They are designed to represent standard statistical data, where each row is an observation and each column is a variable that was recorded for all individuals. To create one, use the function `data.frame()`. Here we create a data frame (`bird_df`) using the vectors we made earlier:
 
@@ -339,7 +339,7 @@ But the values are still held in the `bird_df` data frame:
 head(bird_df)
 ```
 
-### Indexing data frames
+## Indexing data frames
 
 We can also access any given column in a data frame by using the matrix `[row,col]` indexing. For example, to access the leg values (the second column):
 
@@ -380,7 +380,7 @@ bird_df$wgsq = sqrt(bird_df$wt)
 names(bird_df)
 ```
 
-### Lists
+# Lists
 
 Lists provide a 'meta'-object in R, in which multiple different data types can be stored. For example, if you have a matrix, a data frame and a vector, it is possible to store them all in a list with a single variable name. To create a list, use the `list()` function, which uses similar syntax to the `data.frame()` function. To demonstrate this, we'll combine several of the objects that we previously made in to a list called `bird_list`. 
 
@@ -411,7 +411,7 @@ This function produces a list object, which we have called 'fit', which has a gr
 names(fit)
 ```
 
-## Working with subsets of data
+# Working with subsets of data
 
 In this next section, we are going to illustrate methods for obtaining subsets of a dataframe. This will build on the indexing introduced above. We will use a data set of squid caught at various locations in Scottish waters in different months and years in the file *squid.csv*. The file contains the sample identifier, year and month, location and sex. It also contains a variable 'GSI' related to the body size of the squid. Download the file from Canvas, and copy it into the working directory you created. As in the previous lab, check that R can see the file, then load it with `read.csv()`:
 
@@ -429,7 +429,7 @@ This is a data frame, and as before, we can check the column names:
 names(squid)
 ```
 
-### The `str()` function
+## The `str()` function
 
 The `str()` function provides information on the *structure* of a data object in R. Type:
 ```{r}
@@ -457,7 +457,7 @@ levels(squid$Sex)
 table(squid$Sex)
 ```
 
-### Subsetting data frames
+## Subsetting data frames
 
 In general, the data we read in will contain all observations from a study (or several studies). For our analyses, we may want to use subsets to explore patterns in different groups, or to remove certain samples that we don't want to retain in the analysis.  For example, with the squid data, we may only want to work with the female data, data from a certain location, or data from the females of a certain location. 
 
@@ -486,6 +486,7 @@ dim(squidM)
 Note that we don't need to use the dollar notation here, the function understands that the second argument is a column in the data frame (the first argument) to be used for subsetting. 
 
 And we can do the same to extract the females:
+
 ```{r results='hide'}
 squidF = subset(squid, Sex == "F")
 squidF
@@ -547,7 +548,7 @@ subset(squid, Location == 1 & Year == 4 & Month == 1)
 
 This simply means that no measurements were taken at location 1 in month 1 of the fourth year. 
 
-### The `which()` function
+## The `which()` function
 
 An alternative approach to the selection of subsets uses the function `which()`. While this is generally a more complex approach to the same problem, it can offer some flexibility beyond the `subset()` function, and is particularly useful for doing repeated resampling of a dataset. If this function is used with a binary TRUE/FALSE vector, it will return the positions or indexes of each TRUE value in that vector:
 
@@ -571,6 +572,7 @@ squid$GSI[maleID]
 ```
 
 With this, we can make a similar vector for the female squid by simply prepending a '`-`' sign:
+
 ```{r results='hide'}
 squid$GSI[-maleID]
 ```
@@ -611,17 +613,18 @@ squid[order(squid$GSI), ]
 ```
 
 Or this can be used as a vector index, here to sort the GSI values by the month:
+
 ```{r results='hide'}
 squid$GSI[order(squid$Month)]
 ```
 
 
-## Exercises
+# Exercises
 
 There are two parts to this exercise, all based on the code introduced above. Make one R script for each part and submit these separately through the Canvas assignment link for this module.  
 
 
-### Part 1
+## Part 1
 
 The file *BirdFlu_deaths.csv* contains the annual number of confirmed deaths resulting from human Avian Influenza A/(H5N1) for several countries as reported to the World Health Organization (WHO). Each row represents one country, and the columns give the number of deaths from 2003 to 2008. The data were taken from the WHO website (www.who.int/en/) and reproduced for educational purposes. 
 
@@ -631,7 +634,7 @@ The file *BirdFlu_deaths.csv* contains the annual number of confirmed deaths res
 - Use this (the row number) to identify the country with the highest number of deaths in 2005, using R's indexing notation (`[row, col]`)
 - Use the same method to find the highest number of deaths in 2007
 
-### Part 2
+## Part 2
 
 In the previous lab, we looked at a file containing measurements of atmospheric CO2 concentration (*co2_mm_mlo.txt*). Read this file in again
 
@@ -649,9 +652,9 @@ Once the file is read in:
 
 Convert the months in the CO2 data frame to factors and create a new column called 'fmnth' to store this in the data frame. Use the `levels()` and `table()` functions to a) make sure this worked, and b) see how many observations you have for each month
 
-## Files used in lab
+# Files used in lab
 
-### *squid.csv* 
+## *squid.csv* 
 
 Scottish squid dataset
 
@@ -664,7 +667,7 @@ Scottish squid dataset
 | Sex | Sex | 
 | GSI | Gonadosomatic index | 
 
-### *co2_mm_mlo.txt* 
+## *co2_mm_mlo.txt* 
 
 Observed atmospheric carbon dioxide concentration from Mauna Loa from 1958 to present
 
