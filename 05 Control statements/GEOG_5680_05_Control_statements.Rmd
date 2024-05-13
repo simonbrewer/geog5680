@@ -18,7 +18,7 @@ library(png)
 library(grid)
 ```
 
-## Introduction
+# Introduction
 
 In this lab, we'll explore some control statements that can be used to define the way that your script and analysis work. If you have previously used any programming language you will be familiar with these. You may find that you only rarely use these in R, as it is often possible to work with an entire vector or matrix, rather than iterating over every value. It is still worth having some idea about how these work as they can come in useful.
 
@@ -30,7 +30,7 @@ Before starting, remember to create a working directory (e.g. `module05`). Next 
 
 Then start RStudio, and change your working directory from the [Session] menu > [Set working directory] > [Choose directory...]. Remember to check that R can see the files by running the `list.files()` command. 
 
-## Looping in R
+# Control statements in R
 
 As a programming language, R has functions for loops and control flows. Looping, in particular, is a powerful extension that allows you to repeat or automate certain tasks. Further, looping, when combined with R's indexing functions provides an excellent way to perform the same set of analyses on different subsets of a dataset. 
 
@@ -240,11 +240,11 @@ plot(allyears, ann_temp, type = 'h',
      xlab= "Year", ylab = "T anomaly")
 ```
 
-## Exercises
+# Exercises
 
 The exercise for this lab is in two parts. For each you will need to submit a) your R script and b) a Word document containing the figures you have made. Figures can be directly exported from RStudio by clicking the [Export] button or by writing directly to a PDF file (see above for an example). 
 
-### Part 1: `for` loops
+## Part 1: `for` loops
 
 In the first section, you made a `for` loop to plot select time series by month (i.e. all the Januaries, Februaries, etc):
 ```{r eval=FALSE}
@@ -259,13 +259,13 @@ for (i in 1:12) {
 
 Modify this loop so that it loops across all years instead of months, and plots the 12 monthly time values for each year. Your answer should consist of your R script (you do not need to submit all the figures that this will make). 
 
-### Part 2: `if` statements
+## Part 2: `if` statements
 
 In the last section, we used an `ifelse` statement to generate a vector of colors dependent on whether the temperature anomaly was above or below zero. How would you change this to generate a vector of colors dependent on whether the year is before 1980, or after 1980? Make a new figure that uses these colors. Your answer should consist of the R script and the figure you made. 
 
-## Files used in lab
+# Files used in lab
 
-### *giss_temp.csv*
+## *giss_temp.csv*
 
 GISS northern hemisphere temperature dataset: 
 
