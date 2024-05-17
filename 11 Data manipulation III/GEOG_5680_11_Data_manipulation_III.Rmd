@@ -4,7 +4,7 @@ author: |
   | Simon Brewer
   | Geography Department
   | University of Utah
-date: "May 05, 2021"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
   html_document:
     toc: true
@@ -18,7 +18,7 @@ library(png)
 library(grid)
 ```
 
-## Introduction
+# Introduction
 
 We have previously look at processing and manipulating data in R using basic functions and **dplyr**. In this lab, we'll introduce a third method using **data.table**. This package is provides a different implementation of the data frames that we have been using so far, designed to work with large datasets (>100GB in RAM). It does this by a number of methods: making certain low-level function parallel (i.e. run on multiple cores of your computer) and more efficient referencing of the file in memory. It also provides a way to manipulate and subset data that is based on the functions available in Structured Query Language (SQL) commonly used with databases.
 
@@ -62,7 +62,8 @@ Let's take a quick look at the data. You can use `str()` as we have before, or t
 flights
 ```
 
-Note that you can also create a `data.table` using the `data.table()` function: 
+Note that you can also create a `data.table` using the `data.table()` function:
+
 ```{r}
 DT = data.table(
   ID = c("b","b","b","a","a","c"),
@@ -103,7 +104,7 @@ This can be read as:
 
 Let's begin by looking at `i` and `j` first - subsetting rows and operating on columns.
 
-### Subset rows by `i`
+## Subset rows by `i`
 
 a) Get all the flights with "JFK" as the origin airport in the month of June.
 
@@ -130,7 +131,7 @@ ans <- flights[order(origin, -dest)]
 head(ans)
 ```
 
-### Select column(s) by `j`
+## Select column(s) by `j`
 
 a) Select `arr_delay` column, but return it as a *vector* (this returns all the rows for this column)
 
@@ -169,7 +170,7 @@ ans <- flights[, .(delay_arr = arr_delay, delay_dep = dep_delay)]
 head(ans)
 ```
 
-### Compute or *do* by `j`
+## Compute or *do* by `j`
 
 a) How many trips have had total delay < 0?
 
@@ -180,7 +181,7 @@ ans
 
 The `j` expression can handle more than just selecting columns. As columns can be referred to as if they are variables, we can use then in *expressions*, i.e., calculating new values from them. Here, we simply calculate the sum of the two delay variables, and then use this to select rows with positive delays. 
 
-### Subset by `i` *and* do by `j`
+## Subset by `i` *and* do by `j`
 
 a) Calculate the average arrival and departure delay for all flights with "JFK" as the origin airport in the month of June.
 
@@ -208,7 +209,7 @@ ans <- flights[origin == "JFK" & month == 6L, .N]
 ans
 ```
 
-### Selecting columns stored in a variable
+## Selecting columns stored in a variable
 
 If you've stored the desired columns in a character vector, there are two options: 
 a) Select columns named in a variable using the `..` prefix
@@ -246,11 +247,11 @@ ans <- flights[, !(year:day)]
 ```
 
 
-## Aggregating data
+# Aggregating data
 
 We'll now look at how to combine the `i` and `j` methods described above with with `by` to perform operations *by group*. This is very similar to **dplyr**'s `group_by` function to do split-apply-combine. 
 
-### Grouping using `by`
+## Grouping using `by`
 
 a) Get the number of trips corresponding to each of the three origin airports
 
@@ -318,6 +319,7 @@ ggplot(ans, aes(x = month, y = m_arr, col = dest)) + geom_line() + facet_wrap(~o
 ```
 
 Note that we can also use the pipe operator (`%>%`) that we used with **dplyr** to pass the selected data to **ggplot2** or any other function. Here, we select calculate the departure delay for all flights to Dallas Fort Worth. Note that we need to load the **magrittr** package to make this work. 
+
 ```{r}
 library(magrittr)
 flights[dest == "DFW",
@@ -326,7 +328,7 @@ flights[dest == "DFW",
   ggplot(aes(x = month, y = m_dep, col = origin)) + geom_line()
 ```
 
-### Expressions in `by`
+## Expressions in `by`
 
 a) If we include conditional statements in the `by` section, this will then find a set of groups based on those conditions. For example, the following finds all observations where the departure delay is positive, and a second group where this value is 0 or less:
 
@@ -342,7 +344,7 @@ ans <- flights[, .N, .(dep_delay>0, arr_delay>0)]
 ans
 ```
 
-### Working with multiple columns in `j`
+## Working with multiple columns in `j`
 
 Previously, we used the `j` expression to calculate the mean of a couple of variables (with and without `i` expressions). But what if we had a large number of variables? Obviously, we can through one-by-one, but fortunately, **data.table** provides a symbol to facilitate this; `.SD`. This stands for **S**ubset of **D**ata, and is itself a `data.table` that holds the data for *the current group* defined using `by`. To see what this looks like, let's use the small data table we created earlier (`DT`):
 
@@ -369,7 +371,7 @@ flights[carrier == "AA",                       ## Only on trips with carrier "AA
         .SDcols = c("arr_delay", "dep_delay")] ## for just those specified in .SDcols
 ```
 
-## Summary
+# Summary
 
 The general form of `data.table` syntax is:
 
@@ -379,7 +381,7 @@ DT[i, j, by]
 
 We have seen so far that,
 
-#### Using `i`: {.bs-callout .bs-callout-info}
+### Using `i`: {.bs-callout .bs-callout-info}
 
 * We can subset rows similar to a `data.frame`- except you don't have to use `DT$` repetitively since columns within the frame of a `data.table` are seen as if they are *variables*.
 
@@ -387,7 +389,7 @@ We have seen so far that,
 
 We can do much more in `i` by keying a `data.table`, which allows blazing fast subsets and joins. We will see this in the *"Keys and fast binary search based subsets"* and *"Joins and rolling joins"* vignette.
 
-#### Using `j`: {.bs-callout .bs-callout-info}
+### Using `j`: {.bs-callout .bs-callout-info}
 
 1. Select columns the `data.table` way: `DT[, .(colA, colB)]`.
 
@@ -399,7 +401,7 @@ We can do much more in `i` by keying a `data.table`, which allows blazing fast s
 
 5. Combine with `i`: `DT[colA > value, sum(colB)]`.
 
-#### Using `by`: {.bs-callout .bs-callout-info}
+### Using `by`: {.bs-callout .bs-callout-info}
 
 * Using `by`, we can group by columns by specifying a *list of columns* or a *character vector of column names* or even *expressions*. The flexibility of `j`, combined with `by` and `i` makes for a very powerful syntax.
 
@@ -415,11 +417,11 @@ We can do much more in `i` by keying a `data.table`, which allows blazing fast s
 
     3. `DT[col > val, head(.SD, 1), by = ...]` - combine `i` along with `j` and `by`.
 
-## Reshaping with **data.table**
+# Reshaping with **data.table**
 
 We have previously encountered reshaping with **ggplot2**, where we needed to convert a short and fat data frame to a long and thin one. **data.table** also includes an implementation of a `melt` and `dcast` functions specifically designed to work with large in-memory data (e.g. 10Gb).
 
-### `melt`ing `data.table`s (wide to long)
+## `melt`ing `data.table`s (wide to long)
 
 Let's create a small `data.table` containing some information about 5 families, including an ID, mother's age and the date of birth of their children:
 
@@ -452,7 +454,7 @@ DT.m1 = melt(DT, measure.vars = c("dob_child1", "dob_child2", "dob_child3"),
 DT.m1
 ```
 
-### `dcast`ing `data.table`s (long to wide)
+## `dcast`ing `data.table`s (long to wide)
 
 In the previous section, we saw how to get from wide form to long form. Let's see the reverse operation in this section. Basically, what we wish to do is to collect all *child* observations corresponding to each `family_id, age_mother` into the same row. This can be done with the `dcast` function as follows:
 
@@ -469,7 +471,7 @@ dcast(DT.m1, family_id ~ ., fun.agg = function(x) sum(!is.na(x)), value.var = "d
 
 Check `?dcast` for other useful arguments and additional examples.
 
-## Exercise
+# Exercise
 
 We'll use the dataset *Temperature.csv*, a file with sea temperature and salinity recorded from 31 stations over 15 years. The stations are located in one of 10 areas. Download this file, move it to your working directory and read it into R.You should submit the results as an R script with the commands you used, and a Word (or equivalent) with any results or figures *or* as an html page generated from an R Markdown document
 
@@ -488,9 +490,9 @@ Using this dataset and the functions introduced in this lab, do the following:
 - Estimate average temperatures by month by area
 - Plot the output of the previous question using **ggplot2** using the `geom_line()` geometry
 
-## Files used in lab
+# Files used in lab
 
-### *iris.csv* 
+## *iris.csv* 
 
 Fisher's Iris morphology dataset
 
@@ -503,7 +505,7 @@ Fisher's Iris morphology dataset
 | Species | Species name |
 | Code | Species code |
 
-### *flights14.csv*
+## *flights14.csv*
 
 Dataset of flights leaving New York airports in 2014
 
@@ -520,7 +522,7 @@ Dataset of flights leaving New York airports in 2014
 | air_time | Time in air (mins) |
 | distance | Distance (miles) |
 
-### *Temperature.csv*
+## *Temperature.csv*
 
 Dutch ocean monitoring dataset
 
