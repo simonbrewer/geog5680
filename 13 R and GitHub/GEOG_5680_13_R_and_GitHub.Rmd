@@ -154,14 +154,14 @@ git config --global --list
 
 In this section, we will walk through the steps of connecting to GitHub for the first time, and both pulling from and pushing to GitHub from your computer.
 
-## Make a repo on GitHub
+## Create a new repository on GitHub
 
 Go to https://github.com and make sure you are logged in to your account. Click on [Repositories], then click the green [New] button.
 
 This will open a form with several options. Enter the following:
 
 - Repository name: `myrepo` (or whatever name you will easily remember).
-- Description: “setup test” (or whatever, but it is good to get into practice of writing something descriptive in the README).
+- Description: "test repo" (or something more meaningful - it is good to get into practice of writing something descriptive in the README).
 - Public. YES 
 - Initialize this repository with a README. **This is a key option for linking to R**
 - For everything else, just accept the default.
@@ -241,7 +241,7 @@ To https://github.com/geogrtest/myrepo.git
 
 Now let's check to see if the local change propagated to the GitHub repository. Go back to your GitHub page and refresh the repository page. You should now see the new line in the README file.
 
-If you click on [commits], at the top of the page, you will get a list of the past changes (there will only be one so far). At the far right hand side of this page is a small icon that looks like this `<>` for each commit. Clicking this will show you the files in the repository *before* that commit was made, which allows you to track the changes made by yourself (and others). 
+Just below the green [Code] button, you should see a link labeled [commits] (it will probably say 1 or 2 commits. If you click on this, you will get a list of the past changes (there will only be one so far). At the far right hand side of this page is a small icon that looks like this `<>` for each commit. Clicking this will show you the state of the repository *before* that commit was made, which allows you to track the changes made by yourself (and others). 
 
 If you have got to this point, you now have a successfully working git installation. We will next look at how to integrate this properly with R/RStudio.
 
@@ -251,7 +251,7 @@ In the previous section, we went through the somewhat laborious steps of setting
 
 ## 1. Make a new repository on GitHub
 
-We covered this briefly in the previous instructions, but let's do this again. Go to [GitHub][ghID], make sure you are logged in and go to [Repositories]. Click the green button to make a new repository. Call this `my_r_repo`, and add a short description (something like `testing RStudio setup`). Make sure the check-box to initialize the repository with a README is checked and click [Create repository]. Once created, click the green button [Code], and copy the HTTPS URL (if you click on the little clipboard icon this will get copied to your clipboard).
+We covered this briefly in the previous instructions, but let's do this again. Go to [GitHub][ghID], make sure you are logged in and go to [Repositories]. Click the green button to make a new repository. Call this `my_r_repo`, and add a short description (something like `testing RStudio setup`). Make sure the check-box to initialize the repository with a README is checked and click [Create repository]. Once created, click the green button [Code], and copy the HTTPS URL (remember, if you click on the little clipboard icon this will get copied to your clipboard).
 
 ## 2. Make a new RStudio project
 
@@ -266,7 +266,7 @@ img <- readPNG("images/project1.png")
 grid.raster(img)
 ```
 
-## 3. Saving your Github credentials
+## Saving your Github credentials
 
 Before working with the repository, you need to store the token you created earlier (otherwise you'll be asked for it each time you try to make a change). Fortunately, there is a library to help with this. Install **gitcreds**:
 
@@ -303,7 +303,7 @@ This should show your current credentials:
 3: See the password / token
 ```
 
-Select `2` to add your token, copy-paste it and hit Enter. It should something like:
+Select `2` to add your token, copy-paste it from whereever you saved it earlier and hit Enter. It should something like:
 
 ```
 -> Adding new credentials...
@@ -316,11 +316,11 @@ If all this has worked, congratulations - you have successfully linked RStudio t
 - You will need to replace your token when it expires
 - You will need to create a new repository for different projects and clone it to a R project (this is just to keep things organized) 
 
-## 4. Start making changes to your project
+## Start making changes to your project
 
 Let's try and make some changes. First, make sure the `README.md` file is open in the files panel. If not, click on the file browser, which will show you the contents of the project directory, and double click the README.md file. Add a small amount of text to this (I'll leave this up to you). 
 
-If you now look at the RStudio panel with the Environment, History and Connections tabs, you should see a new one labeled [Git]. Click on this and you should see your `READ.md` file with a small blue `M` next to it. This indicates that this file has been modified and is different from the version downloaded from GitHub. If you're happy with the changes you made, click on the check-box next to the `M` (under the heading `Staged`) to stage these changes for uploading.
+If you now look at the RStudio panel with the [Environment], [History] and [Connections] tabs, you should see a new one labeled [Git]. Click on this and you should see your `READ.md` file with a small blue `M` next to it. This indicates that this file has been modified and is different from the version downloaded from GitHub. If you're happy with the changes you made, click on the check-box next to the `M` (under the heading `Staged`) to stage these changes for uploading.
 
 Now click the [Commit] button. A new window will open showing a) all the files; b) the staged files with a check mark; c) a blank panel to add a commit message; d) a display of which lines have been changed in the currently highlit file (green for additions, red for deletions). Check that your file is still listed as `Staged` and add a commit message; a short description of the changes. Once this is done, click [Commit] to commit your changes. This effectively creates an updated local version of the repository, including the staged changes. However, if you check your GitHub repository, and look at the README file there, you will see that the changes have not yet been uploaded. To do this, we need to push the changes, so click the [Push] button. You should now see a short message detailing the upload. 
 
@@ -391,6 +391,7 @@ There is no additional work to do for this module's exercise. Simply submit the 
 # Files used in lab
 
 ## Mauna Loa CO2 data: *co2_mm_mlo.csv* 
+
 | Column header | Variable |
 | --- | --- |
 | Year | Year | 
