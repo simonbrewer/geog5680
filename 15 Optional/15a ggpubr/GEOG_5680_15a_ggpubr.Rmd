@@ -35,6 +35,7 @@ Then start RStudio, and change your working directory from the [Session] menu > 
 As the name might imply, **ggpubr** is built on **ggplot2**, the add-on package we looked at in a previous module. The goals of **ggpubr** are to simplify some of the syntax used for commonly used plots. The plots have also been largely cleaned up with better scaling of fonts and symbols. It also comes with a second package (**ggsci**) which includes color palettes for several of the main publishing groups. 
 
 We'll start by loading the libraries we need (we'll use **dplyr** for some data manipulation, and **ggplot2** for a comparison). 
+
 ```{r}
 
 library(ggplot2)
@@ -87,6 +88,89 @@ ggscatter(gap07, x = "gdpPercap", y = "lifeExp", col = "continent",
 The first thing you should notice is that rather than adding a series of layers, we can incorporate all the options in the `ggscatter()` function. This makes **ggpubr** a bit of a hybrid between the base plots and the **ggplot2** plots, and is a little simpler to work with. The resulting figure is a bit nicer - the gray background has been removed, and axis labels are a little clearer. 
 
 One other thing to note here - unlike `ggplot`, the variable names need to be enclosed in quotation marks. 
+
+**ggpubr** also comes with several additional functions to help visualize your data. For example, we can add labels to each points
+
+```{r fig.show='hide'}
+
+ggscatter(gap07, x = "gdpPercap", y = "lifeExp", col = "continent",
+          xlab = "GDP per capita ($)", ylab = "Life expectancy (yrs)", 
+          main = "GapMinder Data 2007", label = "country", repel = TRUE) + 
+  xscale("log10", .format = TRUE)
+
+```
+
+Or we can select a handful of points to label:
+
+```{r fig.show='hide'}
+
+sel_countries = c("United States", "China", "Germany")
+ggscatter(gap07, x = "gdpPercap", y = "lifeExp", col = "continent",
+          xlab = "GDP per capita ($)", ylab = "Life expectancy (yrs)", 
+          main = "GapMinder Data 2007", label = "country", 
+          label.select = sel_countries, repel = TRUE) + 
+  xscale("log10", .format = TRUE)
+
+```
+
+The distribution of points can be shown using a 'rug' - the position of each observation:
+
+```{r fig.show='hide'}
+
+ggscatter(gap07, x = "gdpPercap", y = "lifeExp", col = "continent",
+          xlab = "GDP per capita ($)", ylab = "Life expectancy (yrs)", 
+          main = "GapMinder Data 2007") + 
+  xscale("log10", .format = TRUE)
+
+```
+
+Or a marginal histogram:
+
+```{r fig.show='hide'}
+
+library(ggExtra)
+p <- ggscatter(gap07, x = "gdpPercap", y = "lifeExp", col = "continent",
+          xlab = "GDP per capita ($)", ylab = "Life expectancy (yrs)", 
+          main = "GapMinder Data 2007") + 
+  xscale("log10", .format = TRUE)
+ggMarginal(p, type = "histogram")
+
+```
+
+We can add a regression line (note that it automatically fits one per color group)
+
+```{r fig.show='hide'}
+
+ggscatter(gap07, x = "gdpPercap", y = "lifeExp", col = "continent",
+          xlab = "GDP per capita ($)", ylab = "Life expectancy (yrs)", 
+          main = "GapMinder Data 2007", add = "reg.line", conf.int = TRUE) + 
+  xscale("log10", .format = TRUE)
+
+```
+
+And correlations:
+
+```{r fig.show='hide'}
+
+ggscatter(gap07, x = "gdpPercap", y = "lifeExp", col = "continent",
+          xlab = "GDP per capita ($)", ylab = "Life expectancy (yrs)", 
+          main = "GapMinder Data 2007", add = "reg.line", conf.int = TRUE) + 
+  xscale("log10", .format = TRUE) +
+  stat_cor(aes(color = continent), method = "spearman")
+
+```
+
+Or even the regression line equations:
+
+```{r}
+
+ggscatter(gap07, x = "gdpPercap", y = "lifeExp", col = "continent",
+          xlab = "GDP per capita ($)", ylab = "Life expectancy (yrs)", 
+          main = "GapMinder Data 2007", add = "reg.line", conf.int = TRUE) + 
+  xscale("log10", .format = TRUE) +
+  stat_regline_equation(aes(color = continent))
+
+```
 
 ## Histograms
 
@@ -245,7 +329,7 @@ ggbarplot(gap07,
 
 Which clearly show the difference across continents, particularly Africa. Note that if you set the `sort.by.groups` argument to true, this will first group all countries from a continent together, then sort them. 
 
-An alternative to barplots are dot plots or Cleveland plots. Note that adding segments forces the 
+An alternative to barplots are dot plots or Cleveland plots. Note that adding segments forces the origin to zero:
 
 ```{r}
 
@@ -397,6 +481,26 @@ ggboxplot(gap_sub, x = "year", y = "lifeExp", ylab = "Years", facet.by = "contin
 
 ```
 
-## Exercise
+
+```{r}
+
+ggscatter(gap07, x = "gdpPercap", y = "lifeExp", 
+          xlab = "GDP per capita ($)", ylab = "Life expectancy (yrs)", 
+          main = "GapMinder Data 2007",
+          add = "reg.line") + 
+  xscale("log10", .format = TRUE)
+
+```
+
+```{r}
+
+ggscatter(gap07, x = "gdpPercap", y = "lifeExp", col = "continent",
+          xlab = "GDP per capita ($)", ylab = "Life expectancy (yrs)", 
+          main = "GapMinder Data 2007") + 
+  xscale("log10", .format = TRUE)
+
+```
+
+# Exercise
 
 There is no additional exercise for today, but you need to submit your R script or (preferably) a Markdown document with the code examples from the lab
