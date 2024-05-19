@@ -18,7 +18,7 @@ library(png)
 library(grid)
 ```
 
-## Introduction
+# Introduction
 
 In this lab we will cover the use of generalized linear models (GLMs) in R for modeling non-normal response variables, e.g. binary outcomes or count data. 
 
@@ -32,8 +32,7 @@ Before starting, remember to create a working directory (e.g. `module15`). Next 
 Then start RStudio, and change your working directory from the [Session] menu > [Set working directory] > [Choose directory...]. Remember to check that R can see the files by running the `list.files()` command. 
 
 
-
-## Generalized Linear Models
+# Generalized Linear Models
 
 Generalized Linear Models (GLMs) allow model fitting to non-normal data types and distributions. Previously, we looked at ordinary least squares models, that model some outcome $y$ as a function of one or more covariates $X$:
 
@@ -91,7 +90,7 @@ In R, the `glm()` function is used to fit these models, and follows a similar fo
 
 We'll look here at the two most common types of regression: binomial (binary data) and Poisson (count data)
 
-## Binomial Models
+# Binomial Models
 
 As a first example, we will fit a model to some binary data, using a binomial model (these models are also called logistic or logit models). We will use the Irish education dataset and use this to model the relationship between students taking their leaving certificate (`lvcert`) and their scores on a vocal reasoning test (`DVRT`). Download the data from Canvas and load it into R in a data frame called `irished`. 
 
@@ -194,7 +193,7 @@ anova(irished.glm1, test='Chisq')
 
 ```
 
-## Poisson Models
+# Poisson Models
 
 Poisson models are used to build relationships with count data. These have a couple of key characteristics: the counts are integers and they are zero-bounded (i.e. you can't have a count less than zero). This example will show you how to build a Poisson model to explore the number of awards won by students. Load the dataset from the file *hsa.csv* into a data frame called `hsa`. As before, the school program (`prog`) is stored as numerical value, so we will need to convert it to a factor. We also center the math score `math`:
 
@@ -269,13 +268,13 @@ predict(hsa.glm, newdata = newstudent,
 
 Which gives a value a little of 2. Try building a second, simpler model, which only uses the math score to explain the number of awards and use the `anova()` function to compare this to the model that includes both math score and school program. 
 
-## Exercise
+# Exercise
 
 There is no additional exercise for today, but you need to submit your R script or (preferably) a Markdown document with the code examples from the lab
 
-## Files used in lab
+# Files used in lab
 
-### Irish Education data set: *irished.csv*
+## Irish Education data set: *irished.csv*
 | Column header | Variable |
 | --- | --- |
 | sex | Sex of student (male = 0; female = 1) |
@@ -284,7 +283,7 @@ There is no additional exercise for today, but you need to submit your R script 
 | lvcert | Taken leaving certificate (yes = 1; no = 0) |
 | schltype | School type |
 
-### Honor Student Award data set: *hsa.csv*
+## Honor Student Award data set: *hsa.csv*
 | Column header | Variable |
 | --- | --- |
 | id | Student ID |
