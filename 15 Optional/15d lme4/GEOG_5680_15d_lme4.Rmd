@@ -55,7 +55,9 @@ Now make a plot of `distance` against age:
 
 ```{r}
 library(ggplot2)
-ggplot(orthodont, aes(x = age, y = distance, col = Subject)) + geom_point()
+ggplot(orthodont, aes(x = age, y = distance, col = Subject)) + 
+  geom_point() +
+  theme_bw()
 ```
 
 The figure shows a clear trend of increasing distances by age. But you should note that some of the individuals tend to have generally higher distance measurements (e.g. M10):
@@ -104,24 +106,30 @@ anova(lm2)
 Let's plot out the model:
 
 ```{r}
-pl <- ggplot(data=orthodont, aes(x=age2,y=distance)) + geom_point() 
-pl + geom_line(aes(x=age2,y=predict(lm1)))
+p <- ggplot(data = orthodont, aes(x = age2,y = distance)) + 
+  geom_point() + 
+  geom_line(aes(x = age2,y = predict(lm1)))  +
+  theme_bw()
+p
 ```
 
 Which looks fairly reasonable, but if we look at how the model looks relative to `sex`, we can see that the model tends to underestimate `distance` for males, and overestimate for `females`
 
 ```{r}
-pl + geom_line(aes(x=age2,y=predict(lm1))) + facet_wrap(~Sex)
+p + facet_wrap(~ Sex)
 ```
 
 We can go a little further and see how this model relates to the individual children. Here, we subset out four boys and four girls, and plot their `distance` values relative to the model
 
 ```{r}
-subject.select <- c(paste0("M0",5:8),paste0("F0",2:5))
+subject.select <- c(paste0("M0", 5:8), paste0("F0", 2:5))
 orthodont.select <- orthodont %>% 
   filter(Subject %in% subject.select)
-ggplot(orthodont.select, aes(x=age2,y=distance)) + geom_point() + 
-  geom_line(aes(x=age2,y=predict(lm1, newdata=orthodont.select))) + facet_wrap(~Subject, nrow=2) 
+
+ggplot(orthodont.select, aes(x = age2,y = distance)) + 
+  geom_point() + 
+  geom_line(aes(x = age2,y = predict(lm1, newdata = orthodont.select))) + facet_wrap(~ Subject, nrow = 2) +
+  theme_bw()
 ```
 
 And again, we can see a problem. While the model might fit well to some of the individuals, for some others it is quite biased (e.g. `M06`).
@@ -129,8 +137,11 @@ And again, we can see a problem. While the model might fit well to some of the i
 Indeed, we didn't take into account the fact that the data are repeated measurements made on the same subjects. A more convenient plot for this type of data consists in joining the data of a same individual:
 
 ```{r}
-ggplot(data=orthodont, aes(x=age2,y=distance)) + geom_point(size=3)  + 
-  geom_line(aes(x=age2,y=distance,group=Subject)) + facet_wrap(~Sex)
+ggplot(data = orthodont, aes(x = age2, y = distance)) + 
+  geom_point(size = 3) + 
+  geom_line(aes(x = age2, y = distance, group = Subject)) + 
+  facet_wrap(~ Sex) +
+  theme_bw()
 ```
 
 We see on this plot, that even if the distance seems to increase linearly for each individual, the intercept and the slope may change from a subject to another one, including within the same `Sex` group.
@@ -159,7 +170,8 @@ All this means is that the intercept per child is modeled as a normal distributi
 So let's build this model in R. The function we will use is `lmer()`, which fits linear mixed-effects models. The syntax for the fixed effects is the same as we have previously seen for `lm()`. The syntax for the random intercepts is `(1 | Subject)`. The `1` tells R to allow the intercepts to vary, and the `| Subject` defines the variable to be used for the groups, here the subject ID. The final argument (`REML = FALSE`) forces the model to be fit by maximum likelihood (I'll discuss why this is important below)
 
 ```{r}
-lme1 = lmer(distance ~ age2 + (1 | Subject), data = orthodont, REML = FALSE) 
+lme1 = lmer(distance ~ age2 + (1 | Subject), 
+            data = orthodont, REML = FALSE) 
 summary(lme1)
 ```
 
@@ -179,8 +191,10 @@ We'll now plot the modeled value for each child using the `fitted()` function (t
 
 ```{r}
 orthodont$random_intercept <- fitted(lme1)
-ggplot(data=orthodont, aes(x=age,y=distance)) + geom_point() + 
-  geom_line(aes(x=age,y=random_intercept)) + facet_wrap(~Subject, ncol=5) 
+ggplot(data = orthodont, aes(x = age, y = distance)) + 
+  geom_point() + 
+  geom_line(aes(x = age, y = random_intercept)) + 
+  facet_wrap(~Subject, ncol=5) 
 ```
 
 This looks much better. However, there is one other effect we might want to examine. 
@@ -208,7 +222,8 @@ $$
 Let's build this now. 
 
 ```{r}
-lme2 = lmer(distance ~ age2 + (age2 | Subject), data = orthodont, REML = FALSE) 
+lme2 = lmer(distance ~ age2 + (age2 | Subject), 
+            data = orthodont, REML = FALSE) 
 summary(lme2)
 ```
 
@@ -232,8 +247,10 @@ And again, we can plot the models for each child:
 
 ```{r}
 orthodont$random_slope <- fitted(lme2)
-ggplot(data=orthodont, aes(x=age,y=distance)) + geom_point() + 
-  geom_line(aes(x=age,y=random_slope)) + facet_wrap(~Subject, ncol=5) 
+ggplot(data = orthodont, aes(x = age, y = distance)) + 
+  geom_point() + 
+  geom_line(aes(x = age, y = random_slope)) + 
+  facet_wrap(~ Subject, ncol=5) 
 ```
 
 As noted above, the variation in the slope is relatively low, but you should see some differences, for example between `M13` and `M14`.
@@ -253,7 +270,8 @@ Here the AIC scores for the two mixed effects models are virtually identical. Gi
 The models that we built used maximum likelihood (ML) to fit the model coefficients. We used this as this allows the AIC values to be calculated and the models compared. However, this approach results in a slight bias in the variance estimates for the random effects. This can be fixed by fitting a model using restricted maximum likelihood (REML). In general, the best approach is to start by using ML to allow for model comparison, then refit the chosen model with REML to get an unbiased estimate of the variance. We'll do this now for the first model `lme1`. 
 
 ```{r}
-lme3 = lmer(distance ~ age2 + (1 | Subject), data = orthodont, REML = TRUE) 
+lme3 = lmer(distance ~ age2 + (1 | Subject), 
+            data = orthodont, REML = TRUE) 
 summary(lme3)
 ```
 
