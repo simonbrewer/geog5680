@@ -20,74 +20,111 @@ library(grid)
 
 # Introduction
 
-In this lab we'll introduce the add-on package **tmap**, which can be used to produce much nicer maps than the default mapping functions in R. Before starting the lab, make sure this is installed. 
+In this lab we'll introduce the add-on package **tmap**, which can be used to produce much nicer maps than the default mapping functions in R. We'll also look briefly at **leaflet**, a package for making interactive maps. Before starting the lab, make sure both of these packages are installed. Other useful ones include **mapsf** **highcharter**, **mapview** and **mapdeck**. 
 
 Remember to use RStudio's script editor (top left panel) to enter your commands and then copy-paste these to the console when you are ready. This will keep a copy of the commands that you can save and return to. 
 
 Before starting, remember to create a working directory (e.g. `module15`). Next download the files for today's lab from the Canvas page and move them to this directory (unzip the compressed files). You'll need the following files:
 
 - Climate dataset for Western North America: *WNAclimate.csv*
-- New York state polygon data in a shapefile: *NY_Data.zip*
-- A shapefile of country borders: *ne_50m_admin_0_countries.zip*
-- A NetCDF file of global monthly air temperature: *air.mon.ltm.nc*
+- A shapefile of UTA light rail routes: *LightRail_UTA.shp*
+- A shapefile of UTA light rail stations: *LightRailStations_UTA.shp*
+- A shapefile of Salt Lake City census tracts: *slctracts.shp*
+- A LandSat8 scene for part of California: *rs.zip*
+- A shapefile of California places: *ca_places.shp*
 
-Then start RStudio, and change your working directory from the [Session] menu > [Set working directory] > [Choose directory...]. Remember to check that R can see the files by running the `list.files()` command. 
+Note for the shapefiles, you will need to download and decompress the zip file for each one to get the shapefile and the associated extra files. If you are not sure about this, please let me know.
 
-# The **tmap** package
+Now start RStudio, and change your working directory from the [Session] menu > [Set working directory] > [Choose directory...]. Remember to check that R can see the files by running the `list.files()` command. 
 
-**tmap** works in a very similar way to **ggplot2**, by building a series of layers and map geometries and elements. In general, we start by using `tm_shape()` to identify the spatial object to be used, and add geometries are added, including filled polygons, borders and symbols. Finally, we can add legends, scale bars, etc. 
+Once you have done this, let's load all the files we will need:
 
-```{r message=FALSE}
+```{r message=FALSE, warning=FALSE, results='hide'}
 
-library(tmap)
-
-```
-
-## Example 1: Syracuse data
-
-For the first example, we'll make some maps using the subset of the `NY8` shapefile for Syracuse (we used this in a previous module). Start by loading the packages we need (**sf** to read the data, and **tmap** to plot it):
-
-```{r}
-
-library(tmap)
 library(sf)
+library(terra)
+
+sf_use_s2(FALSE)
 
 ```
 
-Next load the `NY8` data, and subset Syracuse. We'll also make a quick map with the default mapping function as a reference:
+
+# **tmap**
+
+**tmap** makes thematic maps. It works in a very similar way to **ggplot2**, by building a series of layers and map geometries and elements. In general, we start by using `tm_shape()` to identify the spatial object to be used, and add geometries are added, including filled polygons, borders and symbols. Finally, we can add legends, scale bars, etc. We'll look at three examples of working with this package here, but there are a lot more details and examples on the [TMap website][tmapid].
+
+### Example 1: Salt Lake County
+
+We'll first make a map with a mixture of vector layers, including census tracts, light rail tracks and stations. Let's start by loading these:
 
 ```{r}
 
-NY8 <- st_read("NY_data/NY8_utm18.shp")
-Syracuse <- NY8[NY8$AREANAME == "Syracuse city", ]
-plot(Syracuse[, "POP8"])
+## Census tracts for Salt Lake County with population density
+tracts <- st_read("./slc_tract/slc_tract_2015.shp", quiet = TRUE)
+## Salt Lake light rail tracks
+lightrail <- st_read("./LightRail_UTA/LightRail_UTA.shp", quiet = TRUE)
+## Salt Lake light rail stations
+stations <- st_read("./LightRailStations_UTA/LightRailStations_UTA.shp", quiet = TRUE)
 
 ```
 
-Now let's do the same things with **tmap**. First, let's make a simple map showing the polygon outlines using `tm_borders()`:
+If we check the CRS, you'll see that `tracts` has a different one, so will need to be reprojected:
+
+```{r}
+
+st_crs(tracts)$epsg
+
+st_crs(lightrail)$epsg
+
+```
+
+```{r}
+
+tracts <- st_transform(tracts, st_crs(lightrail))
+
+```
+
+Now let's start mapping things out with **tmap**. First, let's make a simple map showing the polygon outlines using `tm_borders()`. This is the standard **tmap** method: first define the object that you want to plot with `tm_shape`, then define what you want to plot. 
 
 ```{r fig.keep='high', message=FALSE}
 
-tm_shape(Syracuse) + tm_borders()
+library(tmap)
+
+tm_shape(tracts) + 
+  tm_borders()
 
 ```
 
-The function `tm_fill()` will then fill these using one of the variables in the Syracuse data set (POP8). Note that this automatically adds a legend within the frame of the figure:
+The function `tm_fill()` will then fill these using one of the variables in the tract data set. We'll use the population density (`density`). Note that this automatically adds a legend within the frame of the figure:
 
 ```{r fig.keep='high', message=FALSE}
 
-tm_shape(Syracuse) + tm_borders() + tm_fill("POP8")
+tm_shape(tracts) + 
+  tm_fill("density") +
+  tm_borders()
 
 ```
 
-The color scale can be changed by setting the `palette` argument in `tm_fill()`. This includes the ColorBrewer scales described in the previous module, and the algorithm used to define the intervals. For example, to use the 'Greens' palette with percentile breaks:
+The color scale can be changed by setting the `palette` argument in `tm_fill()`. This includes ColorBrewer and viridis scales and there are a set of methods todefine the intervals in the color palette. For example, to use the 'Greens' palette with percentile breaks. We also change the color of the tract boundaries to lightgray:
 
 ```{r fig.keep='high', message=FALSE}
 
-tm_shape(Syracuse) + tm_borders() + 
-  tm_fill("POP8", palette = "Greens", style = "quantile")
+tm_shape(tracts) + 
+  tm_fill("density", palette = "Greens", style = "quantile") +
+  tm_borders("lightgray")
 
 ```
+You can reverse the color scale by prepending a `-`. This uses a reversed `magma` palette from the viridis set, with a continuous palette:
+
+```{r fig.keep='high', message=FALSE}
+
+tm_shape(tracts) + 
+  tm_fill("density", palette = "-magma", style = "cont") +
+  tm_borders("lightgray")
+
+```
+
+
 
 If you want to see the full set of palettes that you can use, install the **tmaptools** package and run the following code (you may also need to install **shinyjs**):
 
@@ -97,192 +134,383 @@ tmaptools::palette_explorer()
 
 ```
 
-Other map elements can be added. Here we add a longitude/latitude graticule with `tm_graticules()`, a north arrow and a line of text with the date the map was made. 
+Let's now add another layer. We'll overlay the light rail track on this map. As this is a different object in R (`lightrail`), we first need to use `tm_shape` to indicate that we are using it, then add `tm_lines()` to show the routes. We'll make the lines a little thicker with `lwd` and change the type to `dashed`. 
 
 ```{r fig.keep='high', message=FALSE}
 
-tm_shape(Syracuse) + tm_graticules(col = "lightgray") + tm_borders() + 
-  tm_fill("POP8", palette = "Greens", style = "quantile") + 
-  tm_compass(position = c("left", "bottom")) + 
-  tm_credits("2019-10-19", position = c("right", "top"))
+tm_shape(tracts) + 
+  tm_fill("density", palette = "Greens", style = "quantile") +
+  tm_borders("lightgray") +
+  tm_shape(lightrail) +
+  tm_lines(lwd = 2, lty = 'dashed', col = "darkorange")
 
 ```
 
-## Interactive maps
+Note that if you use a varible name for the color, it will thematically map the lines (I've removed the polygon fill to make this clear):
 
-**tmap** also has a function to produce a simple, interactive map. This is done by changing the mode of operation from `plot` to `view`. The following code set the mode to interactive, makes a simple plot of the Syracuse data, and resets the mode to static plots. Note that these plots will be interactive in RStudio, and can also be embedded in the html files produced in R Markdown. At the end we reset the view back to static plots. Note that you can use this interactive function with any data with latitude/longitude coordinates.
+```{r fig.keep='high', message=FALSE}
 
-```{r fig.keep='high', eval=FALSE}
+tm_shape(tracts) + 
+  #tm_fill("density", palette = "Greens", style = "quantile") +
+  tm_borders("lightgray") +
+  tm_shape(lightrail) +
+  tm_lines(lwd = 4, col = "ROUTE")
 
+```
+We can now add the stations (using `tm_shape()` to select the correct object to plot):
+
+```{r fig.keep='high', message=FALSE}
+
+tm_shape(tracts) + 
+  tm_fill("density", palette = "Greens", style = "quantile") +
+  tm_borders("lightgray") +
+  tm_shape(lightrail) +
+  tm_lines(lwd = 2) +
+  tm_shape(stations) +
+  tm_dots(size = 0.25, shape = 23)
+
+```
+
+Now let's add some details to the map. We'll add a graticule before the polygons are plotted, a compass and a scalebar. We'll also use the `tm_layout` function to add a title and move the legend to a new position. (This function has a lot of options for changing your map - it's well worth checking the help page.)
+
+```{r fig.keep='high', message=FALSE}
+
+tm_shape(tracts) + 
+  tm_graticules(col = "lightgray") + 
+  tm_fill("density", title = "Popn density", palette = "Greens", style = "quantile") +
+  tm_borders("lightgray") +
+  tm_shape(lightrail) +
+  tm_lines(lwd = 2) +
+  tm_shape(stations) +
+  tm_dots(size = 0.25, shape = 23) +
+  tm_compass(position = c("left", "bottom")) +
+  tm_scale_bar(position = c("right", "top")) +
+  tm_layout(main.title = "Salt Lake County Light Rail", 
+            legend.outside = TRUE,
+            legend.outside.position = c("left"))
+
+```
+
+The map can be clipped to smaller regions by using the `bbox` argument in the first `tm_shape()` function. In this code, we'll extract a set of census tracts that correspond to downtown Salt Lake. We'll then use the the bounding box of these to crop the map (I've removed the fill). We'll also add the station name using `tm_text()`:
+
+```{r fig.keep='high', message=FALSE}
+
+tracts_sub = tracts %>%
+  dplyr::filter(TRACTCE %in% c(102500, 102600, 114000))
+
+tm_shape(tracts, bbox = st_bbox(tracts_sub)) + 
+  tm_borders("lightgray") +
+  tm_shape(lightrail) +
+  tm_lines(lwd = 2) +
+  tm_shape(stations) +
+  tm_dots(size = 0.25, shape = 23) +
+  tm_text("STATIONNAM", ymod = -1, bg.color = "white", size = 0.8)
+
+```
+
+Finally, **tmap** allows you to make interactive maps fairly simply with the `tmap_mode()` function. Setting this to `view` will make an interactive map, to `plot` will make a static map (like the ones we have made so far). Here we'll remake the full map as an interactive map:
+
+```{r}
+
+## Set interactive
 tmap_mode("view")
-names(Syracuse)
-tm_shape(Syracuse) + tm_borders() + tm_fill("Cases", palette = "Greens")
+
+tm_shape(tracts) + 
+  tm_fill("density", title = "Popn density", palette = "Greens", style = "quantile", id = "TRACTCE") +
+  tm_borders("lightgray") +
+  tm_shape(lightrail) +
+  tm_lines(lwd = 2) +
+  tm_shape(stations) +
+  tm_dots(size = 0.25, shape = 23)
+
+```
+
+We'll reset back to static maps for the rest of this exercise:
+
+```{r}
+
 tmap_mode("plot")
 
 ```
 
-## Example 2
+### Example 2: Western North America climate
 
-We'll next make some maps with the Western North American site data. We'll first need to read the data in:
-
-```{r}
-
-wna_climate <- read.csv("WNAclimate.csv")
-str(wna_climate)
-
-```
-
-Now let's convert this to a `sf` object (a points data frame):
+In this example, we'll map out the climate data from western North America. We'll go a bit faster in this example and not explain every step. First we'll need to convert the `wna_climate` data frame to an `sf` object:
 
 ```{r}
 
+wna_climate <- read.csv("./WNAclimate.csv")
 wna_climate <- st_as_sf(wna_climate, 
                         coords = c("LONDD", "LATDD"),
                         crs = 4326)
-
 ```
 
-Individual symbols can be plotted on a color scale using `tm_symbols`.
+Make a quick thematic map of average july temperature:
 
-```{r fig.keep='high', message=FALSE}
-
-tm_shape(wna_climate) + tm_symbols(col="Jan_Tmp")
-
+```{r}
+tm_shape(wna_climate) +
+  tm_symbols(col = "Jul_Tmp")
 ```
 
-This takes the same arguments as `tm_fill()` for the color palette. We'll use a red to blue color scale from RColorBrewer. The minus sign before the palette name reverses the order of the colors. As there is a large amount of overlap between the sites, we also add an alpha level to make the symbols transparent. 
-
-```{r fig.keep='high', message=FALSE}
-
-tm_shape(wna_climate) + 
-  tm_symbols(col="Jan_Tmp", alpha = 0.5, palette = "-RdBu") 
-
-```
-
-Next, load the Natural Earth shapefile of country boundaries. 
+Next, we'll download country outlines and river centerlines from [Natural Earth][natEarthID] using the **rnaturalearth** package (you will need to install this). This will download layers from the Natural Earth website - there are a variety of these available, including country and state boundaries, physical features (rivers, lakes, etc) and cultural features (place names, roads, etc). There are three levels of resolution: 1:10m, 1:50m and 1:110m. To download a layer, you need to specify the resolution (`scale`) and the name of the layer. The full set of available layers can be found [here][rneid]
 
 ```{r message=FALSE, results='hide'}
 
-countries <- st_read("ne_50m_admin_0_countries/ne_50m_admin_0_countries.shp")
+library(rnaturalearth)
+
+countries50 <- ne_download(scale = 50, type = "admin_0_countries")
+rivers50 <- ne_download(scale = 50, type = "rivers_lake_centerlines", category = "physical")
 
 ```
 
-We can now add this to our existing plot. Note that as this is a different spatial object, we have to use `tm_shape()` a second time to reference this, then use `tm_borders()` to add the lines.
-
-```{r fig.keep='high', message=FALSE, results='hide'}
-
-tm_shape(wna_climate) + 
-  tm_symbols(col="Jan_Tmp", alpha = 0.75, palette = "-RdBu") + 
-  tm_shape(countries) + tm_borders(col="gray")
-
-```
-
-We can use `tm_style()` to alter the appearance of the map:
-```{r fig.keep='high', message=FALSE}
-
-tm_shape(wna_climate) + 
-  tm_symbols(col="Jan_Tmp", alpha = 0.75, palette = "-RdBu", size = 0.5) + 
-  tm_shape(countries) + tm_borders(col="gray") + tm_style("cobalt") 
-
-```
-
-Like **ggplot2**, the figures that are made can be saved as R objects. Here we make two maps (January and July temperature) and save them as `tm1` and `tm2`
-```{r fig.keep='high', message=FALSE}
-
-tm1 <- tm_shape(wna_climate) + 
-  tm_symbols(col="Jan_Tmp", alpha = 0.75, palette = "-RdBu", size = 0.5) + 
-  tm_shape(countries) + tm_borders(col="gray") + tm_style("classic") 
-
-tm2 <- tm_shape(wna_climate) + 
-  tm_symbols(col="Jul_Tmp", alpha = 0.75, palette = "-RdBu", size = 0.5) + 
-  tm_shape(countries) + tm_borders(col="gray") + tm_style("classic") 
-
-```
-
-We can now use `tm_arrange()` to make a single figure with the two maps:
+Now we can put this all together as a series of layers. We'll make the color palette continuous and use a red-blue palette. 
 
 ```{r}
 
-tmap_arrange(tm1, tm2)
+tm_shape(countries50, bbox = st_bbox(wna_climate)) +
+  tm_borders() +
+  tm_shape(rivers50) +
+  tm_lines("lightblue", lwd = 2) +
+  tm_shape(wna_climate) +
+  tm_symbols(col = "Jul_Tmp", palette = "-RdBu", alpha = 0.75,
+             style = "cont", title.col = "degC")
 
 ```
 
-## Example 3
+Finally, we'll make two maps (july temperature and annual precipitation), and use `tmap_arrange()` to make a two panel plot:
 
-In the final example, we'll make figures using the global air temperature dataset. Start by reading the data using the **raster** package:
+```{r}
 
-```{r fig.keep='high', message=FALSE}
+m1 = tm_shape(countries50, bbox = st_bbox(wna_climate)) +
+  tm_borders() +
+  tm_shape(rivers50) +
+  tm_lines("lightblue", lwd = 2) +
+  tm_shape(wna_climate) +
+  tm_symbols(col = "Jul_Tmp", palette = "-RdBu", alpha = 0.75,
+             style = "cont", title.col = "degC")
 
-library(raster)
-r <- raster("air.mon.ltm.nc", varname="air")
-r <- rotate(r)
-names(r)
+m2 = tm_shape(countries50, bbox = st_bbox(wna_climate)) +
+  tm_borders() +
+  tm_shape(rivers50) +
+  tm_lines("lightblue", lwd = 2) +
+  tm_shape(wna_climate) +
+  tm_symbols(col = "annp", palette = "BuPu", alpha = 0.75,
+             style = "cont", title.col = "mm/yr")
+
+tmap_arrange(m1, m2)
 
 ```
 
-The variable name in our raster layer is quite long and complex, so to reduce the amount of typing in these examples, we'll change ti to something simpler
+### Example 3: Raster images
 
-```{r fig.keep='high', message=FALSE}
+In the final example, we'll use the Landsat data with **tmap**. 
 
-names(r) <- "jan_tmp"
+```{r}
+
+## Landsat images for California
+filenames <- paste0('./rs/LC08_044034_20170614_B', 1:11, ".tif")
+landsat <- rast(filenames)
+## Places for California
+ca_places <- st_read("./ca_places/ca_places.shp", quiet = TRUE)
 
 ```
 
-Now let's make a plot using `tm_raster()`, which again takes similar options for color palettes. We'll also add the country borders. Note that there is also a function `tm_rgb()` that allows you to plot multi-band images. 
+The main function to map raster data is `tm_raster()`. We'll remake the NDVI layer that we made in lab 12 and plot this.
+
+```{r}
+b4 <- landsat[[4]]
+b5 <- landsat[[5]]
+
+ndvi <- (b5 - b4) / (b5 + b4)
+
+plot(ndvi, col=rev(terrain.colors(10)), main = "NDVI")
+
+```
+
+```{r message=FALSE}
+
+tm_shape(ndvi) +
+  tm_raster()
+
+```
+
+We'll update this a little by clamping the NDVI values at a lower limit of 0, changing the color palette and making it continuous. We'll also add the California places added as an overlay.
+
+```{r message=FALSE}
+
+tm_shape(clamp(ndvi, lower = 0)) +
+  tm_raster(palette = "Greens", style = "cont", title = "NDVI") +
+  tm_shape(ca_places) +
+  tm_borders(lwd = 2) +
+  tm_layout(main.title = "Landsat 8 (2017/06/14)", 
+            legend.position = c("left", "top"), 
+            legend.bg.color = "white", legend.bg.alpha = 0.7)
+
+```
+
+A second function (`tm_rgb()`) allows the creation of color composites. We'll use the red, green and blue bands to make the true color composite. The maximum reflectance value in these files is 1.0, so we need to set this for scaling. 
+
+
+```{r message=FALSE}
+
+tm_shape(landsat) + 
+  tm_rgb(r = 4, g = 3, b = 2, max.value = 1)
+
+```
+
+When we made this figure earlier, it was a lot brighter. This is because the previous function 'stretched' the range of values for each layer. We can mimic that here by first using the `stretch()` function from **terra**, then repeating the plot:
+
+```{r message=FALSE}
+
+landsat_stretch = stretch(landsat, minv = 0, maxv = 1, 
+                          minq = 0.01, maxq = 0.99)
+
+tm_shape(landsat_stretch) + 
+  tm_rgb(r = 4, g = 3, b = 2, max.value = 1)
+
+```
+
+# `leaflet`
+
+The **tmap** mode function allows you to quickly make an interacitve map. The resulting map is based on the well-known Leaflet javascript library, which offers a much greater range of flexibility in making these maps. Fortunately, there is an R library (**leaflet**) that allows access to the Leaflet API allowing you to build quite complex maps from R. We'll remake the map of Salt Lake County and the light rail routes using this now. First install the library (`install.packages("leaflet")`), and load it (and a helper library for working with html formats):
+
+```{r}
+library(leaflet)
+library(htmltools)
+```
+
+**leaflet** operates in a similar way to **ggplot2** and **tmap** in building a map by layers. Layers are added using the pipe operator that we encountered in an earlier lab (`%>%`). There are three basic ingredients that are required: 
+
+- A blank map canvas from the `leaflet()` function
+- A set of background tiles
+- One or more markers or polygons to display
+
+Here's a really simple example, where we use the default tiles from OpenStreetMap and drop a marker on the University of Utah:
+
+```{r}
+m <- leaflet() %>%
+  addTiles() %>%  # Add default OpenStreetMap map tiles
+  addMarkers(lng=-111.8421, lat=40.7649, popup="The University of Utah")
+m  # Print the map
+```
+
+
+You can also try changing the *Provider* - the source of the background map. For example, this will use ESRI map (the map is not shown here but will appear in RStudio when you run this):
 
 ```{r eval=FALSE}
-
-tm_shape(r) + 
-  tm_raster("jan_tmp", style="fisher", palette="-RdBu") +
-  tm_shape(countries) + tm_borders() 
-
+m <- leaflet() %>%
+  addProviderTiles("Esri.WorldStreetMap") %>%  
+  addMarkers(lng=-111.8421, lat=40.7649, popup="The University of Utah")
+m
 ```
 
-This throws an error about the projections. We'll simply set the projection of the raster `r` using the `crs()` function:
+ESRI imagery:
+
+```{r eval=FALSE}
+m <- leaflet() %>%
+  addProviderTiles("Esri.WorldImagery") %>%  # Add default OpenStreetMap map tiles
+  addMarkers(lng=-111.8421, lat=40.7649, popup="The University of Utah")
+m
+```
+
+You can find a full set of these providers here: https://leaflet-extras.github.io/leaflet-providers/preview/
+
+
+We'll now add the census tracts and light rail `sf` objects. First, these need to be reprojected to WGS84 long-lat (EPSG code 4326) to work with Leaflet.
 
 ```{r}
+tracts_ll <- st_transform(tracts, crs = 4326)
+stations_ll <- st_transform(stations, crs = 4326)
+lightrail_ll <- st_transform(lightrail, crs = 4326)
+```
 
-crs(r) <- 4326
+Now we can add these to a dark basemap. First the tracts with `addPolygons`, then the routes (`addPolylines`) and stations (`addMarkers`). Note that the stations include a `label` taken from the station name column in the `sf` object. This wil appear when you hover your cursor over a marker.
+
+```{r eval=FALSE}
+leaflet() %>%
+  # add a dark basemap
+  addProviderTiles("CartoDB.DarkMatter") %>%
+  # add the polygons of the clusters
+  addPolygons(
+    data = tracts_ll,
+    color = "#E2E2E2",
+    opacity = 1, # set the opacity of the outline
+    weight = 1, # set the stroke width in pixels
+    fillOpacity = 0.2 # set the fill opacity
+  ) %>%
+  addPolylines(
+    data = lightrail_ll
+  ) %>%
+  addMarkers(
+    data = stations_ll,
+    label = ~htmlEscape(STATIONNAM)
+  )
+```
+
+Finally, we'll add some extra details. First, we'll set colors for each station by the light rail line it lies on. This is a little complicated - below we:
+
+- Get the list of unique station names 
+- Make up a color palette from the **RColorBrewer** package (you may need to install this)
+- Convert the station names to an integer code (so the first name alphabetically will be 1, etc)
+- Finally use the integer code to assign the matching color back to the `sf` object
+
+```{r}
+unique(stations_ll$LINENAME)
+
+line_pal <- RColorBrewer::brewer.pal(9, "Set1")
+line_no <- as.numeric(as.factor(stations_ll$LINENAME))
+
+stations_ll$LINECOL <- line_pal[line_no]
+```
+
+Next we'll make a popup window for each station. This will appear when the marker is clicked (as opposed to the label which appears when a cursor hovers over the marker). This has to be formatted using html. Here, we use R's `paste()` function to stick together html tags with the station name, address, etc. The `<b>` tags make the labels bold, and the `<br>` tags add a line break. You can do a lot more here, for example, including images or URLs in each popup. 
+
+```{r}
+station_popup = paste0(
+  "<b>Station: </b>",
+  stations_ll$STATIONNAM,
+  "<br>",
+  "<b>Line Name: </b>",
+  stations_ll$LINENAME,
+  "<br>",
+  "<b>Park n Ride: </b>",
+  stations_ll$PARKNRIDE,
+  "<br>",
+  "<b>Address: </b>",
+  stations_ll$ADDRESS
+  
+)
+```
+
+With all this in place, we can rebuild our map. The main changes here are that we use a circle marker as this has an option to change color, and include the popup information in the marker.
+
+```{r}
+leaflet() %>%
+  # add a dark basemap
+  addProviderTiles("Esri.WorldStreetMap") %>%
+  # add the polygons of the clusters
+  addPolygons(
+    data = tracts_ll,
+    color = "#E2E2E2",
+    # set the opacity of the outline
+    opacity = 1,
+    # set the stroke width in pixels
+    weight = 1,
+    # set the fill opacity
+    fillOpacity = 0.2
+  ) %>%
+  addPolylines(
+    data = lightrail_ll
+  ) %>%
+  addCircleMarkers(
+    data = stations_ll,
+    color = ~LINECOL,
+    label = ~htmlEscape(STATIONNAM),
+    popup = station_popup
+  )
 
 ```
 
-And now remake the figure
-
-```{r fig.keep='high', message=FALSE, warning=FALSE}
-
-tm_shape(r) + 
-  tm_raster("jan_tmp", palette="RdBu") +
-  tm_shape(countries) + tm_borders() 
-
-```
-
-There's a few things wrong here. 
-- The color palette is the wrong way around, so we can reverse this by prepending a `-` before the palette name.
-- The palette intervals are quite large, so we don't see much of the spatial variation, particularly over mountain chains. We add `n=11` to the function to increase the number of intervals
-- The legend doesn't show up very well
-
-We can address this last point in a couple of ways. First by adding a background to the legend:
-
-```{r fig.keep='high', message=FALSE, warning=FALSE}
-
-tm_shape(r) + 
-  tm_raster("jan_tmp", style="fisher", palette="-RdBu", n = 9, title = "January temperature") +
-  tm_shape(countries) + tm_borders() + 
-  tm_layout(legend.bg.color = "white", legend.bg.alpha = 0.6)
-
-```
-
-Alternatively, we can do this a little by moving the color legend outside of the plotting area. We'll increase the number of color classes to 9, and add a histogram showing the frequency of different values. 
-
-```{r fig.keep='high', message=FALSE, warning=FALSE}
-
-tm_shape(r) + 
-  tm_raster("jan_tmp", style="fisher", palette="-RdBu", legend.hist = TRUE, 
-            n = 9, title = "January temperature") +
-  tm_shape(countries) + tm_borders() + tm_layout(legend.outside = TRUE, 
-                                                 legend.outside.position = "left")
-
-```
 
 # Exercise
 
