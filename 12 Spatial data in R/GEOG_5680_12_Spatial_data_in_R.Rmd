@@ -29,8 +29,10 @@ Before starting, remember to create a working directory (e.g. `module12`). Next 
 - A shapefile of UTA light rail routes: *LightRail_UTA.shp*
 - A shapefile of UTA light rail stations: *LightRailStations_UTA.shp*
 - A shapefile of Utah counties: *utahcounty.shp*
+- A LandSat8 scene for part of California: *rs.zip*
+- A shapefile of California places: *ca_places.shp*
 
-Note for the shapefiles, you will need to download the full folder for each one to get the shapefile and the associated extra files. If you are not sure about this, please let me know.
+Note for the shapefiles, you will need to download and decompress the zip file for each one to get the shapefile and the associated extra files. If you are not sure about this, please let me know.
 
 Base R has no structure for spatial data, so you will need to install the following packages (you should have some of these from previous modules):
 
