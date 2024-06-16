@@ -1,10 +1,10 @@
 library(shiny)
-library(maptools)
+library(rgdal)
 library(classInt)
 library(RColorBrewer)
 source("helpers.R")
 
-mapdata = readShapeSpatial("./sids2/sids2.shp")
+mapdata = readOGR("./sids2/sids2.shp")
 
 shinyServer(function(input, output) {
   

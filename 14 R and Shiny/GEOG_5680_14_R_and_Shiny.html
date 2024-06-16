@@ -1481,7 +1481,7 @@ border-radius: 0px;
 <h4 class="author"><div class="line-block">Simon Brewer<br />
 Geography Department<br />
 University of Utah</div></h4>
-<h4 class="date">19 May, 2024</h4>
+<h4 class="date">16 June, 2024</h4>
 
 </div>
 
@@ -1824,11 +1824,11 @@ the sidebar to the right of the main panel.</p>
 <code>shinyServer()</code> function to load the packages we need and the
 shapefile:</p>
 <pre class="r"><code>library(shiny)
-library(rgdal)
+library(sf)
 library(classInt)
 library(RColorBrewer)
 
-mapdata = readOGR(&quot;./sids2/sids2.shp&quot;)</code></pre>
+mapdata = st_read(&quot;./sids2/sids2.shp&quot;, quiet = TRUE)  </code></pre>
 <p>Then add the following code in the <code>shinyServer()</code>
 function:</p>
 <pre class="r"><code>output$choose_buttons &lt;- renderUI({
@@ -1931,8 +1931,8 @@ choose whether or not to log-transform the data (particularly useful
 with right-skewed data). Add the following:</p>
 <p>In <em>ui.R</em> add a check box:</p>
 <pre class="r"><code>checkboxInput(&quot;checkbox&quot;, label = &quot;Log-transform?&quot;, value = FALSE)</code></pre>
-<p>In <em>helpers.R</em> modify the function to include a parameter for
-log-transformation:</p>
+<p>In <em>helpers.R</em> modify the first line of the function to
+include a parameter for log-transformation:</p>
 <pre class="r"><code>make_map &lt;- function(mysf, varname, nclr, pal=&quot;Greens&quot;, logtrans=FALSE) {</code></pre>
 <p>and add a test to the <code>make_map</code> function: if
 <code>logtrans=TRUE</code>, then log10 transform the selected variable

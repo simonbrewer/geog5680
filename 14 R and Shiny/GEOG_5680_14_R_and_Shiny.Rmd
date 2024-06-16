@@ -309,11 +309,11 @@ In the *server.R* script add the following code before the `shinyServer()` funct
 
 ```{r eval=FALSE}
 library(shiny)
-library(rgdal)
+library(sf)
 library(classInt)
 library(RColorBrewer)
 
-mapdata = readOGR("./sids2/sids2.shp")
+mapdata = st_read("./sids2/sids2.shp", quiet = TRUE)  
 ```
 
 
@@ -427,7 +427,7 @@ In *ui.R* add a check box:
 checkboxInput("checkbox", label = "Log-transform?", value = FALSE)
 ```
 
-In *helpers.R* modify the function to include a parameter for log-transformation:
+In *helpers.R* modify the first line of the function to include a parameter for log-transformation:
 
 ```{r eval=FALSE}
 make_map <- function(mysf, varname, nclr, pal="Greens", logtrans=FALSE) {
