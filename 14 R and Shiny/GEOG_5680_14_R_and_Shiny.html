@@ -1481,7 +1481,7 @@ border-radius: 0px;
 <h4 class="author"><div class="line-block">Simon Brewer<br />
 Geography Department<br />
 University of Utah</div></h4>
-<h4 class="date">16 June, 2024</h4>
+<h4 class="date">02 July, 2024</h4>
 
 </div>
 
@@ -1835,7 +1835,7 @@ function:</p>
   # Get the data set with the appropriate name
   colnames &lt;- names(mapdata)
   # Find columns with numeric data
-  numID = sapply(mapdata@data, is.numeric)
+  numID = sapply(mapdata, is.numeric)
   colnames = colnames[numID]
   # Create the buttons and check the first by default
   selectInput(&quot;buttons&quot;, &quot;Choose variable&quot;, 

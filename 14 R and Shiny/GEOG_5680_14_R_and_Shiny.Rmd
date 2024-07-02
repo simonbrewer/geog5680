@@ -324,7 +324,7 @@ output$choose_buttons <- renderUI({
   # Get the data set with the appropriate name
   colnames <- names(mapdata)
   # Find columns with numeric data
-  numID = sapply(mapdata@data, is.numeric)
+  numID = sapply(mapdata, is.numeric)
   colnames = colnames[numID]
   # Create the buttons and check the first by default
   selectInput("buttons", "Choose variable", 
