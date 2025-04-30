@@ -1,0 +1,693 @@
+---
+title: |
+  | GEOG 5680 6680
+  | Introduction to R
+  | 02 Data manipulation
+author: 
+  - name: "Simon Brewer"
+    email: simon.brewer@ess.utah.edu
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+format:
+  html:
+    toc: true
+    embed-resources: true
+editor: source
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(png)
+library(grid)
+set.seed(42)
+```
+
+# Introduction
+
+In this lab, we'll introduce the main data types you will work with in R: vectors, data frames and lists. This will show how to create these, how to manipulate them to extract subsets of data and how to use them in simple functions. 
+
+As a general rule, these labs are designed to give you examples of how R works. I strongly encourage you to try changing the code to see what happens. Things might go wrong, but that is often a good way to learn! Remember that you can get help on any R function with the `help()` command. 
+
+Before starting, remember to create a working directory (e.g. `module01`). Then start RStudio, and change your working directory from the [Session] menu > [Set working directory] > [Choose directory...]. You will need to make sure this is correctly set to load a file later on.
+
+**This is one of the longest labs in this class, and contains some boring, but very useful information about working with data in R. I would suggest working through it in 2 or even 3 sessions. If you do this, remember to save your code in a script so you can continue working on it, and remember to re-set your working directory if you close and re-open RStudio.**
+
+## A simple dataset
+
+The following table contains measurements for different body parts of 8 sparrows (this is part of a much larger dataset) as well as their sex. 
+
+| Wing | Leg | Head | Wt | Sex |
+|---|---|---|---
+| 59 | 22.3 | 31.2 | 9.5 | F |
+| 55 | 19.7 | 30.4 | 13.8 | F |
+| 53.5 | 20.8 | 30.6 | 14.8 | F |
+| 55 | 20.3 | 30.3 | 15.2 | F |
+| 52.5 | 20.8 | 30.3 | 15.5 | M |
+| 57.5 | 21.5 | 30.8 | 15.6 | M |
+| 53 | 20.6 | 32.5 | 15.6 | M |
+| 55 | 21.5 | NA | 15.7 | M |
+
+# Vectors 
+
+Vectors are one-dimensional data structures containing data of the same mode. For example, the set of wing length values would make a *numerical* vector of length 8, and the set of sex values would make a *character* vector, also of length 8. 
+
+## Making vectors
+
+The easiest way to make a vector in r is with the `c()` function, which concatenates or sticks a set of individual values into a vector:
+
+```{r}
+wing = c(59,55,53.5,55,52.5,57.5,53,55)
+```
+
+As a reminder: when you create a variable in R and assign it to a variable name, you won't see anything appear in the console, but you should see the variable appear in the environment window (top right). If you want to see the content of the variable, simply type it's name:
+
+```{r}
+wing
+```
+
+Two things to note here: the variables are separated by commas, and everything is enclosed in parentheses `(,)`. You can put spaces in as well to improve readability:
+
+```{r}
+wing = c(59, 55, 53.5, 55, 52.5, 57.5, 53, 55)
+```
+
+The `c()` function has created a vector with a length of 8. You can check this with the `length()` function:
+
+```{r results='hide'}
+length(wing)
+```
+
+We can make a similar vector for the sex values:
+
+```{r}
+sex = c("F", "F", "F", "F", "M", "M", "M", "M")
+sex
+```
+
+The function `rep()` provides a much easier way to produce series of repeating values. Enter the following:
+
+```{r}
+sex2 = rep(c("F", "M"), 4)
+sex2
+```
+
+This creates a vector with the sex labels (`F` and `M`), then repeats this four times, but this is not what we want. `rep()` has an additional argument (`each`), which repeats the individual values a set number of times:
+```{r}
+sex2 = rep(c("F", "M"), each=4)
+sex2
+```
+
+Another useful function to create vectors is `seq()` which creates a regular series of numbers. For example, if we wanted to generate a unique id for each sparrow, we can do this as follows:
+
+```{r results='hide'}
+id = seq(1,8)
+id
+```
+
+If you would like more detail on these functions including other arguments that may change how they work, remember to use the `help()` command or `?` to see the help page:
+
+```{r eval=FALSE}
+?seq
+```
+
+## Vector indexing
+
+To access the individual values in a vector, we use the index, the position of that value. These indexes are entered between brackets `[ ]`, so to get the first value, type:
+
+```{r results='hide'}
+wing[1]
+```
+
+(The `[1]` you saw earlier when looking at the output of a variable, indicates that you are looking at a vector). You can give a range of indexes using a colon `:`. The following means get the values from position 2 to 4 from the Wing vector:
+
+```{r results='hide'}
+wing[2:4]
+```
+
+As the indices are just another vector, you can use the `c()` function to generate an irregular set of indices. This extracts data in the 1, 4 and 6 position. 
+
+```{r results='hide'}
+wing[c(1,4,6)]
+```
+
+You can reverse indexes by using a minus sign. This prints all *except* the second value:
+
+```{r results='hide'}
+wing[-2]
+```
+
+## Vectors and functions
+
+We can now use functions directly on these vectors, for example to calculate the sum of wing lengths:
+
+```{r}
+sum(wing)
+```
+
+And we can store the sum in a new variable
+
+```{r results='hide'}
+wing.sum <- sum(wing)
+wing.sum
+```
+We can use indexes when using these functions, so this will calculate the sum without the second bird:
+
+```{r results='hide'}
+sum(wing[-2])
+```
+
+Now try using the following functions with this vector:
+
+- `mean()`: mean
+- `sd()`: standard deviation
+- `range()`: range of values
+- `min()`: minimum value
+- `max()`: maximum value
+
+Now let's create vectors for the other variables in the table. If you haven't already done so, open a script to work through the next sections (e.g. `script_02a.R`). You can open a script by going to [File] -> [New File] -> [R Script] in RStudio (you can also click on the icon in the top left of the window). If you are opening a new script, you should also add the code above to create the `wing` and `sex` vectors:
+
+```{r}
+wing = c(59, 55, 53.5, 55, 52.5, 57.5, 53, 55)
+sex = rep(c("F", "M"), each=4)
+leg <- c(22.3, 19.7, 20.8, 20.3, 20.8, 21.5, 20.6, 21.5)
+head <- c(31.2, 30.4, 30.6, 30.3, 30.3, 30.8, 32.5, NA)
+wt <- c(9.5, 13.8, 14.8, 15.2, 15.5, 15.6, 15.6, 15.7)
+```
+
+Note that the eighth bird was missing a measurement for head size. Missing values are represented by an `NA` in R, and many functions have options for dealing with these. For example, this will return a missing value:
+
+```{r}
+sum(head)
+```
+
+If you add the argument `na.rm = TRUE`, this function will drop this value and calculate the sum of the remaining seven birds:
+
+```{r}
+sum(head, na.rm = TRUE)
+```
+
+All the parameters for a function can be seen by looking at the help page:
+
+```{r eval=FALSE}
+help(sum)
+```
+
+Adding `na.rm = TRUE` will work for many basic functions (e.g. `mean`, `min`, `max`, etc), but not all of them, so it is worth checking the help when faced by missing values, and in general when working with a new function. 
+
+## Character vectors
+
+One of the vectors we created contained character values  (`sex`). You can use all the same indexing with this as with a numerical vector:
+
+```{r}
+sex[1:4]
+```
+
+You can also get the count of each character string in the vector with `table()`:
+
+```{r}
+table(sex)
+```
+
+## Factor vectors
+
+R has another data type, which is similar to character strings called *factors*. The main difference with factors is that R can use these to identify observations belonging to different groups. In contrast, R does not recognize two identical character strings as belonging to a distinct group. This seems like a very small difference, but factors are very important in modeling, to define hierarchical structures or dummy variables in regression (we will use these later in the class). To convert a character vector to a factor, you can use the `factor()` function:
+
+```{r}
+sex_f = factor(sex)
+sex_f
+```
+
+When R shows the vector, it also displays the *levels*: the different groups that have been identified (here, just two). You can also just get a list of the groups with `levels()`. Compare the output of this function with the character and factor vectors:
+
+```{r}
+levels(sex)
+levels(sex_f)
+```
+
+Note that by default R sets the group order alphabetically. For some applications (e.g. regression), the first group will be used as the reference group. If you want to have a different order to the groups, you can specify the order using the `levels` argument:
+
+```{r}
+sex_f2 <- factor(sex, levels=c("M","F"))
+levels(sex_f)
+levels(sex_f2)
+```
+
+## Boolean vectors
+
+A last data type that you may encounter in R is Boolean (true/false). These usually result from conditional selections (e.g. equal to or greater/less than). For example, if we check which of the sex values are male, we can do this:
+
+```{r}
+sex_b = sex == "M"
+sex_b
+```
+
+We'll use this more extensively below to subset data. 
+
+# Matrices
+
+Matrices in R are simply 2D arrays containing the same data mode (numeric, character, etc). You can create these using the `cbind()` function, which combine different vectors together by converting them into the columns of a matrix(`cbind` = column bind):
+
+```{r}
+bird_mat = cbind(wing, leg, head, wt)
+bird_mat
+```
+
+Note that if you include the character vector `sex` in the matrix, *all* the values will be converted to character strings to make the matrix consistent. 
+
+```{r results='hide'}
+cbind(wing, leg, head, wt, sex)
+```
+
+## Matrix indexing
+
+Note that at the start of each line, the index is given as `[1,]` or `[2,]` etc. The comma in the brackets indicates that this is a matrix, and that each value has two indexes, one for the row, and one for the column (the format is `[row,col]`). So to access the value on the first row, first column:
+
+```{r}
+bird_mat[1,1]
+```
+
+Leaving either of these blank will return all the values in a row or column. To get the first column:
+
+```{r}
+bird_mat[,1]
+```
+
+Or third row:
+```{r}
+bird_mat[3,]
+```
+
+As with the vectors, we can use indexes in a variety of ways to extract different parts of the matrix. 
+
+```{r, results='hide'}
+bird_mat[, 2 : 3]
+bird_mat[4, 4]
+bird_mat[, 4]
+bird_mat[, -3]
+bird_mat[, c(1, 3, 4)]
+bird_mat[, c(-1, -3)]
+```
+
+- The first command gives all the data for columns 2 and 3
+- The second creates 'X' containing the weight for bird 4
+- The third creates 'Y' with all the Wt data. 
+- The minus sign can be used to exclude columns or rows, and 'W' contains all variables except Head. 
+- We can also use the `c()` function to access non-sequential rows or columns of `bird_mat`; this contains the first, third, and fourth columns of Z
+- The last contains all but the first and third columns.
+
+If you use an index that is outside the number of columns or rows, then you will get the following error:
+
+```{r error=TRUE}
+bird_mat[10,10]
+```
+
+The function `dim()` can be used to find out the size of a matrix, and is a good way to check if your indexes are correct:
+
+```{r}
+dim(bird_mat)
+```
+
+The function `rbind()` is similar to `cbind()`, but binds each vector into a row:
+```{r}
+bird_mat2 = rbind(wing, leg, head, wt)
+bird_mat2
+```
+
+## Functions and matrices
+
+The functions described above will work with matrices. For example, to calculate the mean and standard deviation of our matrix `bird_mat` (with missing values removed):
+
+```{r results='hide'}
+mean(bird_mat2, na.rm = TRUE)
+sd(bird_mat2, na.rm = TRUE)
+```
+
+Blank matrices can be created with the `matrix()` function, by specifying the number of rows and columns. For example, to create a blank matrix with the same number of rows and columns
+
+```{r results='hide'}
+bird_blank = matrix(NA, nrow = 8, ncol = 4)
+bird_blank
+```
+
+# Data frames
+
+Data frames are one of the most frequently used data objects in R. These have two dimensions, like a matrix, but can have mixed data modes (numeric, categorical, etc) in them. They are designed to represent standard statistical data, where each row is an observation and each column is a variable that was recorded for all individuals. To create one, use the function `data.frame()`. Here we create a data frame (`bird_df`) using the vectors we made earlier:
+
+```{r}
+bird_df = data.frame(wg=wing, lg=leg, hd=head, wt=wt, sex=sex)
+bird_df
+```
+
+When creating the data frame, we have to name each column, and give it a set of variables. So within the data frame called `bird_df`, we have created a column headed `wg` and have given it the values held in the vector `wing`. To demonstrate this, we will remove the `wing` vector:
+
+```{r error=TRUE}
+rm(wing)
+wing
+```
+But the values are still held in the `bird_df` data frame:
+```{r}
+head(bird_df)
+```
+
+## Indexing data frames
+
+We can also access any given column in a data frame by using the matrix `[row,col]` indexing. For example, to access the leg values (the second column):
+
+```{r}
+bird_df[,2]
+```
+
+So combining row and column indices
+```{r}
+bird_df[1:4,4]
+```
+
+However, a better way to access columns is to use the dollar notation with the column name. This avoids the need to know the position of any variable in a file. The notation follows this syntax: `dataframe$column`. As this returns a vector from the data frame, we can then use vector indexing:
+
+```{r}
+bird_df$lg
+bird_df$lg[1:4]
+```
+
+There is a third, but less common way that combines these, and uses the column name instead a the numerical index inside `[,]`. 
+```{r results='hide'}
+bird_df[,"lg"]
+```
+
+All of these give us the same set of data, and will give the same results in any analysis:
+```{r}
+mean(bird_df$lg)
+mean(bird_df[,2])
+mean(bird_df[,"lg"])
+```
+
+In this class, we will mainly use the '`$`' notation. This uses the column name, providing an instant reminder of what variable you are using. This also helps provide a check on your analysis, as if there is no column called `lg` in your data, the functions will fail to run. The third method is mainly useful when you want to generate the variable name during your analysis - we'll see an example of this toward the end of the week.
+
+The dollar notation also makes it easy to add new variables to the data frame, e.g. original variables that have been transformed or the results of some analysis. To add the square root of weight as `wgsq`, and print out the column names:
+
+```{r}
+bird_df$wgsq = sqrt(bird_df$wt)
+names(bird_df)
+```
+
+# Lists
+
+Lists provide a 'meta'-object in R, in which multiple different data types can be stored. For example, if you have a matrix, a data frame and a vector, it is possible to store them all in a list with a single variable name. To create a list, use the `list()` function, which uses similar syntax to the `data.frame()` function. To demonstrate this, we'll combine several of the objects that we previously made in to a list called `bird_list`. 
+
+```{r}
+bird_list = list(head = head, sex = sex, mat = bird_mat, df = bird_df)
+```
+Now type `bird_list` to see the contents, or use `names()` to see the content:
+
+```{r}
+bird_list
+names(bird_list)
+```
+
+You can use the dollar notation to access individual list elements, and then use indexing to access values within individual list elements:
+```{r results='hide'}
+bird_list$head
+bird_list$mat[2,]
+```
+
+You may wonder why we need to go to all this trouble, given that we could keep the original vector, matrix, etc. The reason is that nearly all functions in R (e.g., linear regression, generalized linear modeling, $t$-test, etc.) produce output that is stored in a list, and knowing how to manipulate and use them is essential. For example, the following code applies a linear regression model in which wing length is modeled as a function of weight. Don't worry about the syntax - we will spend some time with regression models later in this class:
+
+```{r}
+fit <- lm(wg ~ wt, data = bird_df)
+```
+This function produces a list object, which we have called 'fit', which has a great deal of information about the model, including the coefficients and residuals:
+
+```{r}
+names(fit)
+```
+
+# Working with subsets of data
+
+In this next section, we are going to illustrate methods for obtaining subsets of a dataframe. This will build on the indexing introduced above. We will use a data set of squid caught at various locations in Scottish waters in different months and years in the file *squid.csv*. The file contains the sample identifier, year and month, location and sex. It also contains a variable 'GSI' related to the body size of the squid. Download the file from Canvas, and copy it into the working directory you created. As in the previous lab, check that R can see the file, then load it with `read.csv()`:
+
+```{r}
+squid = read.csv("./data/squid.csv")
+```
+
+Type `ls()` to make sure that the file has been read in, and a new variable created:
+```{r results='hide'}
+ls()
+```
+
+This is a data frame, and as before, we can check the column names:
+```{r results='hide'}
+names(squid)
+```
+
+## The `str()` function
+
+The `str()` function provides information on the *structure* of a data object in R. Type:
+```{r}
+str(squid)
+```
+
+And this will tell you what class of object this is (data frame), the number of observations (rows) and variables (columns). For each variable, it tells you the name and the data type: Sample, Year, Month, Location, and Sex are integers, and GSI is numeric. 
+
+This provides a very quick and easy way to check that your data has been correctly imported. If you see, for example, numerical values that are listed as character strings, then you know something has gone wrong. 
+
+The data contain a couple of categorical variables: `Sex` and `Location`. As in the previous section, we'll convert these to factors so that R can use them for grouping using the `factor()` function. Note that we don't create a new variable, but simply overwrite the existing variable in the data frame'
+
+- Location
+```{r}
+squid$Location <- factor(squid$Location)
+levels(squid$Location)
+table(squid$Location)
+```
+
+- Sex. In the original data, `Sex` is coded as `1 = male` and `2 = female`. To make this a little easier to read, we relabel this variable while converting to a factor: 
+
+```{r}
+squid$Sex <- factor(squid$Sex, labels=c("M","F"))
+levels(squid$Sex)
+table(squid$Sex)
+```
+
+## Subsetting data frames
+
+In general, the data we read in will contain all observations from a study (or several studies). For our analyses, we may want to use subsets to explore patterns in different groups, or to remove certain samples that we don't want to retain in the analysis.  For example, with the squid data, we may only want to work with the female data, data from a certain location, or data from the females of a certain location. 
+
+For example, if we want to access only the male data, we need to extract only those rows of our data frame where the 'Sex' variable is equal to `M`. We can find these using a conditional statement (`==, !=, <, >, <=, >=`). Type:
+
+```{r results='hide'}
+maleID = squid$Sex == "M"
+maleID
+```
+
+This returns a Boolean TRUE/FALSE vector where each value tells us whether or not that squid was male. While this may not be much use on it's own, if we use this as a row index in the data frame (i.e. before the comma in the `[,]`), we will get a subset of only the male squid. 
+```{r results='hide'}
+squidM = squid[maleID, ]
+squidM
+dim(squidM)
+```
+
+The `subset()` function provides a slightly easier way to do this by combining the conditional selection and the subset in a single function. It is also quite flexible, allowing multiple conditions to be specified. To select the male squid, type:
+
+```{r results='hide'}
+squidM = subset(squid, Sex == "M")
+squidM
+dim(squidM)
+```
+
+Note that we don't need to use the dollar notation here, the function understands that the second argument is a column in the data frame (the first argument) to be used for subsetting. 
+
+And we can do the same to extract the females:
+
+```{r results='hide'}
+squidF = subset(squid, Sex == "F")
+squidF
+```
+
+The less than/greater than operators are useful with continuous variables. If we need to find all squid with a GSI value less than or equal to 2:
+
+```{r results='hide'}
+squid2 = subset(squid, GSI <= 2)
+squid2
+```
+
+How do we know this has worked? Well, we can estimate the maximum `GSI` value for this new data set and make sure that it is less than 2:
+
+```{r}
+max(squid2$GSI)
+```
+
+It is possible to combine multiple conditions for selection using Boolean operators (`&` = AND, `|` = OR, `!` = NOT). For example:
+
+- Select the squid that are males AND have a GSI value over 3:
+```{r results='hide'}
+squidM3 = subset(squid, Sex == "M" & GSI > 3)
+squidM3
+```
+
+- Select the squid that were found in location 1 OR 3:
+```{r results='hide'}
+squid1_3 = subset(squid, Location == 1 | Location == 3)
+squid1_3
+```
+
+- Select the squid that were NOT sampled in year 4:
+```{r results='hide'}
+squid4 = subset(squid, Location != 4)
+squid4
+```
+
+- we can combine three conditional operators to get the male squid in locations 1 OR 2:
+```{r results='hide'}
+squidM12 = subset(squid, Sex == "M" & Location == 1 | Location == 2)
+squidM12
+```
+
+- for more complex subsetting (e.g. we want to extract the values for winter, ie. December (12), January (1) and February (2)) we can use the match function `%in%` and a vector of the values to match against. The following two lines create a vector of month numbers that we want to keep, then makes a subset of all observations taken in this range
+
+```{r results='hide'}
+monthID = c(12,1,2)
+squidWin = subset(squid, Month %in% monthID)
+squidWin
+table(squidWin$Month)
+```
+
+Don’t panic if the output of a subsetting command shows the following message.
+
+```{r}
+subset(squid, Location == 1 & Year == 4 & Month == 1)
+```
+
+This simply means that no measurements were taken at location 1 in month 1 of the fourth year. 
+
+## The `which()` function
+
+An alternative approach to the selection of subsets uses the function `which()`. While this is generally a more complex approach to the same problem, it can offer some flexibility beyond the `subset()` function, and is particularly useful for doing repeated resampling of a dataset. If this function is used with a binary TRUE/FALSE vector, it will return the positions or indexes of each TRUE value in that vector:
+
+```{r results='hide'}
+maleID = squid$Sex == "M"
+maleID
+which(maleID)
+```
+
+And we can see that the 24th, 48th, 58th, etc observations are male squid. If we include this as a row index, then we extract only these rows, which creates a new, smaller data frame:
+
+```{r results='hide'}
+squidM = squid[which(maleID), ]
+class(squidM)
+dim(squidM)
+```
+
+Where this becomes useful is that we can also use this to select from vectors. Here, for example, rather than subsetting the entire dataframe, we will just create a new vector containing only the GSI values for the male squid:
+```{r results='hide'}
+squid$GSI[maleID]
+```
+
+With this, we can make a similar vector for the female squid by simply prepending a '`-`' sign:
+
+```{r results='hide'}
+squid$GSI[-maleID]
+```
+
+And as before, we can combine multiple conditions into the `which()` function:
+```{r results='hide'}
+m12ID = which(squid$Sex == 1 & squid$Location == 1 | squid$Location == 2)
+squidM12 = squid[m12ID, ]
+squidM12
+```
+
+## Sorting data
+
+In general, sorting is probably easier in a spreadsheet than in R, but it can still be done. To sort an individual vector, use the `sort()` function, e.g.:
+```{r results='hide'}
+sort(squid$GSI)
+```
+
+And to do a reverse sort, include the parameter `decreasing=TRUE`:
+```{r results='hide'}
+sort(squid$GSI, decreasing=TRUE)
+```
+
+The function `order()` also sorts data, but instead of giving you the sorted values, it gives you the rank or position of each value:
+```{r results='hide'}
+order(squid$GSI)
+```
+
+The 2283th observation from the original data is the first in order of increasing GSI. Where this function becomes very useful is in combining it with the indexing that we have seen earlier. For example, to return a ranked order set of squid GIS values:
+
+```{r results='hide'}
+squid$GSI[order(squid$GSI)]
+```
+
+More usefully, this can be used to order the entire squid data frame by GIS value, by using the `order()` function to generate a vector of row indexes:
+```{r results='hide'}
+squid[order(squid$GSI), ]
+```
+
+Or this can be used as a vector index, here to sort the GSI values by the month:
+
+```{r results='hide'}
+squid$GSI[order(squid$Month)]
+```
+
+
+# Exercises
+
+There are two parts to this exercise, all based on the code introduced above. Make one R script for each part and submit these separately through the Canvas assignment link for this module.  
+
+
+## Part 1
+
+The file *BirdFlu_deaths.csv* contains the annual number of confirmed deaths resulting from human Avian Influenza A/(H5N1) for several countries as reported to the World Health Organization (WHO). Each row represents one country, and the columns give the number of deaths from 2003 to 2008. The data were taken from the WHO website (www.who.int/en/) and reproduced for educational purposes. 
+
+- Read the data into R
+- Use the functions `names()`, `head()` and `str()` in R to view the data and get a overview of its structure
+- Find the row number containing highest number of deaths for 2005 using the `which()` function
+- Use this (the row number) to identify the country with the highest number of deaths in 2005, using R's indexing notation (`[row, col]`)
+- Use the same method to find the highest number of deaths in 2007
+
+## Part 2
+
+In the previous lab, we looked at a file containing measurements of atmospheric CO2 concentration (*co2_mm_mlo.txt*). Read this file in again
+
+```{r eval=FALSE}
+co2 <- read.table("co2_mm_mlo.txt", 
+                  col.names = c("year", "month", "decdate", "average",
+                                "interpolated", "trend", "ndays"))
+```
+
+Once the file is read in:
+
+- Create a vector containing all CO2 concentrations for all years up to and including 1985 (Use the column headed 'interpolated' for the CO2 values)
+- Create a vector containing all CO2 concentrations for all years following 1985
+- Estimate the mean CO2 concentration for each of these vectors
+
+Convert the months in the CO2 data frame to factors and create a new column called 'fmnth' to store this in the data frame. Use the `levels()` and `table()` functions to a) make sure this worked, and b) see how many observations you have for each month
+
+# Files used in lab
+
+## *squid.csv* 
+
+Scottish squid dataset
+
+| Column header | Variable |
+| --- | --- |
+| Sample | Sample ID | 
+| Year | Year | 
+| Month | Month | 
+| Location | Location | 
+| Sex | Sex | 
+| GSI | Gonadosomatic index | 
+
+## *co2_mm_mlo.txt* 
+
+Observed atmospheric carbon dioxide concentration from Mauna Loa from 1958 to present
+
+| Column header | Variable |
+| --- | --- |
+| Year | Year | 
+| Month | Month | 
+| DecDate | Year-Month as decimal | 
+| CO2 | CO2 conc. (ppm)| 
+| CO2int | CO2 conc. with missing values filled |
+| Trend | Long-term trend | 
+| Full | All days in month recorded | 
+
+
