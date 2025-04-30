@@ -1,0 +1,530 @@
+---
+title: |
+  | GEOG 5680 6680
+  | Introduction to R
+  | 04 R functions
+author: 
+  - name: "Simon Brewer"
+    email: simon.brewer@ess.utah.edu
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+format:
+  html:
+    toc: true
+    embed-resources: true
+editor: source
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(png)
+library(grid)
+set.seed(42)
+```
+
+# Introduction
+
+In the first couple of labs we have looked how to import and export data, and how to manipulate this by conditional selection and subsetting. In this lab, we'll cover two things. First, we'll look at how to use some simple functions to help summarizing your data, such as the mean of a data or of a subset of that data. Second, we'll look in detail at how an R function is made, and show how you can make your own function. 
+
+Remember to use RStudio's script editor (top left panel) to enter your commands and then copy-paste these to the console when you are ready. This will keep a copy of the commands that you can save and return to. 
+
+Before starting, remember to create a working directory (e.g. `module04`). Next download the files for today's lab from the Canvas page and move them to this directory. You'll need the following files
+
+- *ssclimate2.txt*
+- *ssvegcode.txt*
+- *Deer.csv*
+- *Temperature.csv*
+
+Then start RStudio, and change your working directory from the [Session] menu > [Set working directory] > [Choose directory...]. Remember to check that R can see the files by running the `list.files()` command. 
+
+## Simple functions for describing data
+
+We'll start by calculating some summary statistics using the values in the text files *ssclimate2.txt* and *ssvegcode.txt*. These files contain climate and vegetation cover/elevation information for a set of locations in North America. These are tab delimited files, which can be read with `read.table()`, a more general import function. As both of these have a header line with the names of columns, we can read them in as follows:
+
+```{r}
+clim = read.table("./data/ssclimate2.txt", header=TRUE)
+veg = read.table("./data/ssvegcode.txt", header=TRUE)
+```
+
+For the exercises that follow, we will only keep the monthly temperature from the climate and combine this with the vegetation cover codes and elevation in a new data frame. Start by looking at the structure and names of the climate data:
+
+```{r results='hide'}
+str(clim)
+names(clim)
+```
+
+The monthly temperature values are found in columns 20 to 31. Now use the same functions to check the structure of the vegetation data - here we only need to keep the vegetation type (`vegcode`) and the elevation (`elev`). We'll make a new data frame with only the columns we need:
+
+```{r results='hide'}
+temp = data.frame(vegcode=veg$vegcode, elev=veg$elev, clim[,20:31])
+names(temp)
+```
+
+We can start by calculating some descriptive statistics for values recorded as January temperature (`Jan_Tmp`). For all of these functions, we give the vector of values as an argument. However, as there are missing values (`NA`) in this data where temperatures were not recorded, all functions will return an answer of `NA`:
+
+```{r}
+mean(temp$Jan_Tmp)
+```
+
+To avoid this, we use a parameter `na.rm=TRUE`, which removes any missing values from the vector prior to calculating the statistic.
+
+```{r}
+mean(temp$Jan_Tmp, na.rm=TRUE)
+```
+
+### Measures of central tendency:
+
+- Mean
+```{r results='hide'}
+mean(temp$Jan_Tmp, na.rm=TRUE)
+```
+- Median
+```{r results='hide'}
+median(temp$Jan_Tmp, na.rm=TRUE)
+```
+
+- 50th percentile (should match median). Note that here we tell the function that we want the value corresponding to 50% of the data (`0.5`):
+```{r results='hide'}
+quantile(temp$Jan_Tmp, 0.5, na.rm=TRUE)
+```
+
+### Measures of range
+
+- Variance
+```{r results='hide'}
+var(temp$Jan_Tmp, na.rm=TRUE)
+```
+
+- Standard deviation
+```{r results='hide'}
+sd(temp$Jan_Tmp, na.rm=TRUE)
+```
+
+- Range
+```{r results='hide'}
+range(temp$Jan_Tmp, na.rm=TRUE)
+```
+
+- Interquartile range. Again, we tell the function the percentiles that we want, here 25 and 75% (`c(0.25, 0.75)`):
+```{r results='hide'}
+quantile(temp$Jan_Tmp, c(0.25, 0.75), na.rm=TRUE)
+```
+
+We see here that the mean and median are close, suggesting at a first glance that the data is roughly normally distributed, we have a standard deviation of about 3 and an overall range of 13. 
+
+## The `*apply()` functions
+
+Of more interest would be to know if the different vegetation classes have different mean values. From an earlier lab, we know that we can do this by a conditional selection on the vegetation class:
+
+```{r results='hide'}
+mean(temp$Jan_Tmp[which(temp$vegcode == 1)], na.rm=TRUE)
+mean(temp$Jan_Tmp[which(temp$vegcode == 2)], na.rm=TRUE)
+mean(temp$Jan_Tmp[which(temp$vegcode == 3)], na.rm=TRUE)
+mean(temp$Jan_Tmp[which(temp$vegcode == 4)], na.rm=TRUE)
+mean(temp$Jan_Tmp[which(temp$vegcode == 5)], na.rm=TRUE)
+mean(temp$Jan_Tmp[which(temp$vegcode == 6)], na.rm=TRUE)
+mean(temp$Jan_Tmp[which(temp$vegcode == 7)], na.rm=TRUE)
+mean(temp$Jan_Tmp[which(temp$vegcode == 8)], na.rm=TRUE)
+```
+
+Typing this for each transect is pretty cumbersome, and this is for only 8 transects. With a large number, this will quickly become impractical. Fortunately, there is a much more efficient way to do this, by using the set of `*apply()` functions. 
+
+The first of these that we will look at is `tapply()`. The syntax for this command is `tapply(Data, Index, Function)`. The function uses the `Index` to find different groups and then *applies* the `Function` to the `Data` that fall into each group, one at a time. To demonstrate this, type the following:
+
+```{r results='markup'}
+tapply(temp$Jan_Tmp, temp$vegcode, mean, na.rm=TRUE)
+```
+
+In this case, we have used the mean, but we can also use the standard deviation (function `sd()`), variance (function `var()`), length (function `length()`), maximum (function `max()`) and so on.The following lines of code calculate some of these functions for the vegetation data:
+
+```{r results='hide'}
+Me <- tapply(temp$Jan_Tmp, temp$vegcode, mean, na.rm=TRUE)
+Sd <- tapply(temp$Jan_Tmp, temp$vegcode, sd, na.rm=TRUE)
+Le <- tapply(temp$Jan_Tmp, temp$vegcode, length)
+Mx <- tapply(temp$Jan_Tmp, temp$vegcode, max, na.rm=TRUE)
+data.frame(mean=Me, sd=Sd, length=Le, max=Mx)
+```
+
+To calculate the mean, minimum, maximum, standard deviation, and length of the full series, we still need to use `mean(temp$Jan_Tmp)`, `min(temp$Jan_Tmp)`, `max(temp$Jan_Tmp)`, `sd(temp$Jan_Tmp)`, and `length(temp$Jan_Tmp)`. If we want to calculate one of these values for all variables in a large data set, we are again faced with the problem of having to run the command multiple times (e.g. `mean(temp$Jan_Tmp)`, `mean(temp$Feb_Tmp)`, etc). 
+
+To help with this, R provides other functions similar to `tapply()` to address this situation: `apply()` and `sapply()`. The `apply()` function applies a function to a dimension of a dataset, specified by the parameter `MARGIN`. As the data frame is a 2D data set, this means we can use it on either the rows (margin 1) or columns (margin 2). 
+
+So, to calculate the average monthly temperatures across all locations, we use the column margin (2):
+
+```{r results='hide'}
+apply(temp[,3:14], MARGIN = 2, FUN = mean, na.rm = TRUE)
+```
+
+There are several arguments used here. The `FUN` argument specifies the function to be calculated. Instead of the mean, you can use any other function as an argument for `FUN`, and as we will see later, you can write your own functions. The `MARGIN` argument controls how the means are calculated (1 = row-wise, 2 = column-wise). We also include the `na.rm` argument to remove any missing values. 
+
+We'll look into how the arguments for a function work in a little more detail below. But for now, you should know that as long as you specify the parameters in the correct order, we do not need to write them out explicitly, and the following will achieve the same results:
+
+```{r results='hide'}
+apply(temp[,3:14], 2, mean, na.rm=TRUE)
+```
+
+However, this will not:
+
+```{r results='hide', eval=FALSE}
+apply(temp[,3:14], mean, 2, na.rm=TRUE)
+```
+
+
+The distinction with the previous example is that `tapply()` calculates the mean (or any other function) for subsets of observations of a variable, whereas `apply()` and `sapply()` calculate the mean (or any other function) of one or more variables, using all observations.
+
+Now we calculate the mean annual temperature for each location using `apply()` in a row-wise direction by setting the `MARGIN` to 1:
+```{r results='hide'}
+apply(temp[,3:14], 1, mean, na.rm=TRUE)
+```
+
+## The `aggregate()` function
+
+Th `apply()` function allowed us to use a function either for subsets of the data or across a set of variables. The `aggregate()` function allows us to combine these two approaches. For example, we might want to calculate the average monthly temperature for each month, for each vegetation group. The syntax is similar to the `apply()` function, but note that the grouping variable must be given as a list:
+
+```{r results='hide'}
+aggregate(temp[,3:14], list(temp$vegcode), mean, na.rm=TRUE)
+```
+
+Giving us the seasonal temperature cycle of each group. 
+
+More than one grouping can be included in this function, if they exist. To demonstrate this, we create a new variable splitting the sites into high and low elevation at 1500m, then use this **and** the vegetation groups to calculate the seasonal temperature cycle for each group at low *and* high elevations:
+
+```{r results='hide'}
+temp$elevcode = factor(temp$elev > 1500, labels=c("low","high"))
+aggregate(temp[,3:14], list(temp$vegcode, temp$elevcode), mean, na.rm=TRUE)
+```
+
+## The `summary()` function
+
+The `summary()` provides another way to get basic descriptive statistics for a dataset. It can be applied to a vector or data frame and will adapt to form of the input data:
+
+```{r results='hide'}
+summary(temp$Jan_Tmp)
+summary(temp)
+```
+
+`summary()` is also used quite extensively to summarize the output of statistical modeling, and we will cover this later. It is, however, a great example of the object-orientated nature of R. The same function adapts to the input data and produces different output for a vector, a matrix, a data frame or, as we will see later, a model object. 
+
+## The `table()` function
+
+The functions we have looked at so far work well to summarize numerical data, but do not play well with categorical data or factors - the `table()` function can be used instead. To demonstrate this, we'll use a set of data looking at the occurrence of tuberculosis in deer in several farms in Spain (Vincente et al, 2006). The columns `Ecervi` and `Tb` indicate the presence (1) or absence (0) of, respectively, a parasite and tuberculosis. This data can be found in the *Deer.csv* file, so load this and do the usual check of the column names and structure of the data frame. 
+
+```{r echo=TRUE}
+deer = read.csv("./data/Deer.csv")
+names(deer)
+```
+
+The `table()` function can be used to estimate how many observations fall into different groups, by supplying a vector with the categories. For example, to find out how many animals were sampled on each farm:
+
+```{r}
+table(deer$Farm)
+```
+
+If we use two categories, then `table()` will produce a cross-table showing how many observations were in each combination of categories. To show how many deer of each sex were sampled at each farm:
+
+```{r results='hide'}
+table(deer$Sex, deer$Farm)
+```
+
+Or to make this more readable, we can add the animals sex as a factor with a label:
+
+```{r results='hide'}
+deer$fSex = factor(deer$Sex, labels=c("Male","Female"))
+table(deer$fSex, deer$Farm)
+```
+
+Similarly, we can show the number of animals sampled each year on each farm, which may give us an idea of uneven sampling:
+
+```{r results='hide'}
+table(deer$Year, deer$Farm)
+```
+
+We can clearly see that while most farms were sampled over several years, there are a couple with samples from just one year. 
+
+# Functions
+
+We've already used a lot of R functions, but it is worth taking a look at how they work in a little detail. Any function in R is designed to carry out a specific operation, either on some data (e.g. the `mean()` function) or on the system (e.g. `ls()` which returns a list of the variables and objects in R's memory). In general, all functions take a series of argument, parameters that alter the behavior of the function. We'll illustrate what these are and how they work by looking at the `seq()` function, which generates a series of regular numbers. 
+
+Start by looking at the help page for the `seq()` function:
+
+```
+?seq
+```
+
+Which should open this page in the help browser (bottom right):
+```{r fig.width=6.5, fig.height=4., echo=FALSE}
+img <- readPNG("images/seq_help.png")
+grid.raster(img)
+```
+
+This tells us that this function has a series of arguments (scroll down to see the explanation of each one):
+
+- `from`: the first number in the sequence
+- `to`: the last number in the sequence
+- `by`: the interval between numbers in the sequence
+- `length.out`: fixes the length of the sequence
+- `along.with`: a vector that is used to fix the length of the sequence
+
+You should also see that some of these arguments have default settings (e.g. `from = 1`). These are the values that are used if you do not set that argument in the function. 
+
+Let's see what happens if you run the function with no arguments:
+
+```{r}
+seq()
+```
+
+As both `from` and `to` are set to 1, this simply returns the value 1. Let's now try and specify these to generate integers between 0 and 10:
+
+```{r}
+seq(from = 0, to = 10)
+```
+
+Now change the `by` argument to use a step of 2:
+
+```{r}
+seq(from = 0, to = 10, by = 2)
+```
+
+Note that will also generate sequences of real numbers as well as integers:
+
+```{r results='hide'}
+seq(from = 0, to = 10, by = 0.5)
+```
+
+R uses positional matching for arguments to functions. This means that as long as you follow the expected order of arguments (here: `from` then `to` then `by`), you don't need to include the argument names. So this will produce the same results as above:
+
+```{r results='hide'}
+seq(0, 10, 2)
+```
+
+However, if we put the `by` argument in the wrong place, then we will not get the expected results
+
+```{r results='hide'}
+seq(0, 2, 10)
+```
+
+Next let's add the argument to specify a fixed length of the sequence:
+
+```{r error=TRUE}
+seq(0, 10, 2, length.out = 20)
+```
+
+This failed as there is a conflict in the arguments. Let's remove the `by` argument to generate a sequence that is exactly 20 values long. Note that as the `length.out` argument is now in an incorrect position we *have* to give the argument name:
+
+```{r error=TRUE}
+seq(0, 10, length.out = 20)
+```
+
+## Function code
+
+So how does this function work? R is object oriented, which means that a given function might give different output depending on the object it is used with. For example, the `length()` function will return the length of an individual vector:
+
+```{r}
+length(seq(0, 50, 5))
+```
+
+But if used with a data frame, will return the number of columns (`cars` is a built in dataset in R):
+
+```{r}
+data(cars)
+head(cars)
+length(cars)
+```
+
+These are called *generic* functions, and in general are calling a lower-level function to do the work. The `seq()` function actually calls a function called `seq.default()`. If you type just the name of this function in the console without parentheses this will display the code in the function:
+
+```
+seq.default
+```
+
+What this shows is that this function is itself made up of R code. In fact many R functions are simply a set of low-level R functions combined together to produce a certain operation. This is not true for all functions; some call backend code compiled in Fortran or C++. However, what this does mean is that it is easy to write your own functions, particularly for any operation that you might need to do repeatedly. Here, we'll borrow an example from Hadley Wickham's R for Data Science book and make a function to do a min-max rescaling of a vector of variables. This rescales a vector of values so that the minimum becomes zero and the maximum becomes 1:
+
+$$
+\mbox{MinMax}(x_i) = \frac{x_i - \mbox{min}(x)}{(\mbox{max}(x) - \mbox{min}(x))}
+$$
+
+The template for any function in R is 
+
+```
+function.name <- function(arg1, arg2, arg3=2, ...) {
+  code goes here...
+  return value here...
+}
+```
+
+To make our `minmax` function, open a new script (`my_function.R`), and set up the basic template:
+
+```{r eval=FALSE}
+minmax = function(x) {
+  
+}
+```
+
+This will create a blank function with a single argument `x` which will represent the vector of numbers that the function will be used with. Next, let's add the code to carry out the rescaling:
+
+```{r eval=FALSE}
+minmax = function(x) {
+  x2 = (x - min(x)) / (max(x) - min(x))
+  return(x2)
+}
+```
+
+Hopefully this should be fairly clear; basically this subtracts the minimum value from each value in `x`, the divides by the range of values. The `return()` function is important - this is the value that you will get back out of the function. You don't have to use this; the following function will do the same thing by not storing the intermediate values in `x2`:
+
+```{r eval=TRUE}
+minmax = function(x) {
+  (x - min(x)) / (max(x) - min(x))
+}
+```
+
+Let's try and run this on some data we loaded earlier (the elevation data):
+
+```{r results='hide'}
+elev_minmax = minmax(temp$elev)
+elev_minmax
+range(elev_minmax)
+```
+
+And this has correctly rescaled the vector. What about the January temperatures?
+
+```{r results='hide'}
+jantmp_minmax = minmax(temp$Jan_Tmp)
+jantmp_minmax
+```
+
+Our function has been fooled by the missing values in this vector. To avoid this, we can simply add `na.rm = TRUE` arguments to the `min()` and `max()` functions inside out function. We'll also modify the code to avoid having to calculate the minimum twice, by calculating it (and the maximum) before the rescaling step:
+
+```{r eval=TRUE}
+minmax = function(x) {
+  x_min = min(x, na.rm = TRUE)
+  x_max = max(x, na.rm = TRUE)
+  x2 = (x - x_min) / (x_max - x_min)
+  return(x2)
+}
+```
+
+Now try to rescale the temperature data, and you should see that the NA values have been ignored:
+
+```{r results='hide'}
+jantmp_minmax = minmax(temp$Jan_Tmp)
+jantmp_minmax
+```
+
+Now we have a function, we can use it with the `apply()` functions described above. For example, the `temp` data frame has temperature values in columns 3 thru 14:
+
+```{r}
+temp_minmax = apply(temp[,3:14], 2, minmax)
+```
+
+As a final step, we'll add a couple of arguments that can be modified to allow us to rescale to an arbitrary new range. To do this, we use the following equation after the rescaling to 0/1: 
+
+$$
+\mbox{MinMax2}(x_i) = (\mbox{MinMax}(x_i) \times (\mbox{max_offset} - \mbox{min_offset})) + \mbox{min_offset}
+$$
+
+So we add a `min_offset` and `max_offset` argument to the function. We set the defaults to 0 and 1, respectively, so if these are not set, the function will produce a 0/1 rescaling by default. 
+
+```{r eval=TRUE}
+minmax = function(x, min_offset = 0, max_offset = 1) {
+  x_min = min(x, na.rm = TRUE)
+  x_max = max(x, na.rm = TRUE)
+  x2 = (x - x_min) / (x_max - x_min)
+  x3 = (x2 * (max_offset - min_offset)) + min_offset
+  return(x3)
+}
+```
+
+Now compare:
+
+```{r}
+elev_minmax = minmax(temp$elev)
+range(elev_minmax, na.rm = TRUE)
+```
+
+with:
+
+```{r}
+elev_minmax = minmax(temp$elev, min_offset = 100, max_offset = 200)
+range(elev_minmax, na.rm = TRUE)
+```
+
+# Exercises
+
+The exercise for this lab uses the file *Temperature.csv*. This contains temperature and salinity observations made at 31 locations along the Dutch coastline. The data were collected and provided by the Dutch institute RIKZ (under the monitoring program MWTL; Monitoring Waterstaatkundige Toestand des Lands). Sampling began in 1990, and the final measurements in the spreadsheet were taken in December 2005, a period of 16 years. Sampling frequency was 0–4 times per month, depending on the season. 
+
+Use `read.csv()` to load this data into R, then answer the following questions. You will need to submit an R script with the functions that you used, and a word document showing the answers to the questions. You can enter the answers correctly and/or use screenshots of your R session
+
+- Estimate the mean and standard deviation for temperature and salinity across all samples. As this dataset has some missing values (`NA`) you will need to include the parameter `na.rm=TRUE` to remove these from the calculation of mean/std. dev.
+- Using `tapply()` estimate the average values of temperature and salinity across a) all sites and b) all years
+- Using `aggregate()`, estimate the average monthly values of temperature and salinity by year across all sites to make a time series
+- Use the `table()` function to determine the number of observations:
+    - at each station
+    - for each year
+    - at each station per year
+
+# Files used in lab
+
+## *ssclimate2.txt*
+
+North American climate dataset: 
+
+| Column header | Variable |
+| --- | --- |
+| sample | Sample ID |
+| Cols 2:19 | Various bioclimate parameters |
+|  | e.g. Growing degree days, moisture index |
+| Cols 20:31 | Mean monthly temperature |
+| TMax | Maximum annual temperature |
+| TMin | Minimum annual temperature |
+| Cols 34:45 | Mean monthly precipitation |
+| Cols 46:57 | Mean monthly cloud cover |
+| Cols 58:67 | Various vegetation indices |
+
+## *ssvegcode.txt*
+
+North American landcover dataset: 
+
+| Column header | Variable |
+| --- | --- |
+| sample | Sample ID |
+| vegcode | Land cover class |
+| elev | Site elevation |
+
+## *Deer.csv*
+
+Spanish deer health dataset
+
+| Column header | Variable |
+| --- | --- |
+| Farm | Farm ID |
+| Month | Farm ID |
+| Year | Farm ID |
+| Sex | Farm ID |
+| clas1_4 | Age class |
+| LCT | Length |
+| KFI | Kidney fat index |
+| Ecervi | Elaphostrongylus cervi presence (0/1) |
+| Tb | Tuberculosis presence (0/1) |
+
+## *Temperature.csv*
+
+Dutch ocean monitoring dataset: 
+
+| Column header | Variable |
+| --- | --- |
+| Sample | Sample ID |
+| Date | Date |
+| DateNr | Date (different format) |
+| dDay1 |  |
+| dDay2 |  |
+| dDay3 |  |
+| Station | Station ID |
+| Area | Station region |
+| X31UE_ED50 | Easting |
+| X31UN_ED50 | Northing |
+| Year | Year |
+| Month | Month |
+| Season | Season |
+| Salinity | Salinity (psu) |
+| Temperature | Temperature (C) |
+| CHLFa | Chlorophyll-a conc. |
+
