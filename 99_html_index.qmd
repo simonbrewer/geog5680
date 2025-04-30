@@ -26,8 +26,14 @@ Spatial data science is a fast-growing discipline, with wide-ranging application
     - [Introduction to R][m01]
 - Module 02: 
     - [Basic data manipulation][m02]
-- Module 01: 
+- Module 03: 
     - [Basic plotting][m03]
+- Module 04: 
+    - [R Functions][m04]
+- Module 05: 
+    - [Control statements][m05]
+- Module 06: 
+    - [Report generation][m06]
 
 # Data
 
@@ -39,4 +45,7 @@ Spatial data science is a fast-growing discipline, with wide-ranging application
 [m01]: https://simonbrewer.github.io/geog5680/GEOG_5680_01.html
 [m02]: https://simonbrewer.github.io/geog5680/GEOG_5680_02.html
 [m03]: https://simonbrewer.github.io/geog5680/GEOG_5680_03.html
+[m04]: https://simonbrewer.github.io/geog5680/GEOG_5680_04.html
+[m05]: https://simonbrewer.github.io/geog5680/GEOG_5680_05.html
+[m06]: https://simonbrewer.github.io/geog5680/GEOG_5680_06.html
 
