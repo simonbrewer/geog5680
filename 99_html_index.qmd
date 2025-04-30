@@ -1,0 +1,42 @@
+---
+title: |
+  | GEOG 5680 6680
+  | Introduction to R
+author: 
+  - name: "Simon Brewer"
+    email: simon.brewer@ess.utah.edu
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+format:
+  html:
+    embed-resources: true
+    output-file: "index"
+editor: source
+---
+
+# Introduction
+
+Spatial data science is a fast-growing discipline, with wide-ranging applications, including human health, economics, water resources, energy and food security, infrastructure, natural hazards, and biodiversity. This class is designed to provide an introduction to the methods used to work with these data, including data acquisition and manipulation, building predictive model pipelines and spatial simulation approaches. Students taking this class will learn both the theory and practice of using these methods through a combination of lecture and hand-on computer work. Over the course of the semester, students will develop their own spatial data analytical projects, which will include the design and implementation of the project as well as the communication of results. 
+
+# Modules
+
+- Module 00: 
+    - [Installation instructions][m00]
+    - [Using CSBS services][m00b]
+- Module 01: 
+    - [Introduction to R][m01]
+- Module 02: 
+    - [Basic data manipulation][m02]
+- Module 01: 
+    - [Basic plotting][m03]
+
+# Data
+
+# Links
+
+
+[m00]: https://simonbrewer.github.io/geog5680/GEOG_5680_00.html
+[m00b]: https://simonbrewer.github.io/geog5680/GEOG_5680_00b.html
+[m01]: https://simonbrewer.github.io/geog5680/GEOG_5680_01.html
+[m02]: https://simonbrewer.github.io/geog5680/GEOG_5680_02.html
+[m03]: https://simonbrewer.github.io/geog5680/GEOG_5680_03.html
+
