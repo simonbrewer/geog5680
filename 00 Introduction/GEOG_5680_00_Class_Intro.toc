@@ -1,3 +1,0 @@
-\beamer@sectionintoc {1}{Course Introduction}{2}{0}{1}
-\beamer@sectionintoc {2}{Introduction to R}{11}{0}{2}
-\beamer@sectionintoc {3}{Brief introduction to R/RStudio}{18}{0}{3}

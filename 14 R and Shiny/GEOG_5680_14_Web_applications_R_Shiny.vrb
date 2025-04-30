@@ -1,7 +1,0 @@
-\frametitle{Shiny applications}
-\begin{itemize}
-    	\item Easy way to make simple web applications for analysis
-    	\item Integrates with RMarkdown
-    	\item Can use all standard R add-ons, including \textbf{ggplot2}, etc
-    	\item Can be deployed using personal Shiny server or through RStudio's site
-  \end{itemize}
