@@ -2,7 +2,7 @@
 title: |
   | GEOG 5680 6680
   | Introduction to R
-  | GEOG 5680 6680 00 Installing R and RStudio
+  | 00 Installing R and RStudio
 author: 
   - name: "Simon Brewer"
     email: simon.brewer@ess.utah.edu
@@ -26,6 +26,18 @@ set.seed(42)
 This document will walk you through installing R and RStudio on your computer for use in the class. [R](https://cran.r-project.org) is the main piece of software, and comes with a fairly simple graphical user interface (GUI). [RStudio](https://www.rstudio.com) provides a full integrated development environment (IDE), with a bunch of tools to help programming and debugging your code. These instructions are modified from the [RStudio website](https://rstudio-education.github.io/hopr/starting.html).
 
 NOTE: These labs were developed and tested under various versions of R up to 4.5.0
+
+# Computer setup
+
+We'll be using a number of different files, R code and scripts during this seminar. I'd suggest setting your computer up with a folder (called for example `geog5680`) for the class somewhere that is easy to find (e.g. the Desktop), and that contains a subfolder `data`:
+
+```         
+- Desktop
+  - geog5680
+    - data
+```
+
+We'll use the main folder to store scripts, and the subfolder `data` for the various data files. *This is not obligatory - if you want to use a different setup, please do so!*
 
 # Installing R
 
