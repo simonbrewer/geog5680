@@ -2,7 +2,7 @@
 title: |
   | GEOG 5680 6680
   | Introduction to R
-  | 06 Generating reports with Quarto
+  | 06 Packages and report generation
 author: 
   - name: "Simon Brewer"
     email: simon.brewer@ess.utah.edu
@@ -170,6 +170,8 @@ prp(iris.rpart, type=3, extra=1)
 
 The numbers in each box represent the number of observations of each species that get classified into that group, using the variable splits. This tells us that the first split perfectly differentiates 'setosa', but the second split has some misclassification. For example, the smaller widths correctly classify 49 'versicolor', but also 5 'virginica'. 
 
+# Report generation
+
 ```{r echo = FALSE, message=FALSE}
 require(knitr)
 hook_source_def = knit_hooks$get('source')
@@ -185,19 +187,15 @@ knit_hooks$set(source = function(x, options){
 ```
 
 
-# Report generation
-
-R has several add-on packages that allow you to write reports directly from R, incorporating the code, analyses and plots that you would make. These include **Sweave**, **knitr** and **pander**. These can be used to generate a wide variety of output documents, including LaTeX, RTF, the open document format (ODF) and html. One of the most advanced of these is **knitr**, which integrates extremely well with RStudio. Using **knitr**, reports can be generated in html using *markdown*, a simplified version of the full html markup language. 
-
-The report that you write as part of this course should be generated using **knitr** and markdown, and this lab should provide a sufficient introduction for you to be able to write your own documents. 
+R has several add-on packages that allow you to write reports directly from R, incorporating the code, analyses and plots that you would make. These include **Sweave**, **knitr**, **pander** and **rmarkdown**. More recently, RStudio have added the ability to generate [Quarto][quartoID] a very flexible publishing system that allows you to generate articles, presentations, dashboards, blogs, etc., using the Pandoc markdown syntax. In short - this allows you to integrate your code, results, figures and text into a single document. This makes it ideal for disseminating your results and working with others (you'll submit the final report for your projects using this). 
 
 ## Markdown
 
-We'll start with a quick introduction to markdown, before starting to introduce R code into our document. 
+We'll start with a quick introduction to [markdown][markdownID], before starting to introduce R code into our document. 
 
 You are probably familiar with html, the markup language that is used to create web pages. Like most markup languages, it works of a series of tags that are used to format different parts of the text. For example, `<h1>` and `</h1>` indicate that the enclosed text is a "level one header", or `<em>` and `</em>` indicate emphasis (generally italics). A web browser will parse the html tags and render the web page, often using a Cascading style sheet (CSS) to define the precise style of the different elements.
 
-Writing directly in html is difficult, as it is necessary to remember all these tags and how they all fit together. Markdown is designed to simplify this, by using very simple formatting. For example, text starting with `#` is a header, text enclosed by `*` is emphasized, and so on. The result is a file that is easy to read even before it is processed into html, and has an easy method for including code: the backtick (on the key to the left of the '1' on your keyboard. See appendix 2 for an example. 
+Writing directly in html is difficult, as it is necessary to remember all these tags and how they all fit together. It also tends to make the resulting document hard to read. Markdown is designed to make this easier, by using very simple formatting. For example, text starting with `#` is a header, text enclosed by `*` is emphasized, and so on. The result is a file that is easy to read even before it is processed into html, and has an easy method for including code: the backtick (on the key to the left of the '1' on your keyboard). See appendix 2 for an example. 
 
 ### Markdown syntax
 
@@ -209,10 +207,14 @@ Headers are indicated in markdown using hashmarks `#`. One `#` is a top-level he
 
 ```
 # My header
+```
 
+```
 My header
 =========
 ```
+
+Different levels of headers
 
 ```
 # Header 1
@@ -229,11 +231,15 @@ Bold text can be written as
 **This is bold text**
 ```
 
+**This is bold text**
+
 Emphasized text uses a single asterix:
 
 ```
 *This text will be emphasized*
 ```
+
+*This text will be emphasized*
 
 #### Lists
 
@@ -245,6 +251,10 @@ markdown can generated unnumbered lists as a set of bullet points (as long as th
 - List item 3
 ```
 
+- List item 1
+- List item 2
+- List item 3
+
 Or as numbered lists:
 
 ```
@@ -252,6 +262,10 @@ Or as numbered lists:
 2. List item 2
 3. List item 3
 ```
+
+1. List item 1
+2. List item 2
+3. List item 3
 
 #### Links
 
@@ -267,86 +281,200 @@ I get 10 times more traffic from [Google][1] than from [Yahoo][2] or [MSN][3].
 
 will convert the words "Google", "Yahoo" and "MSN" in the first line into hyperlinks. 
 
+You can also add the link directly after the text (although this tends to make things less readable). 
+
+```
+I get 10 times more traffic from [Google](http://google.com/)
+```
+
+I get 10 times more traffic from [Google](http://google.com/)
+
 #### Horizontal lines
+
 A horizontal line can be specified by a line of hyphens:
 
 ```
 -----
 ```
 
+-----
+
+#### Quotes
+
+Quoted text can be added by prepending a `>` symbol:
+
+```
+> A wiser fella once said, sometimes you eat the bar, and sometimes, well, the bar eats you. The Stranger in The Big Lebowski (1998)
+```
+
+> A wiser fella once said, sometimes you eat the bar, and sometimes, well, the bar eats you. The Stranger in The Big Lebowski (1998)
+
+#### Images
+
+Images can be included using the following syntax. The first part (in the `[,]`) is the caption, and the second part is the path to the image file
+
+```
+![The Big Lebowski (1998)](images/biglebowski.png)
+```
+
+![The Big Lebowski (1998)](images/biglebowski.png)
+
+Note that you can resize images by including their width and/or height
+
+```
+![The Big Lebowski (1998)](images/biglebowski.png){width=300}
+```
+
+![The Big Lebowski (1998)](images/biglebowski.png){width=300}
+
+#### Equations
+
+Equations can be included in two ways. \emph{Inline} equations are written as part of text and are enclosed in `$`. 
+
+```
+The equation is $y = b x + e$
+```
+
+And more complex equations can be added in a block with two `$$`:
+
+```
+$$
+y = b x + e
+$$
+```
+
+Formatting equations follows the well established LaTeX syntax, so you can include symbols and more complex forms:
+
+```
+$$
+\frac{y}{z} = \beta_1 x_1 + \beta_2 \sqrt{x_2} + e
+$$
+```
+
+Which gives:
+
+$$
+\frac{y}{z} = \beta_1 x_1 + \beta_2 \sqrt{x_2} + e
+$$
+
+An introduction to this can be found [here][latexID]
+
 #### Code
 
-The ease in which programming code can be formatted in a document has made markdown a favorite tool for writing documents and tutorials on programming. For example, all of the lab documents for this course are written using markdown. Text that should be formatted as code is usually shown enclosed in backticks or by indenting the code by four spaces (one tab stop).
+The ease in which programming code can be formatted in a document has made markdown a favorite tool for writing documents and tutorials on programming. For example, all of the lab documents for this course are written using markdown. Text that should be formatted as code is usually shown enclosed in backticks:
 
 ```
     ```
     Some code
     ```
 ```    
-Or
 
 ```
-    Some code
+Some code
 ```
 
 ### Processing markdown
 
-Once the markdown file is written, it can be processed into html. There are quite a few processors that can be used, but a couple of good online free processors and editors are [stackedit][seID] and [dillinger][dlID].
+Once the markdown file is written, it can be processed into html (or other formats). There are quite a few processors that can be used, but a couple of good online free processors and editors are [stackedit][seID] and [dillinger][dlID].
 
 ![Dillinger Window](images/dillinger.png)
 
 Dillinger interface showing the markdown editor on the left and the processed html on the right. 
 
-## R Markdown
+## Quarto
 
-[R Markdown][rmID] is a variant of Markdown developed by the same people who developed RStudio. It allows you to embed *chunks* of R code which is then used with the **knitr** package to create reproducible web-based reports. The clever part about **knitr** is that it will take this code, and actually run it in R. So any R code you include will be processed, and the results can be displayed. This has several advantages: 1) it makes sure that the results are exactly those produced by R (and that the code is consistent with the results); 2) it allows you to easily update your report using new or extra data; 3) the figures are produced directly in the report; 4) your reports are easy to publish on the web. 
+[Quarto][quartoID] is a publishing system developed by Posit (the same company the develops RStudio). It builds from markdown and Pandoc (a document conversion system) to allow straightforward production of documents directly from RStudio, that incorporate code, results, figures, tables *and* discussion. The clever part is that it will take this code, and actually run it in R. So any R code you include will be processed, and the results will be displayed. This has several advantages: 1) it makes sure that the results are exactly those produced by R (and that the code is consistent with the results); 2) it allows you to easily update your report using new or extra data; 3) the figures are produced directly in the report; 4) your reports are easy to publish on the web.
+
+You can use it to make simple html documents (as we will do here), but also slide decks, dashboards, blogs and books (there's even extensions to make Masters and PhD theses from Quarto). We'll walk through building a simple document below, but do check out the [Quarto gallery][qgID] for more examples. 
 
 ### knitr
 
 [knitr][knID] is a package developed by Yihui Xie to embed R code into different documents. This needs to be installed on your computer before you can start generating reports. Use the instructions from the previous lab to install this package. 
 
-### A first R Markdown document
+### A first Quarto document
 
-Go to the [File] menu > [New File] > [R Markdown...]. A window will open, prompting you for a title of your report, plus the format you want the final document in. Select 'HTML' for now. A new markdown document will open in the top-left panel. This is a template and already has some markdown code in it, including the following header which specifies the title, author, date and output format:
+Go to the [File] menu > [New File] > [Quarto Document...]. A window will open, prompting you for the type of document (on the left), a title, plus the format you want the final document in. Select 'HTML' for now. 
+
+![Quarto launch window](images/quarto1.png){width=400}
+
+A new Quarto document will open in the top-left panel. This is a template and already has some markdown code in it, including the following header which specifies the title, format and editor choice. 
 
 ```
 ---
 title: "Untitled"
-author: "Simon Brewer"
-date: "April 30, 2020"
-output: html_document
+format: html
+editor: visual
 ---
 ```
 
-Delete everything apart from this header section (you can change the title etc if needed). Now we'll add some text to the document. Type the following code into the document:
+Delete everything apart from this header section. We'll now update this to make it a little more useful. 
+
+### Editor
+
+There are two editors available for Quarto in RStudio, a visual editor (default) and a source editor. The visual editor has more of a point-and-click interface, whereas the source editor is simple the markdown formatted document. We'll use the latter of these, so first, change `editor: visual` to `editor: source` in the header, then click the [Source] button in the top left. 
+
+### Header
+
+The header has a specific format, and there's a wide variety of options you can add here. First, change the title to something more useful (e..g `My First Quarto Document`). Next, add a line underneath this with your name. This must be formatted as `author: Your Name`. You can also do the following to include your name and email:
 
 ```
-## My first report
-A first example of generating a report using R, RStudio and **knitr**. 
-The goal of this report is to:
+author: 
+  - name: "Your Name"
+    email: your.name@your.email
+```
+
+Next, we'll modify the output to a) include a table of contents; b) make a single html file:
+
+```
+format:
+  html:
+    toc: true
+    embed-resources: true
+```
+
+The final header should look something like:
+
+```
+---
+title: "My First Quarto Document"
+format:
+  html:
+    toc: true
+    embed-resources: true
+author: 
+  - name: "Your Name"
+    email: your.name@your.email
+editor: visual
+---
+```
+
+### Text 
+
+Now we'll add some text to the document. Type the following code into the document:
+
+```
+# My first report
+
+A first example of generating a report using R, RStudio and Quarto. 
+The *goal* of this report is to:
 
 - Generate a simple report
 - Include some R code
 - Include a figure generated by R
 ```
 
-Save the file into your current working directory (it will save with the extension `*.Rmd`). Now we need to process this with **knitr**. On the top menu of the editor panel, you should see a button [Knit]. 
+Save the file into your current working directory (it will save with the extension `*.qmd`). Now we need to process this. On the top menu of the editor panel, you should see a button [render]: 
 
-```{r fig.width=1.5, fig.height=0.5, echo=FALSE}
-img <- readPNG("images/button.png")
-grid.raster(img)
-```
+![Render button](images/render_button.png){width=100}
 
-Click this button, and **knitr** will process the file. Once done, RStudio will open a preview window showing your markdown code converted to html:
+Click this button, and RStudio will process the file. Once done, the new html file should open in your browser:
 
-```{r fig.width=6.5, fig.height=4., echo=FALSE}
-img <- readPNG("images/htmlout2.png")
-grid.raster(img)
-```
+![Quarto html](images/quarto2.png)
+
 
 If you look in your working directory, you should see a new html file with the same name as the R Markdown file. This second file can be open directly in a browser, or sent to colleagues to share your analysis. 
 
-If you click on the down arrow next to the [Knit] button, you will see some other options, including 'knitting' to a Word document or PDF. If you select 'Word' this will create a Word document using Microsoft's XML format. Generating PDFs require a LaTeX application to be available on your computer, but can be used to produce some very nice looking documents.
+### Adding code
 
 We'll now add some R code into this document. Each block of code is called a 'chunk' and is preceded by three backticks and the string `{r}`. The chunk is ended by another three backticks. So a very simple example to add two numbers would be:
 
@@ -356,7 +484,7 @@ We'll now add some R code into this document. Each block of code is called a 'ch
 ```
 ````
 
-Add this to your markdown file, and click on the 'Knit HTML' button. Check the html preview window, and you should see the following lines added to your output:
+Add this to your markdown file, and click on the [Render] button. Check the html preview window, and you should see the following lines added to your output:
 
 ```{r}
 5 + 6
@@ -368,7 +496,7 @@ We'll now add more code to this example to read in some data and calculate summa
 
 ````markdown
 `r ''````{r}
-giss = read.csv("giss_temp.csv")
+giss = read.csv("./data/giss_temp.csv")
 summary(giss)
 ```
 ````
@@ -387,12 +515,9 @@ years = unique(giss$Year)
 
 Again, add some text with outside of the backticks to explain what is going on. Click 'Knit HTML' to check the output. 
 
-Finally, we'll add a couple of plots to the output. Before doing this, we'll add a subheader to the file and a short amount of text
+Finally, we'll add a couple of plots to the output: 
 
 First, a histogram showing the distribution of all temperature anomaly values. 
-Second, a plot of annual temperature change.
-
-Now start by plotting a histogram of all the temperature values:
 
 ````markdown
 `r ''````{r}
@@ -410,35 +535,52 @@ abline(h=0, lty=2)
 ```
 ````
 
-Add some text to explain what the code is doing, and click 'Knit HTML' to get the final report. When it is finished, go to your working directory, and double click the *.html file to open this in a browser. 
+Add some text to explain what the code is doing, and click [Render] to get the final report. When it is finished, go to your working directory, and double click the *.html file to open this in a browser. 
 
 ## Chunk options
 
-**knitr** has a set of [options][opID] for modifying the way in which the chunks are run. This is done by adding options in between brackets at the start of the chunk (`{r}`). For example, `{r echo=FALSE}` will run the code, but not display it in the document. Some other options are:
+Quarto has a set of [options][opID] for modifying the way in which the chunks of code are run and how the output appears. These can be added at the start of the chunk of code as a key:value pair, preceded by `#|`. For example, to show code but not run it (evaluate it):
 
-- `fig.keep=FALSE`: doesn't display any figures
-- `fig.width=10`: alters the figure width (size in inches)
-- `fig.height=7`: alters the figure height (size in inches)
-- `results='hide'`: doesn't display any output from R
-- `eval=FALSE`: don't run the R code
-- `cache=TRUE`: only run the R code once and save the output for subsequent 'knits'. This is very useful for code that takes a long time to run
-
-Multiple options can be used by separating them by commas, e.g. `{r fig.width=10,fig.height=7}` will make a 10x7 figure in the output. 
-
-## Publishing your markdown documents
-
-If you use **knitr** to compile your document to an html page, this can be placed on any web server to help share your code and analyses. The website [RPubs.com][rpID] is designed to integrate with RStudio to make this process easy. When you have compiled your html document, you should see a small button in the top right hand corner 'Publish':
-
-```{r fig.width=1.5, fig.height=.5, echo=FALSE}
-img <- readPNG("images/publish.png")
-grid.raster(img)
+````markdown
+`r ''````{r}
+#| eval: FALSE
+plot(years, annualTemp, type='l', lwd=2, col=2, 
+xlab="Years", ylab="Temp Anom")
+abline(h=0, lty=2)
 ```
+````
 
-If you click on this, RStudio will upload your document to RPubs. R will likely prompt you to install some add-on packages and you will need to create an account. Note that this is a public website, and your code and results will be visible to anyone.
+Some other useful options:
+
+- `results: 'hide'`: hide output
+- `echo: FALSE`: hide R code
+- `fig-keep: FALSE`: doesn't display any figures
+- `fig-width: 10`: alters the figure width (size in inches)
+- `fig-height: 7`: alters the figure height (size in inches)
+
+Multiple options can be used by stacking them:
+
+````markdown
+`r ''````{r}
+#| eval: FALSE
+#| fig-width: 5
+
+...
+
+```
+````
+
+## Publishing your Quarto documents
+
+If you rendered your document to an html page, this can be placed on any web server to help share your code and analyses. The website [RPubs.com][rpID] is designed to integrate with RStudio to make this process easy. When you have compiled your html document, you should see a small button in the top right hand corner 'Publish':
+
+![Publish button](images/publish.png){width=100}
+
+If you click on this, RStudio will give you the option of uploading your html page to one of three services. The first of these (RPubs) is free, so go ahead and select this. R will likely prompt you to install some add-on packages and you will need to create an account. Note that this is a public website, and your code and results will be visible to anyone.
 
 # Exercise
 
-- Choose any one of the previous exercises from this class. Create a new R markdown file with the code you used in this exercise, and some text to describe what the code is doing. Use **knitr** to convert this to html. 
+- Choose any one of the previous exercises from this class. Create a new Quarto file with the code you used in this exercise, and some text to describe what the code is doing. Use **knitr** to convert this to html. 
 - Set up an account on RPubs.com and publish your html page there
 
 You can either submit the html page through Canvas, or a link to the page on your RPubs account
@@ -462,6 +604,10 @@ GISS northern hemisphere temperature dataset
 [seID]: https://stackedit.io
 [dlID]: http://dillinger.io
 [rmID]: http://rmarkdown.rstudio.com
+[markdownID]: https://www.markdownguide.org/
 [knID]: http://yihui.name/knitr/
-[opID]: http://yihui.name/knitr/options/
+[opID]: https://quarto.org/docs/computations/execution-options.html
+[quartoID]: https://quarto.org/
 [rpID]: http://rpubs.com
+[latexID]: https://en.wikibooks.org/wiki/LaTeX/Mathematics
+[qgID]: https://quarto.org/docs/gallery/
