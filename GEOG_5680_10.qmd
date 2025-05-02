@@ -1,0 +1,424 @@
+---
+title: |
+  | GEOG 5680 6680
+  | Introduction to R
+  | 10 Statistical modeling in R
+author: 
+  - name: "Simon Brewer"
+    email: simon.brewer@ess.utah.edu
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+format:
+  html:
+    toc: true
+    embed-resources: true
+editor: source
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(png)
+library(grid)
+set.seed(42)
+```
+
+# Introduction
+
+R has a wide variety of functions for statistical modeling, ranging from the simple to the complex. Despite this range of complexity, much of the syntax for building, diagnosing and using models is the same across different functions. 
+
+In this lab, we will look at the simplest form of statistical modeling, building a linear model between two variables, using a process called ordinary least squares. We will cover first exploring the relationship using correlation analysis, then constructing a model. We will look at how to diagnose the model output and finally how to use the model to do predictions. 
+
+Remember to use RStudio's script editor (top left panel) to enter your commands and then copy-paste these to the console when you are ready. This will keep a copy of the commands that you can save and return to. 
+
+Before starting, remember to create a working directory (e.g. `module10`). Next download the files for today's lab from the Canvas page and move them to this directory. You'll need the following file:
+
+- *lotr_hw.csv*
+- *enrollmentForecast.csv*
+
+Then start RStudio, and change your working directory from the [Session] menu > [Set working directory] > [Choose directory...]. Remember to check that R can see the files by running the `list.files()` command or by looking under the File tab. 
+
+# A basic regression model
+
+For this exercise, we will use a dataset of the physical characteristics of actors auditioning for Lord of the Rings roles (*lotr_hw.csv*). The dataset includes height, weight, length of facial hair and role. 
+
+![Aragorn (imdb.com)](images/aragorn.png)
+
+## Exploratory analysis
+
+Download the file and read it into R. As usual, use `str()` and `summary()` to get some feel for the characteristics of the data. 
+
+```{r}
+lotr = read.csv("./data/lotr_hw.csv")
+str(lotr)
+summary(lotr)
+```
+
+Make some histograms of the variables to visualize the data:
+
+```{r fig.keep='none'}
+library(ggplot2)
+ggplot(lotr, aes(x = height, fill = role)) + 
+  geom_histogram(binwidth = 5,
+                 alpha = 0.4, 
+                 position = "identity")
+ggplot(lotr, aes(x = weight, fill = role)) + 
+  geom_histogram(binwidth = 5,
+                 alpha = 0.4, 
+                 position = "identity")
+```
+
+Now make some scatterplots to look at relationships between height and weight:
+
+```{r fig.keep='none'}
+ggplot(lotr, aes(x = height, y = weight, col = role)) + 
+  geom_point()
+```
+
+We'll start by just modeling the weight/height for the Aragorn actors, so make a new data frame with only these:
+
+```{r fig.keep='high', message=FALSE, warning=FALSE}
+library(dplyr)
+aragorn = lotr %>% 
+  filter(role == "Aragorn")
+ggplot(aragorn, aes(x = height, y = weight)) + 
+  geom_point()
+```
+
+Here the variables show a positive relation, suggesting that weight increases with height and we can also check this with a correlation:
+
+```{r results='hide'}
+cor.test(aragorn$height, aragorn$weight)
+```
+
+Here, the small *p*-value indicates that the correlation is highly unlikely to have arisen by chance. More information about the correlation test, including different forms of the test can be found on the help page, and in the previous lab (09). 
+
+The correlation confirms what the scatterplot shows. This is a reasonably strong, positive relationship, indicating that as the height increases, weight will tend to increase. However, the correlation alone does not tell us anything about the rate at which weight will increase - this is why we now model this relationship.
+
+## Linear models: the `lm()` function
+
+A linear model refers to a simple formula that models the change in a dependent variable ($y$) as a linear increase or decrease in an independent variable ($x$). The basic formula is:
+
+$$
+y = \beta_0 + \beta_1 x + \epsilon
+$$
+
+where $\beta_0$ and $\beta_1$ are coefficients to be estimated. $\beta_0$ is also called the intercept, and indicates the value of $y$ when $x = 0$. $\beta_1$ is the slope, which gives the *rate* at which $y$ changes per unit change in $x$. Here, this would be the change in weight (in kgs) for every 1 cm increase in height. $\epsilon$ represents the model error, the variation in the data that is **not** explained by the model. 
+
+The `lm()` function is used to build linear models in R. This uses R's standard model formula syntax, which is written as `y ~ x`. The tilde (`~`) implies the direction of the relationship; here this would model `y` as a function of `x`. This notation is important to understand as it forms the basis for the majority of modeling functions in R. The variable that we want to model goes on the left, and the variables we use to explain go on the right. 
+
+To build a linear model of actors weights as a function of their height, enter the following code:
+
+```{r}
+lm(weight ~ height, data = aragorn)
+```
+
+```{r echo=FALSE}
+fit1 = lm(weight ~ height, data = aragorn)
+```
+
+Again, the tilde (`~`) implies the direction of the relationship: weight *depends* on height. In statistical terms, this means that `height` is the independent variable, and `weight` the dependent variable (that is, it depends on the value of `height`).
+
+This function fits a linear model to the data using ordinary least squares, and the output includes the two coefficients: `(Intercept)` ($\beta_0$) and `height` ($\beta_1$). The intercept tells us that weight at at height of 0 cm will be `r round(fit1$coefficients[1],4)` and weight increases by `r round(fit1$coefficients[2],4)` kgs for every cm increase in height. This is a pretty good model, but the intercept variable is difficult to understand. We can improve this by centering the height data (i.e. subtracting the mean height) to create a new variable where the values are deviations from mean actor height, and remake the model with this new variable:
+
+```{r}
+aragorn$height.cen = aragorn$height - mean(aragorn$height)
+lm(weight ~ height.cen, data = aragorn)
+```
+
+The intercept now gives us the weight of an Aragorn actor of *average* height, and is `r round(fit1$coefficients[1],4)` (this also has the effect of improving the estimation of the intercept). Note that the slope does not change (`r round(fit1$coefficients[2],4)`).
+
+As with all R functions, we need to store the output of this function in a variable if we want keep the model, and use it in any subsequent analysis:
+
+```{r results='hide'}
+fit1 = lm(weight ~ height.cen, data = aragorn)
+class(fit1)
+str(fit1)
+```
+
+## Model diagnostics
+
+The variable created from the model is a new class of object `lm` (a linear model), and the output of `str()` shows that this is quite complex, with much more information than just the coefficients. Rather than trying to use this, we will instead use the `summary()` function, which provides most of the necessary information to diagnose a linear model:
+
+```{r}
+summary(fit1)
+```
+
+In the output we have information on the residuals, the coefficients, and *goodness-of-fit* of the model. We'll work through each of these.
+
+### Residuals
+
+The output gives a summary of the residuals. These are the models errors, and we will come back to these below. For now in the summary statement, the median should be close to zero, and the `1Q` (first quartile) and `3Q` (third quartile) values should be roughly equivalent. 
+
+### Coefficients
+
+The `summary()` function prints a table of coefficients. Each line is a coefficient (intercept, slope), and the first column gives the estimate of these. The second gives the standard error of these - a measure of the uncertainty of the coefficients. 
+
+The third and fourth give the results of a *t*-test comparing the coefficients to zero. If the *t*-values are low and the *p*-values high then the coefficients are not significantly different from zero. Here, both coefficients are significant. The output also gives a 'code' to represent significance, where 3 stars is the highest. 
+
+### Goodness-of-fit
+
+In the last section, various statistics are given that represent how well the model fits the data:
+
+#### *r*-squared
+
+The *r*-squared value is frequently used to represent this. This is on a scale from 0 to 1, and describes the proportion of variance explained by a model. Values closer to one indicate a model that fits the input data almost exactly. This is, in fact, the value of the correlation squared (you can test this by referring back to the output of `cor.test()` above).
+
+Used on its own, the *r*-squared can be misleading as it can be influenced by very large data sets or can be high even with inappropriate models. It is, however, a useful summary statistic. 
+
+#### *F*-statistic
+
+The *F*-statistic is obtained from a test of the overall model (rather than the individual coefficients). The test asks the question: "is this model better than a null model (i.e one where only the mean is used)?". If the *F*-statistic is large, and the *p*-value small, then this is the case, and the model is useful. 
+
+The *F*-statistic can also be obtained by running an ANOVA on the model object. In addition to the *F*-statistic and the *p*-value, this will display the decomposition of variance (in sum of squares) into the part explained by the model and the residual sum of squares. Note that here we use the function `anova()`, which works directly with model output:
+
+```{r}
+anova(fit1)
+```
+
+## Model plots
+
+We can add the model to a scatterplot by using the `abline()` command:
+
+```{r fig.keep='none'}
+plot(weight ~ height.cen, data = aragorn, pch = 16, col = 4, 
+     xlab = "Centered height (cm)", ylab = "Weight (kg)")
+abline(fit1, col = 2, lwd = 2)
+```
+
+You can use the `text()` function to add some details of the model to the plot, e.g. the R$^2$:
+
+```{r eval=FALSE}
+r2text = paste("r2=",round(summary(fit1)$r.squared,4))
+text(20,65, r2text)
+```
+
+We can also plot this with **ggplot2** by using the model coefficients (slope and intercept) in the function `geom_abline()`:
+
+```{r fig.keep='none'}
+ggplot(aragorn, aes(x = height.cen, y = weight)) + 
+  geom_point() + 
+  geom_abline(slope = coef(fit1)[2], intercept = coef(fit1)[1])
+```
+
+## Residuals
+
+We mentioned above that the *r*-squared on its own may not give a complete picture of how well a dataset has been modeled. We can improve on this by analyzing the residuals of the model. Residuals are the unexplained part of the dataset, the difference between the observed values and the modeled values (the black lines in the following plot):
+
+```{r echo=FALSE}
+plot(weight ~ height.cen, data = aragorn, pch = 16, col = 4, 
+     xlab = "Height (cm)", ylab = "Weight (kg)")
+abline(fit1, col = 2, lwd = 2)
+arrows(aragorn$height.cen, aragorn$weight, aragorn$height.cen, fitted(fit1), length = 0)
+```
+
+If your model is good, then these residuals should be normally distributed and not show any bias (in stats speak they should be independent and identically distributed *i.i.d*). Any bias would mean that the model has not accurately captured the relationship between the variables (e.g. consistent under- or over-estimation).
+
+We can check this by plotting out the residuals. The residuals themselves can be obtained using the function `residuals()`, and we can first plot these as histogram:
+
+```{r fig.keep='none'}
+hist(residuals(fit1))
+```
+While not perfect, these are pretty well distributed (roughly symmetrical around zero). 
+
+R also has a set of diagnostic plots that can be made directly from the model object, using the `plot()` function. This can make six possible diagnostic plots, which can be selected by setting the parameter `which` to a value between 1 and 6. The following will make a plot of the residuals against the fitted values (the model estimates of $y$ for each observation): 
+
+```{r fig.keep='none'}
+plot(fit1, which = 1)
+```
+
+There should be no discernible pattern in this plot (i.e. trends or cycles) which would indicate that there is information that is missed in the model.
+
+A second plot shows Cook's distance for each observation. This is a measure of the independence of each observation in $x$ (i.e. the distance between that value of $x$ and other values). High distances indicate high *leverage* or influence in the model building, and if sufficiently high, may bias the final model. See `help(plot.lm)` for information on the other choices. 
+
+```{r fig.keep='none'}
+plot(fit1, which = 4)
+```
+
+## Predicting from a model
+
+Having built a reasonable model, we may want to use this for forecasting purposes (e.g. what is the weight of an actor who is 180cm tall?).As we know the intercept (`r round(coef(fit1)[1],4)`) and slope (`r round(coef(fit1)[2],4)`) coefficients for our regression equation, we can simply substitute these values with the new height to get a prediction. Note that we also need to center this new height to get the correct prediction:
+```{r}
+newx = 180 - mean(aragorn$height)
+73.3 + (0.4194 * newx)
+```
+
+More usefully, R provides a `predict()` function, which allows you to make predictions. This function requires as input: the model, and a new set of independent values to make predictions. Where this function can trip people up is that the new values have to be in a data frame, with columns that have the *same* names as the independent variables used in the model. For example, this does not work:
+
+```{r results='hide'}
+predict(fit1, height.cen = newx)
+```
+
+This simply outputs the modeled values for the input data. Forcing the new data into a data frame will work:
+```{r results='hide'}
+newhgt = data.frame(height.cen = newx)
+predict(fit1, newhgt)
+```
+
+By including a vector of new heights in the data frame, we we get a vector of predictions. For example, to predict for every cm of height between 150 and 210 degrees:
+
+```{r results='hide'}
+newx = seq(150, 210, by = 1) - mean(aragorn$height)
+newhgt = data.frame(height.cen = newx)
+predict(fit1, newhgt)
+```
+
+We know that the model does not fit the data perfectly, and it would be useful to have this uncertainty reflected in model predictions. The option `interval` allows the prediction uncertainties to be calculated.
+
+```{r results='hide'}
+predict(fit1, newhgt, interval = "prediction")
+```
+
+The output now has three columns, the predicted value ('fit') and the upper and lower confidence intervals. By saving this output, we can make a simple but useful figure showing how well our model predicts for any value of height:
+
+```{r results='hide'}
+newwgt = predict(fit1, newhgt, interval = "prediction")
+plot(weight ~ height.cen, aragorn, pch = 16,
+     xlab = "Centered height (cm)", ylab = "Weight (kg)")
+lines(newhgt$height.cen, newwgt[,1], lwd = 2)
+lines(newhgt$height.cen, newwgt[,2], lty = 2)
+lines(newhgt$height.cen, newwgt[,3], lty = 2)
+```
+
+By default, the prediction confidence intervals are set to 0.95, i.e. there is a 95% probability that the prediction will fall between these. The option `level` in `predict()` allows you to adjust these. 
+
+# Multiple linear models
+
+We introduced the basic linear model: 
+$$
+y = \beta_0 + \beta_1 x + \epsilon
+$$
+
+where $\beta_0$ and $\beta_1$ are coefficients to be estimated. If we have two variables then we simply extend this as: 
+$$
+y = \beta_0 + \beta_1 x1 + \beta_2 x2 + \epsilon
+$$
+and we now have an additional variable, $\beta_2$ to be estimated. And we can add further variables, each with its own coefficient, and this is usually written as: 
+
+$$
+y = \beta X + \epsilon
+$$
+
+Where $\beta$ is a vector of regression coefficients, and $X$ is a matrix of covariates. 
+
+In R, we keep the `lm()` function, but rewrite the model syntax to include a second variable on the right hand side of the `~`. Here, we'll extend our previous height/weight model to include the length of the actors facial hair (`fachair`)
+
+```{r}
+fit2 = lm(weight ~ height.cen + fachair, data = aragorn)
+fit2
+```
+
+And we can now see the new coefficient calculated for the relationship between height and facial hair. Run `summary()` on the new model, and we can see that the model fit has improved slightly, with a new *r*-squared of `r round(summary(fit2)$r.squared,4)`, although the $t$-test on the facial hair coefficient is not significant (*p*-value: `r round(summary(fit2)$coefficients[3,4],4)`), suggesting this does not co-vary with actors weight. 
+
+## Dummy variables
+
+We used continuous variables as independent variables in the previous models. If you have a binary or categorical variable, this can be included in the model as a *dummy* variable, and used to estimated the offset between different groups. The `lotr` data frame contains a categorical variable: the role for to which each actor auditioned, and we will use this to help model weight as a function of height for the full dataset:
+
+Start by making a simple model of weight vs. height for the full dataset (we first recenter the height variable for the whole dataset)
+```{r fig.keep='none', results='hide'}
+lotr$height.cen = lotr$height - mean(lotr$height)
+fit3 = lm(weight ~ height.cen, lotr)
+summary(fit3)
+```
+
+Looking at the diagnostics from the `summary()` function, we have an apparently good model with an R2 of `r round(summary(fit2)$r.squared,4)`, and a significant $F$-test. However, if you look at the coefficients, something seems odd. The relationship between `weight` and `height.cen` has changed from being positive to negative. Further, if we plot the residuals, however, we can see that there are problems, with one or two fairly strong trends in the residuals.
+
+```{r}
+plot(fit3, which = 1)
+```
+
+The problem, as you have probably guessed, is that we have groups of variables, including a set of short and stocky (Gimli), relatively normal (Aragorn), and tall and skinny (Legolas) actors. This can be confirmed by plotting the original data, together with the model:
+
+```{r fig.keep='high'}
+x = ggplot(lotr, aes(x = height.cen, y = weight)) + geom_point()
+x = x + geom_abline(slope = coef(fit3)[2], intercept = coef(fit3)[1])
+print(x)
+```
+
+To account for this, we can include the role as a dummy variable in the model, simply by including the variable 'role' as an independent variable:
+
+```{r results='hide'}
+fit4 = lm(weight ~ role, data = lotr)
+summary(fit4)
+```
+
+Now we have a more understandable model, where the weights are different for each role. The `summary()` function gives two coefficients `roleGimli` and `roleLegolas`, which give the mean offsets in weight compared to Aragorn, the reference, and indicates that Gimli actors are on average `r round(coef(fit4)[2],2)` kg heavier than Aragorn actors, and Legolas actors are on average `r round(coef(fit4)[3],2)` kg lighter. 
+
+This model, while accounting for differences between the different actors, does not include a coefficient to show how weight changes with height. So, let's add height back in as an independent variable:
+
+```{r results='hide'}
+fit5 = lm(weight ~ role + height.cen, data = lotr)
+summary(fit5)
+```
+
+Now we have a single coefficient, that gives us the increase of weight per unit increase in height, together with offsets in weight for Gimli and Legolas. The sign of the coefficient has changed back to positive, and the $r^2$ has improved. 
+
+As a final model, we might wish to see if the coefficient relating weight and height varies among the different actor groups. We can do this by including an interaction term in the model between 'actor' and 'role'. We do this replacing the `+` in the model formula with a `*`. This indicates that we wish to include the individual terms *as well* as their interaction: 
+
+```{r results='markup'}
+fit6 = lm(weight ~ role * height.cen, data = lotr)
+summary(fit6)
+```
+
+The coefficients of this model tell us the following:
+
+- `(Intercept)`: the weight of Aragorn actors of average height
+- `roleGimli`: the increase in weight of Gimli actors of average height
+- `roleLegolas`: the increase in weight of Legolas actors of average height
+- `height.cen`: the slope, or rate of increase in weight for Aragorn actors for cm increase in height
+- `roleGimli:height.cen`: the change in slope for Gimli actors
+- `roleLegolas:height.cen`: the change in slope for Legolas actors
+
+And we can easily plot this set of models by using `geom_smooth()` from **ggplot2**:
+
+```{r fig.keep='high'}
+x = ggplot(lotr, aes(x = height.cen, y = weight, col = role)) + geom_point()
+x = x + geom_smooth(method = "lm")
+print(x)
+```
+
+# Exercises
+
+This exercise will get you to build a simple linear model of student enrollment. The dataset in the file *enrollmentForecast.csv* contains information used to estimate undergraduate enrollment at the University of New Mexico (Office of Institutional Research, 1990). Each row represents a single year (1 = 1961), and the variables include: the enrollment (`ROLL`), the unemployment rate (`UNEM`), the number of high school graduates (`HGRAD`) and monthly per capita income in 1961 US$ (`INC`).  
+
+As ever, your answer should consist of your R code and the answers to the questions below. These can be submitted as a Word document or as an html page generated from R Markdown. You will need to do the following:
+
+- Read in the data
+- Look at the data structure
+- Make scatterplots of `ROLL` against the other variables
+- Build a linear model using the unemployment rate (`UNEM`) and number of spring high school graduates (`HGRAD`) to predict the fall enrollment (`ROLL`), i.e.
+
+```
+ROLL ~ UNEM + HGRAD
+```
+
+- Use the `summary()` and `anova()` functions to investigate the model
+- Which variable is the most closely related to enrollment? 
+- Make a residual plot and check for any bias in the model
+- Use the `predict()` function to estimate the expected fall enrollment, if the current year's unemployment rate is 9% and the size of the spring high school graduating class is 25,000 students
+- Build a second model which includes per capita income (`INC`). 
+- Compare the two models with `anova()`. Does including this variable improve the model?
+
+# Files used in lab
+
+## *lotr_hw.csv* 
+
+Lord of the Rings audition dataset
+
+| Column header | Variable |
+| --- | --- |
+| role | Role being auditioned for |
+| height | Actor height (cm) |
+| weight | Actor weight (kg) |
+| fachair | Length of beard (cm) |
+
+## *enrollmentForecast.csv*
+
+University of New Mexico enrollment data 
+
+| Column header | Variable |
+| --- | --- |
+| YEAR | 961 = 1, 1989 = 29 |
+| ROLL | Fall undergraduate enrollment |
+| UNEM | January unemployment rate (%) for New Mexico |
+| HGRAD | Spring high schoolgraduates in New Mexico |
+| INC | Per capita income in Albuquerque (1961 dollars) |
+
