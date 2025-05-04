@@ -1,0 +1,496 @@
+---
+title: |
+  | GEOG 5680 6680
+  | Introduction to R
+  | 15a **ggpubr**
+author: 
+  - name: "Simon Brewer"
+    email: simon.brewer@ess.utah.edu
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+format:
+  html:
+    toc: true
+    embed-resources: true
+editor: source
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(png)
+library(grid)
+set.seed(42)
+```
+
+```{r include = FALSE}
+
+knitr::opts_chunk$set(echo = TRUE,
+                      fig.align = "center")
+
+```
+
+# Introduction
+
+In this lab we'll introduce the add-on package **ggpubr**, which allows you to create publication ready figures with a minimum of effort. Before starting the lab, make sure this is installed.
+
+Remember to use RStudio's script editor (top left panel) to enter your commands and then copy-paste these to the console when you are ready. This will keep a copy of the commands that you can save and return to. 
+
+Before starting, remember to create a working directory (e.g. `module15`). Next download the files for today's lab from the Canvas page and move them to this directory (unzip the compressed files). You'll need the following files:
+
+- *gapMinder5.csv*
+
+Then start RStudio, and change your working directory from the [Session] menu > [Set working directory] > [Choose directory...]. Remember to check that R can see the files by running the `list.files()` command. 
+
+# **ggpubr** figures
+
+As the name might imply, **ggpubr** is built on **ggplot2**, the add-on package we looked at in a previous module. The goals of **ggpubr** are to simplify some of the syntax used for commonly used plots. The plots have also been largely cleaned up with better scaling of fonts and symbols. It also comes with a second package (**ggsci**) which includes color palettes for several of the main publishing groups. 
+
+We'll start by loading the libraries we need (we'll use **dplyr** for some data manipulation, and **ggplot2** for a comparison). 
+
+```{r message=FALSE, warning=FALSE}
+
+library(ggplot2)
+library(ggpubr)
+library(dplyr)
+
+```
+
+Next load the GapMinder data set:
+
+```{r}
+
+gap = read.csv("./data/gapminderData5.csv")
+str(gap)
+
+```
+
+We'll just a subset of the GapMinder data for the year 2007, so let's extract this now:
+
+```{r}
+
+gap07 = gap %>% 
+  filter(year == 2007 & continent != "Oceania")
+
+```
+
+## Scatter plots
+
+We'll start with a scatter plot, the easiest way to visualize bivariate data. We'll remake one of the figure that you previously made with **ggplot2**:
+
+```{r}
+
+ggplot(gap07, aes(x = gdpPercap, y = lifeExp, col = continent)) + 
+  geom_point() + scale_x_log10("GDP per capita ($)") + 
+  scale_y_continuous("Life Expectancy (yrs)") + ggtitle("GapMinder Data 2007")
+
+```
+
+Now let's do the same thing with **ggpubr**. The function we need is `ggscatter()`, and we can make the same figure as follows:
+
+```{r}
+
+ggscatter(gap07, x = "gdpPercap", y = "lifeExp", col = "continent",
+          xlab = "GDP per capita ($)", ylab = "Life expectancy (yrs)", 
+          main = "GapMinder Data 2007") + 
+  xscale("log10", .format = TRUE)
+
+```
+
+The first thing you should notice is that rather than adding a series of layers, we can incorporate all the options in the `ggscatter()` function. This makes **ggpubr** a bit of a hybrid between the base plots and the **ggplot2** plots, and is a little simpler to work with. The resulting figure is a bit nicer - the gray background has been removed, and axis labels are a little clearer. 
+
+One other thing to note here - unlike `ggplot`, the variable names need to be enclosed in quotation marks. 
+
+**ggpubr** also comes with several additional functions to help visualize your data. For example, we can add labels to each points
+
+```{r fig.show='hide'}
+
+ggscatter(gap07, x = "gdpPercap", y = "lifeExp", col = "continent",
+          xlab = "GDP per capita ($)", ylab = "Life expectancy (yrs)", 
+          main = "GapMinder Data 2007", label = "country", repel = TRUE) + 
+  xscale("log10", .format = TRUE)
+
+```
+
+Or we can select a handful of points to label:
+
+```{r fig.show='hide'}
+
+sel_countries = c("United States", "China", "Germany")
+ggscatter(gap07, x = "gdpPercap", y = "lifeExp", col = "continent",
+          xlab = "GDP per capita ($)", ylab = "Life expectancy (yrs)", 
+          main = "GapMinder Data 2007", label = "country", 
+          label.select = sel_countries, repel = TRUE) + 
+  xscale("log10", .format = TRUE)
+
+```
+
+The distribution of points can be shown using a 'rug' - the position of each observation:
+
+```{r fig.show='hide'}
+
+ggscatter(gap07, x = "gdpPercap", y = "lifeExp", col = "continent",
+          xlab = "GDP per capita ($)", ylab = "Life expectancy (yrs)", 
+          main = "GapMinder Data 2007") + 
+  xscale("log10", .format = TRUE)
+
+```
+
+Or a marginal histogram:
+
+```{r fig.show='hide'}
+
+library(ggExtra)
+p <- ggscatter(gap07, x = "gdpPercap", y = "lifeExp", col = "continent",
+          xlab = "GDP per capita ($)", ylab = "Life expectancy (yrs)", 
+          main = "GapMinder Data 2007") + 
+  xscale("log10", .format = TRUE)
+ggMarginal(p, type = "histogram")
+
+```
+
+We can add a regression line (note that it automatically fits one per color group)
+
+```{r fig.show='hide'}
+
+ggscatter(gap07, x = "gdpPercap", y = "lifeExp", col = "continent",
+          xlab = "GDP per capita ($)", ylab = "Life expectancy (yrs)", 
+          main = "GapMinder Data 2007", add = "reg.line", conf.int = TRUE) + 
+  xscale("log10", .format = TRUE)
+
+```
+
+And correlations:
+
+```{r fig.show='hide'}
+
+ggscatter(gap07, x = "gdpPercap", y = "lifeExp", col = "continent",
+          xlab = "GDP per capita ($)", ylab = "Life expectancy (yrs)", 
+          main = "GapMinder Data 2007", add = "reg.line", conf.int = TRUE) + 
+  xscale("log10", .format = TRUE) +
+  stat_cor(aes(color = continent), method = "spearman")
+
+```
+
+Or even the regression line equations:
+
+```{r}
+
+ggscatter(gap07, x = "gdpPercap", y = "lifeExp", col = "continent",
+          xlab = "GDP per capita ($)", ylab = "Life expectancy (yrs)", 
+          main = "GapMinder Data 2007", add = "reg.line", conf.int = TRUE) + 
+  xscale("log10", .format = TRUE) +
+  stat_regline_equation(aes(color = continent))
+
+```
+
+## Histograms
+
+Histograms can be generated using `gghistogram()`. For example, to see the distribution of life expectancy values:
+
+```{r}
+
+gghistogram(gap07, x = "lifeExp", main = "GapMinder Life Expectancy")
+
+```
+
+Now let's add a `fill` argument to separate the continents:
+
+```{r}
+
+gghistogram(gap07, x = "lifeExp", fill = "continent", 
+            main = "GapMinder Life Expectancy")
+
+```
+
+## Palettes
+
+Let's remake these figures using different color palettes. The add-on package **ggsci** has about 15 extra color palettes that can be easily added. Here we use the default Nature Publishing Group (`npg`) palette:
+
+```{r}
+
+gghistogram(gap07, x = "lifeExp", fill = "continent", 
+            main = "GapMinder Life Expectancy", palette = "npg")
+
+```
+
+Try some of the others:
+
+- `lancet`: The Lancet
+- `jco`: Journal of Clinical Oncology
+- `aaas`: American Association for the Advancement of Science
+- `rickandmorty`: Self explanatory...
+
+Look at the **ggsci** help pages for the full list
+
+
+## Density plots
+
+Density plots are a great alternative to histograms. The **ggdensity()** function automatically adds transparency to the plots:
+
+```{r}
+
+ggdensity(gap07, x = "lifeExp", fill = "continent", 
+          main = "GapMinder Life Expectancy", palette = "jco")
+
+```
+
+The **ggpubr** commands can also take a `facet.by` argument that produces the multiple facet plots we saw earlier with **ggplot2**:
+
+```{r}
+
+ggdensity(gap07, x = "lifeExp", fill = "continent", 
+          main = "GapMinder Life Expectancy", palette = "jco",
+          facet.by = "continent")
+
+```
+
+A couple of other useful additions are the ability to add a reference line (here the median life expectancy by continent) and a *rug plot*, which adds ticks below the axis to show where the actual observed values fall:
+
+```{r}
+
+ggdensity(gap07, x = "lifeExp", fill = "continent", 
+          main = "GapMinder Life Expectancy", palette = "jco",
+          facet.by = "continent",
+          add = "median", rug = TRUE)
+
+```
+
+## Violin plots
+
+Violin plots are an alternative to density plots. These plot a mirrored density curve:
+
+```{r}
+
+ggviolin(gap07, x = "continent", y = "lifeExp")
+
+```
+
+Let's improve on this a little. We'll add a fill by continent using the `jco` palette, overlay a box and whisker plot for each continent to illustrate where the median and quartiles lie, and a `jitter` function which adds the observed values (with a small amount of horizontal noise):
+
+```{r}
+
+ggviolin(gap07, x = "continent", y = "lifeExp", 
+         fill = "continent", palette = "jco",
+         add = c("boxplot", "jitter"),
+         ylab = "Life expectancy (yrs)")
+
+```
+
+
+Not happy with vertical violins? Add the `rotate` argument to make them horizontal:
+```{r}
+
+ggviolin(gap07, x = "continent", y = "lifeExp", 
+         fill = "continent", palette = "jco",
+         add = c("boxplot", "jitter"),
+         ylab = "Life expectancy (yrs)",
+         rotate = TRUE)
+
+```
+
+## Bar plots
+
+Let's now make a bar plot by country, where the height of the bar is the life expectancy using `ggbar()`:
+
+```{r}
+
+ggbarplot(gap07,
+          x = "country",
+          y = "lifeExp")
+
+```
+
+So the basic plot is ok, but let's modify this as follows:
+
+- Add a fill by continent
+- Rotate the country labels and reduce the font size
+- Add axis labels
+
+```{r}
+
+ggbarplot(gap07,
+          x = "country",
+          y = "lifeExp",
+          fill = "continent",
+          palette = "jco",
+          x.text.angle = 90,
+          ylab = "Life expectancy (yrs)",
+          xlab = "Country") +
+  font("x.text", size = 4)
+
+```
+
+A better way to show this would be to order by value. In **ggplot2** we did this by reorganizing the data frame used to plot. Here, we can simply add the argument `sort.val` to sort by the value plotted:
+
+```{r}
+
+ggbarplot(gap07,
+          x = "country",
+          y = "lifeExp",
+          fill = "continent",
+          palette = "jco",
+          sort.val = "desc",
+          sort.by.groups = FALSE,
+          x.text.angle = 90,
+          ylab = "Life expectancy (yrs)",
+          xlab = "Country") +
+  font("x.text", size = 4)
+
+```
+
+Which clearly show the difference across continents, particularly Africa. Note that if you set the `sort.by.groups` argument to true, this will first group all countries from a continent together, then sort them. 
+
+An alternative to barplots are dot plots or Cleveland plots. Note that adding segments forces the origin to zero:
+
+```{r}
+
+ggdotchart(gap07,
+           x = "country",
+           y = "lifeExp",
+           color = "continent",
+           palette = "jco",
+           sorting = "descending",
+           rotate = TRUE,
+           group = "continent",
+           add = "segments",
+           ylab = "Life expectancy (yrs)",
+           xlab = "Country") +
+  font("y.text", size = 4)
+
+```
+
+# Adding comparisons to plots
+
+In this section, we'll look at functions to add the results of statistical tests to the plots. We'll start by making a new subset of the gap data, including only African and Asian countries for three of the years.
+```{r}
+
+gap_sub = gap %>% 
+  filter(continent %in% c("Asia", "Africa"),
+         year %in% c(1957, 1982, 2007))
+
+```
+
+We'll then make a boxplot of the life expectancy values for the two continents, colored by continent, and with jittered observations overlaid:
+
+```{r}
+
+ggboxplot(gap_sub, x = "continent", y = "lifeExp", 
+          ylab = "Years", col = "continent", add = "jitter")
+
+```
+
+Now let's test to see if the mean life expectancy differs between the two continents. The function to do this is `stat_compare_means`. The `label.y` argument specifies the height at which the comparison results will be placed
+
+```{r}
+
+ggboxplot(gap_sub, x = "continent", y = "lifeExp", 
+          ylab = "Years", col = "continent", add = "jitter") + 
+  stat_compare_means(label.y = 90)
+
+```
+
+The default test for two groups is the Wilcoxon rank sum test (a robust equivalent to a $t$-test). The low $p$-value indicates that the means are different between the two continents. If you would prefer to use a $t$-test, you can specify this with `method = "t.test"`:
+
+```{r}
+
+ggboxplot(gap_sub, x = "continent", y = "lifeExp", 
+          ylab = "Years", col = "continent", add = "jitter") + 
+  stat_compare_means(method = "t.test", label.y = 90)
+
+```
+
+This changes the $p$-value, but not the conclusion about the significance of the results. If we now facet the boxplot by `year`, we get three panels with the boxplots by year, and additionally, a comparison between the continents by year (note the decreasing $p$-value indicating the greater difference between Asia and Africa over time).
+
+```{r}
+
+ggboxplot(gap_sub, x = "continent", y = "lifeExp", 
+          ylab = "Years", col = "continent", add = "jitter", facet.by = "year") + 
+  stat_compare_means(method = "t.test", label.y = 90)
+
+```
+
+## Multiple groups
+
+We can use a similar approach to compare multiple groups. Here, we'll make boxplots by year instead of continent, and use the same function to compare the mean by year using ANOVA:
+
+```{r}
+
+ggboxplot(gap_sub, x = "year", y = "lifeExp") + 
+  stat_compare_means(label.y = 80, method = "anova")
+
+```
+
+With multiple groups, we can also make pairwise comparisons, as well as the comparison between all groups. To do this, we first make a list of the groups we want to compare. For this data set, we need to compare
+
+- 1957 and 1982
+- 1957 and 2007
+- 1982 and 2007
+
+So we make a list containing all the pairs of comparisons we want to test:
+
+```{r}
+
+comps = list( c('1957', '1982'), 
+              c('1957', '2007'), 
+              c('1982', '2007'))
+comps
+
+```
+
+Now, we make the boxplot again, adding the `stat_compare_mean` function, where we ask for $t$-tests between all the comparisons in the list `comps`:
+
+```{r}
+
+ggboxplot(gap_sub, x = "year", y = "lifeExp", ylab = "Years") + 
+  stat_compare_means(method = "t.test", comparisons = comps, 
+                     bracket.size = .6, size = 4)
+
+```
+
+We can also include the original comparison based on all three groups by adding a second `stat_compare_means()` function:
+
+```{r}
+
+ggboxplot(gap_sub, x = "year", y = "lifeExp", ylab = "Years") + 
+  stat_compare_means(method = "t.test", comparisons = comps, 
+                     bracket.size = .6, size = 4) + 
+  stat_compare_means(label.y = 110, method = "anova")
+
+```
+
+If we add a `facet.by` argument to the `ggboxplot` function, then we now get the same pairwise and grouped comparison, but individually for the two continents:
+
+```{r}
+
+ggboxplot(gap_sub, x = "year", y = "lifeExp", ylab = "Years", facet.by = "continent") + 
+  stat_compare_means(method = "t.test", comparisons = comps, 
+                     bracket.size = .6, size = 4) + 
+  stat_compare_means(label.y = 110, method = "anova")
+
+```
+
+Note that this shows that while nearly all years are different, there has not been a significant improvement in African life expectancy between 1982 and 2007.
+
+An alternative to listing all the pairwise comparisons is to choose one of the groups as the reference, and compare the other groups to this. To do this, we replace the list of comparisons in the first `stat_compare_means()` function with a reference groups (here the year 1957)
+
+```{r}
+
+ggboxplot(gap_sub, x = "year", y = "lifeExp", ylab = "Years", facet.by = "continent") + 
+  stat_compare_means(method = "t.test", ref.group = "1957") + 
+  stat_compare_means(label.y = 110, method = "anova")
+
+```
+
+The only problem with this is that the test results overlap. We can replace this with a simple scheme that uses `*`'s to represent different levels of significance:
+
+```{r}
+
+ggboxplot(gap_sub, x = "year", y = "lifeExp", ylab = "Years", facet.by = "continent") + 
+  stat_compare_means(label = "p.signif", method = "t.test",
+                     ref.group = "1957") + 
+  stat_compare_means(label.y = 110, method = "anova")
+
+```
+
+# Exercise
+
+There is no additional exercise for today, but you need to submit your R script or (preferably) a Quarto document with the code examples from the lab

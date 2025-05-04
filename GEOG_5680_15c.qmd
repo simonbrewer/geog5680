@@ -524,5 +524,5 @@ leaflet() %>%
 
 # Exercise
 
-There is no additional exercise for today, but you need to submit your R script or (preferably) a Markdown document with the code examples from the lab
+There is no additional exercise for today, but you need to submit your R script or (preferably) a Quarto document with the code examples from the lab
 
