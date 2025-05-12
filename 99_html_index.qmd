@@ -15,7 +15,9 @@ editor: source
 
 # Introduction
 
-Spatial data science is a fast-growing discipline, with wide-ranging applications, including human health, economics, water resources, energy and food security, infrastructure, natural hazards, and biodiversity. This class is designed to provide an introduction to the methods used to work with these data, including data acquisition and manipulation, building predictive model pipelines and spatial simulation approaches. Students taking this class will learn both the theory and practice of using these methods through a combination of lecture and hand-on computer work. Over the course of the semester, students will develop their own spatial data analytical projects, which will include the design and implementation of the project as well as the communication of results. 
+Over the past few years, the R programming language has become increasingly widespread in academia and industry for statistical analysis, bioinformatics, data mining and graphics. This increase in its use means that many people have encountered it through journals, websites, coursework and colleagues, but may have little training in the basics of the language and are unaware of the full set of possible applications. 
+
+This course is designed to give an intensive introduction to R as a programming language and as a graphical tool. We will also cover some basic analysis, although the focus will largely be on the language itself. It is aimed at people with little to no prior experience with R or programming, although some basic knowledge of statistics is assumed.
 
 # Modules
 
