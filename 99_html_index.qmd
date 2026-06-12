@@ -51,7 +51,7 @@ This course is designed to give an intensive introduction to R as a programming 
 - Module 13: 
     - [R and Github][m13]
 - Module 14: 
-    - [Shiny webapps][m12]
+    - [Shiny webapps][m14]
 - Module 15: 
     - Choose **one** of:
     - [Publication ready plots with **ggpubr**][m15a]
